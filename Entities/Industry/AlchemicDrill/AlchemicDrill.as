@@ -362,11 +362,11 @@ void onTick(CBlob@ this)
 
 										if (map.isTileCastle(tile) || map.isTileWood(tile) || map.isTileGold(tile))
 										{
-											Material::fromTile(holder, tile, 1.0f * (hasterra ? 1.5f : 1.0f));
+											Material::fromTile(holder, tile, 1.0f);
 										}
 										else
 										{
-											Material::fromTile(holder, tile, 0.75f * (hasterra ? 1.5f : 1.0f));
+											Material::fromTile(holder, tile, 0.75f * (hasterra ? 1.75f : 1.0f));
 										}
 									}
 								}

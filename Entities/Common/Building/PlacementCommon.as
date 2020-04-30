@@ -62,7 +62,10 @@ bool isBuildableAtPos(CBlob@ this, Vec2f p, TileType buildTile, CBlob @blob, boo
 	}
 
 	// tilemap check
-	const bool issolid = map.isTileSolid(buildTile) || (buildTile >= CCTiles::tile_mar && buildTile <= CCTiles::tile_mard7) || (buildTile >= CCTiles::tile_bas && buildTile <= CCTiles::tile_basd7);
+	const bool issolid = map.isTileSolid(buildTile) || 
+	(buildTile >= CCTiles::tile_mar && buildTile <= CCTiles::tile_mard7) || 
+	(buildTile >= CCTiles::tile_bas && buildTile <= CCTiles::tile_basd7) || 
+	(buildTile >= CCTiles::tile_gold && buildTile <= CCTiles::tile_goldd7);
 	const bool buildSolid = (issolid || (blob !is null && blob.isCollidable()));
 	Vec2f tilespace = map.getTileSpacePosition(p);
 	const int offset = map.getTileOffsetFromTileSpace(tilespace);
@@ -99,7 +102,8 @@ bool isBuildableAtPos(CBlob@ this, Vec2f p, TileType buildTile, CBlob @blob, boo
 	if ((buildTile == CMap::tile_wood && backtile.type >= CMap::tile_wood_d1 && backtile.type <= CMap::tile_wood_d0) ||
 			(buildTile == CMap::tile_castle && backtile.type >= CMap::tile_castle_d1 && backtile.type <= CMap::tile_castle_d0) ||
 			(buildTile == CCTiles::tile_mar && backtile.type >= CCTiles::tile_mard1 && backtile.type <= CCTiles::tile_mard7) ||
-			(buildTile == CCTiles::tile_bas && backtile.type >= CCTiles::tile_basd1 && backtile.type <= CCTiles::tile_basd7))
+			(buildTile == CCTiles::tile_bas && backtile.type >= CCTiles::tile_basd1 && backtile.type <= CCTiles::tile_basd7) ||
+			(buildTile == CCTiles::tile_gold && backtile.type >= CCTiles::tile_goldd1 && backtile.type <= CCTiles::tile_goldd7))
 	{
 		//repair like tiles
 	}
@@ -213,6 +217,7 @@ int getRating(int tile, CMap@ map)
 	return 	(tile >= CMap::tile_wood && tile <= CMap::tile_wood_d0) || tile == CMap::tile_wood_back ? 1 ://WOOD
 			(tile >= CMap::tile_castle && tile <= CMap::tile_castle_d0) || tile == CMap::tile_castle_back ? 2 ://STONE
 			tile >= CCTiles::tile_mar && tile <= CCTiles::tile_bas_backd5 ? 3 ://MARBLE AND BASALT
+			tile >= CCTiles::tile_gold && tile <= CCTiles::tile_goldd7 ? 3 : //GOLD
 			tile >= CCTiles::tile_track && tile <= CCTiles::tile_tracke ? 10 ://TRACK
 			map.isTileSolid(tile) || (tile >= CCTiles::tile_cor1 && tile <= CCTiles::tile_pur3) ? 100 ://REMEMBER TO ADD OTHER NEW NATURAL CUSTOM TILES
 			0;
