@@ -1,0 +1,6 @@
+
+
+void onInit( CMovement@ this )
+{
+
+}
