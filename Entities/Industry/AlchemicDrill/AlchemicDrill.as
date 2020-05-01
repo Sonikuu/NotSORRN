@@ -266,7 +266,7 @@ void onTick(CBlob@ this)
 			if(hasterra)
 				this.add_f32("consumetimet", consume_amount);
 			
-			const u8 delay_amount = inwater ? 20 : 8 / (hasforce ? 2 : 1);
+			const u8 delay_amount = (inwater ? 20 : 8) / (hasforce ? 2 : 1);
 			bool skip = (gametime < this.get_u32(last_drill_prop) + delay_amount);
 
 			if(skip)

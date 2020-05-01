@@ -83,6 +83,7 @@ namespace CCTiles
 };
 
 const SColor color_spawn_cave(255, 128, 128, 0);
+const SColor color_trade_post(255, 200, 200, 150);
 const SColor color_rail_platform(255, 200, 200, 10);
 const SColor color_tile_cor1(0xFFAF00AF); // ARGB(255, 175, 0, 175);
 const int cor_variation = 3;
@@ -133,6 +134,11 @@ void HandleCustomTile(CMap@ map, int offset, SColor pixel)
 		server_CreateBlob("railplatform", 0, position);
 		PlaceMostLikelyTile(map, offset);
 	}
+	if(pixel == color_trade_post)
+	{
+		server_CreateBlob("tradingpost", 0, position);
+		PlaceMostLikelyTile(map, offset);
+	}
 	else if(pixel == color_tile_cor1)
 	{
 		HandleCustomTile(map, offset, CCTiles::tile_cor1);
@@ -156,6 +162,10 @@ void HandleCustomTile(CMap@ map, int offset, SColor pixel)
 	else if(pixel == color_tile_track)
 	{
 		HandleCustomTile(map, offset, CCTiles::tile_track);
+	}
+	else if(pixel == color_tile_gold)
+	{
+		HandleCustomTile(map, offset, CCTiles::tile_gold);
 	}
 }
 

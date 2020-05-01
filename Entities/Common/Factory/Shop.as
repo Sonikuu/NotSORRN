@@ -207,7 +207,9 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 						int total = 1;
 						do 
 						{
-							CBlob@ blob = server_CreateBlob(tokens[0], caller.getTeamNum(), this.getPosition() + spawn_offset);
+							CBlob@ blob = server_CreateBlobNoInit(tokens[0]);
+							blob.server_setTeamNum(caller.getTeamNum());
+							blob.setPosition(this.getPosition() + spawn_offset);
 							if (blob !is null)
 							{
 								if(tokens.length > 1 && !firstrun)
@@ -215,8 +217,17 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 
 								firstrun = true;
 							
-								blob.server_SetQuantity(Maths::Min(blob.maxQuantity, total));
-								total -= blob.maxQuantity;
+								if(blob.maxQuantity == 1 && tokens.length > 1)
+								{
+									blob.set_u8("aux", total);
+									total = 0;
+								}
+								else
+								{
+									blob.server_SetQuantity(Maths::Min(blob.maxQuantity, total));
+									total -= blob.maxQuantity;
+								}
+								
 								
 								bool pickable = blob.getAttachments() !is null && blob.getAttachments().getAttachmentPointByName("PICKUP") !is null;
 								if (spawnToInventory)
@@ -278,9 +289,11 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 									}
 								}
 								@newlyMade = blob;
+								blob.Init();
 							}
 							else
 								break;
+							
 						}
 						while(total > 0);
 					}
