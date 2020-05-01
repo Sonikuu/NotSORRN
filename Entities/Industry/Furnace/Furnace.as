@@ -53,7 +53,21 @@ array<CBurnableItem@> burnlist =
 	"mat_charcoal",
 	1,
 	50,
-	25)
+	25),
+	
+	@CBurnableItem(
+	"mat_corrpulp",
+	"mat_puredust",
+	25,
+	25,
+	25),
+	
+	@CBurnableItem(
+	"blazecore",
+	"unstablecore",
+	1,
+	1,
+	100),
 };
 
 CBurnableItem@ getBurnable(string input)

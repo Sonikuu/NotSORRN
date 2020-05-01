@@ -55,7 +55,26 @@ void onInit(CBlob@ this)
 			this.setInventoryName("Mixer Ecto Recipe");
 		}
 	}
-	
+	else if(id == 3)//Furnace Smelt Recipes
+	{
+		Random rand(this.getNetworkID());
+		id = rand.NextRanged(3);
+		if(id == 0)
+		{
+			this.set_string("recipe", "RecipeFurnaceCharcoal.png");
+			this.setInventoryName("Furnace Charcoal Recipe");
+		}
+		else if(id == 1)
+		{
+			this.set_string("recipe", "RecipeFurnacePureDust.png");
+			this.setInventoryName("Furnace Pure Dust Recipe");
+		}
+		else if(id == 2)
+		{
+			this.set_string("recipe", "RecipeFurnaceUnstableCore.png");
+			this.setInventoryName("Furnace Unstable Core Recipe");
+		}
+	}
 }
 
 //collide with vehicles and structures	- hit stuff if thrown
