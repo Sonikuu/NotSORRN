@@ -69,5 +69,5 @@ void lightFallFxRender(CBlob@ this)
 		lastlowerpos = lowerpos;
 		lastwidth = width;
 	}
-	addVertsToExistingRender(@vertlist, "../Entities/PixelWhite.png");
+	addVertsToExistingRender(@vertlist, "Rules/Render/PixelWhite.png");
 }

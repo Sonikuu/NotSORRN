@@ -60,5 +60,5 @@ void damageReduceRender(CBlob@ this)
 		lastupperpos = upperpos;
 		lastlowerpos = lowerpos;
 	}
-	addVertsToExistingRender(@vertlist, "../Entities/PixelWhite.png");
+	addVertsToExistingRender(@vertlist, "Rules/Render/PixelWhite.png");
 }
