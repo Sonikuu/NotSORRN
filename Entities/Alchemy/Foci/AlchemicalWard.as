@@ -125,7 +125,8 @@ void onTick(CBlob@ this)
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
 	CBitStream params;
-	caller.CreateGenericButton("$toggle_pad$", Vec2f(0, -12), this, this.getCommandID("toggle"), this.get_bool("active") ? "Deactivate Ward" : "Reactivate Ward");
+	params.write_bool(!this.get_bool("active"));
+	caller.CreateGenericButton("$toggle_pad$", Vec2f(0, -12), this, this.getCommandID("toggle"), this.get_bool("active") ? "Deactivate Ward" : "Reactivate Ward", params);
 	
 	//caller.CreateGenericButton("$flip_pad$", Vec2f(0, 0), this, this.getCommandID("flip"), "Flip Pad");
 }
@@ -134,7 +135,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 {
 	if(this.getCommandID("toggle") == cmd)
 	{
-		this.set_bool("active", this.get_bool("active") ? false : true);
+		this.set_bool("active", params.read_bool());
 	}
 	/*else if(this.getCommandID("activate") == cmd)
 	{
