@@ -142,7 +142,35 @@ void onTick(CBlob@ this)
 	
 	if(controller is null)
 		return;
-		
+	
+	//Automatic syncing for nearby blobs
+	//Cause sometimes, stuff succs
+	if(isServer())
+	{
+		for (uint i = 0; i < getPlayersCount(); i++)
+		{
+			CPlayer@ p = getPlayer(i);
+			
+			if(p !is null)
+			{
+				CBlob@ b = p.getBlob();
+				if(b !is null)
+				{
+					float dist = (b.getPosition() - this.getPosition()).Length();
+					int modmult = dist < 128 ? 1 : dist < 256 ? 3 : 30;
+					int mod = 30 * modmult;
+					if((this.getNetworkID() * modmult + getGameTime()) % mod == 0)
+					{
+						CBitStream params;
+						params.write_u16(p.getNetworkID());
+						this.SendCommand(this.getCommandID("sync"), params);
+					}
+				}
+			}
+		}
+	}
+
+	
 	for (uint i = 0; i < controller.tanks.length; i++)
 	{
 		//controller.tanks[i].lasttransfer = -1;
