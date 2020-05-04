@@ -3,14 +3,13 @@
 void onInit(CRules@ this)
 {
     this.set_bool("SoulVisionRunning",false);
+
+    getDriver().SetShader("hq2x",false);//ew blury
+    getDriver().ForceStartShaders(); //need dem shaders doh
 }
 
 void onTick(CRules@ this)
 {
-    getDriver().SetShader("hq2x",false);//ew blury
-
-    getDriver().ForceStartShaders(); //need dem shaders doh
-
     if(getLocalPlayerBlob() !is null && getLocalPlayerBlob().getConfig() == "soul")
     {
         if(this.get_bool("SoulVisionRunning") == false)
@@ -24,6 +23,7 @@ void onTick(CRules@ this)
     else if(this.get_bool("SoulVisionRunning"))
     {
         getDriver().SetShader("SoulVision",false);
+        this.set_bool("SoulVisionRunning",false);
     }
 
 }
