@@ -214,6 +214,130 @@ shared class CRenderParticleArrow : CRenderParticleBase
 	}
 }
 
+shared class CRenderParticleDrop : CRenderParticleBase
+{
+	Vec2f ul;
+	Vec2f ur;
+	Vec2f lr;
+	Vec2f ll;
+	
+	Vertex vul;
+	Vertex vur;
+	Vertex vlr;
+	Vertex vll;
+	
+	Vec2f lastpos;
+	
+	bool defvert;
+
+	CRenderParticleDrop(float scale, bool collides, bool dieoncollide, int timelimit, float gravity, SColor color, bool rotates, u32 randoseed)
+	{
+		super(scale, collides, dieoncollide, timelimit, gravity, color, rotates, randoseed);
+		updatedeath = true;
+		defvert = false;
+		lastpos = Vec2f_zero;
+	}
+	
+	bool onTick()
+	{
+		if(deathtime > 0)
+		{
+			deathtime--;
+			if(deathtime == 0)
+				return false;
+			return true;
+		}
+	
+		CMap@ map = getMap();
+		//velocity.y += gravity;
+		position += velocity;
+
+		
+	//	if(collides)
+		{
+			//if(dieoncollide)
+			{
+				if(map.isTileSolid(position))
+				{
+					startDeath();
+					return true;
+				}
+			}
+		}
+		timelimit--;
+		if(timelimit < 0)
+			startDeath();
+		return true;
+	}
+
+	void appendVerts(array<Vertex>@ verts)
+	{
+		Vec2f temppos = deathtime > 0 ? position : position + velocity * getInterpolationFactor();
+		if(lastpos == Vec2f_zero)
+			lastpos = temppos;
+			
+		Vec2f diffpos = temppos - lastpos;
+		lastpos = temppos;
+		//ul, ur, lr, and ll mean this
+		//Upper left
+		//Upper right
+		//Lower right
+		//Lower left
+		//Makes this easier
+		Vec2f sul(0, 0);
+		Vec2f sur(1, 0);
+		Vec2f slr(1, 1);
+		Vec2f sll(0, 1);
+		
+		if(!defvert)
+		{
+			vul.x = position.x + ul.x;
+			vul.y = position.y + ul.y;
+			vur.x = position.x + ur.x;
+			vur.y = position.y + ur.y;
+			vlr.x = position.x + lr.x;
+			vlr.y = position.y + lr.y;
+			vll.x = position.x + ll.x;
+			vll.y = position.y + ll.y;
+			defvert = true;
+		}
+		else
+		{
+			float dvelx = diffpos.x;
+			float dvely = diffpos.y;
+			vul.x += dvelx;
+			vul.y += dvely;
+			vur.x += dvelx;
+			vur.y += dvely;
+			vlr.x += dvelx;
+			vlr.y += dvely;
+			vll.x += dvelx;
+			vll.y += dvely;
+		}
+		
+		CMap@ map = getMap();
+		SColor maplight = map.getColorLight((deathtime > 0 ? temppos - velocity : temppos));
+		
+		//u32 colorint = (color.getAlpha() << 24) + ((color.getRed() * maplight.getRed()) / 255 << 16) + ((color.getGreen() * maplight.getGreen()) / 255 << 8) + ((color.getBlue() * maplight.getBlue()) / 255);\
+		
+		SColor resc = color;
+		vul.col = resc;
+		vur.col = resc;
+		vlr.col = resc;
+		vll.col = resc;
+		
+		verts.push_back(vul);
+		verts.push_back(vur);
+		verts.push_back(vlr);
+		verts.push_back(vll);
+	}
+	
+	void startDeath()
+	{
+		deathtime = 1;
+	}
+}
+
 shared class CRenderParticleString : CRenderParticleBase
 {
 

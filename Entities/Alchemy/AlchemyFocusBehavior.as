@@ -360,8 +360,11 @@ void wardEcto(float radius, int power, CBlob@ ward)
 	{
 		for (int i = 0; i < blobs.length; i++)
 		{
-			applyFxGhostlike(blobs[i], 2 * power, 1);
-			applyFxLowGrav(blobs[i], 2 * power, 100);
+			if(blobs[i].hasTag("flesh"))
+			{
+				applyFxGhostlike(blobs[i], 2 * power, 1);
+				applyFxLowGrav(blobs[i], 2 * power, 100);
+			}
 		}
 	}
 }

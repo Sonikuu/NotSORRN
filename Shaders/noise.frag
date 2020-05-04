@@ -30,8 +30,8 @@ float valueNoise(vec2 st) {
 void main() 
 {
 	gl_FragColor = texture2D(baseMap, texture_coordinate); 
-	vec4 worldcolor = texture2D(extraMap, texture_coordinate);
-	float static_intensity = gl_FragCoord.w * 1.0 * worldcolor.a;
+	//vec4 worldcolor = texture2D(extraMap, texture_coordinate);
+	float static_intensity = 3.0 - min(gl_FragColor.r * gl_FragColor.b * gl_FragColor.g * 5096 * 8, 3.0);
 	
 	float r = valueNoise(vec2(gl_FragCoord) / 2.0);
 	float g = valueNoise(vec2(gl_FragCoord + 1000.0) / 2.0);

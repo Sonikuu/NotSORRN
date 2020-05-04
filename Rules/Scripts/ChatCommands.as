@@ -410,8 +410,11 @@ bool onBothProcessChat(CRules@ this, const string& in text_in, string& out text_
 			getDriver().SetShader("noise", true);
 			print("" + getDriver().AreShadersAllowed());
 			Texture::createFromFile("world.png", "world.png");
+			CFileMatcher matchy("NotSORRN/Maps/shadertex.png");
+			print(matchy.getFirst());
+			print(matchy.getRandom());
 			getDriver().SetShaderTextureFilter("noise", true);
-			getDriver().SetShaderExtraTexture("noise", "Maps/shadertex.png");
+			getDriver().SetShaderExtraTexture("noise", matchy.getFirst());
 			
 			
 		}
@@ -443,6 +446,10 @@ bool onBothProcessChat(CRules@ this, const string& in text_in, string& out text_
 				else if (tokens[0] == "!tickmult")
 				{
 					this.set_f32("tickmult", parseFloat(tokens[1]));
+				}
+				else if (tokens[0] == "!raincount")
+				{
+					this.set_u16("raincount", parseInt(tokens[1]));
 				}
 				else if(tokens[0] == "!tp" || tokens[0] == "!teleport")
                 {
