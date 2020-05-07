@@ -17,7 +17,7 @@ void main()
     vec4 tex = texture2D(baseMap,vec2(texture_coordinate.x,texture_coordinate.y ));
 
     float MinStrength = .25;
-    float MaxStrength = .5;
+    float MaxStrength = .25;
 
     float speed = .01;
 
