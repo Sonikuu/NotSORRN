@@ -1,8 +1,8 @@
 #include "AbilitiesCommon.as"
 
-class CSoulAbility : CAbilityBase
+class CSoulDisorient : CAbilityBase
 {
-    CSoulAbility(string _textureName, CBlob@ _blob)
+    CSoulDisorient(string _textureName, CBlob@ _blob)
     {
         textureName = _textureName;
         @blob = _blob;
@@ -10,7 +10,16 @@ class CSoulAbility : CAbilityBase
 
     void activate() override
     {
-        print("This is a soul ability " + blob.getConfig());
+        // CBlob@[] blobs;
+        
+        // getMap().getBlobsInRadius(blob.getPosition(),4,@blobs);
+
+        // for(int i = 0; i < blobs.length; i++)
+        // {
+        
+        // }
+
+        getRules().set_u32("disoriented",30*15);
     }
 }
 
@@ -18,7 +27,7 @@ void onInit(CBlob@ this)
 {
     CAbilityManager manager;
 
-    CSoulAbility@ ability = CSoulAbility("Disorient.png",this);
+    CSoulDisorient@ ability = CSoulDisorient("Disorient.png",this);
     manager.abilities.push_back(ability);
     manager.abilities.push_back(ability);
     manager.abilities.push_back(ability);
