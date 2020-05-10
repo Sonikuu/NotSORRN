@@ -63,6 +63,7 @@ Vec2f poscache = Vec2f_zero;
 CFileImage truesky(256, 3, false);
 int resettimer = resetcooldown;
 array<float>@ weightcache = null;
+int raincache = 0;
 
 void onInit(CRules@ this)
 {
@@ -132,9 +133,10 @@ void onTick(CRules@ this)
 		}
 		//Managing weights
 		if(weightcache !is null)
-			if(weightcache == weights && map.getDayTime() < 0.93)
+			if(weightcache == weights && map.getDayTime() < 0.93 && raincache == this.get_u16("raincount"))
 				return;
 		@weightcache = @weights;
+		raincache = this.get_u16("raincount");
 		int highest = 0;
 		int highestweight = -1;
 		int second = 0;
@@ -173,13 +175,27 @@ void onTick(CRules@ this)
 		}
 		ImageData@ dsecsky = Texture::data(secsky + "data");
 		
+		string rainsky = "skygradient_rain.png";
+		if(!Texture::exists(rainsky + "data"))
+		{
+			Texture::createFromFile(rainsky + "data", rainsky);
+		}
+		ImageData@ drainsky = Texture::data(rainsky + "data");
+		
 		//Finally making sky
 		truesky.setPixelOffset(0);
+		float rainratio = this.get_f32("rainratio");
+		float divvor = 1.0 + 0.75 * rainratio;
 		for(int y = 0; y < dprimsky.height(); y++)
 		{
 			for(int x = 0; x < dprimsky.width(); x++)
 			{
-				truesky.setPixelAndAdvance(dprimsky.get(x, y).getInterpolated(dsecsky.get(x, y), interpweight));
+				SColor outcol = dprimsky.get(x, y).getInterpolated(dsecsky.get(x, y), interpweight);
+				if(this.get_u16("raincount") > 0) //Is raining
+				{
+					outcol.set(255, outcol.getRed() / divvor, outcol.getGreen() / divvor, outcol.getBlue() / divvor);
+				}
+				truesky.setPixelAndAdvance(outcol);
 			}
 		}
 		

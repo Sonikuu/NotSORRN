@@ -330,7 +330,10 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 	bool isequipcmd = this.getCommandID("connectequip") == cmd;
 	if(this.getCommandID("connect") == cmd || isequipcmd)
 	{
-		CBlob@ caller = getBlobByNetworkID(params.read_u16());
+		u16 bnet = params.read_u16();
+		CBlob@ caller = null;
+		if(bnet != 0xFFFF)
+			@caller = getBlobByNetworkID(bnet);
 		u8 tankid = params.read_u8();
 		CBlob@ connecttank = getBlobByNetworkID(params.read_u16());
 		u8 targtank = params.read_u8();
@@ -357,14 +360,17 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 						@fromtank = @totank;
 						@totank = @interm;
 					}
-					@fromtank.connection = @totank;
-					fromtank.connectionid = isequipcmd ? connecttank.getNetworkID() : this.getNetworkID();
-					fromtank.dynamicconnection = totank.dynamictank || fromtank.dynamictank;
-					
-					if(isequipcmd)
-						updateSprite(this, connecttank, totank, fromtank, tankid);
-					else
-						updateSprite(connecttank, this, fromtank, totank, targtank);
+					if(fromtank.connection !is totank)
+					{
+						@fromtank.connection = @totank;
+						fromtank.connectionid = isequipcmd ? connecttank.getNetworkID() : this.getNetworkID();
+						fromtank.dynamicconnection = totank.dynamictank || fromtank.dynamictank;
+						
+						if(isequipcmd)
+							updateSprite(this, connecttank, totank, fromtank, tankid);
+						else
+							updateSprite(connecttank, this, fromtank, totank, targtank);
+					}
 				}
 				if(caller !is null)
 					caller.set_bool("connectingalchemy", false);

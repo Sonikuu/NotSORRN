@@ -42,6 +42,7 @@ array<int> blazecore_val = 			{0, 	0, 		0, 			0, 		0, 		500};
 array<int> mat_marble_val = 		{0, 	0, 		0, 			0, 		0, 		0,		1,		1,		0,			0,		0,				1};
 array<int> mat_basalt_val = 		{0, 	0, 		0, 			0, 		0, 		0,		1,		0,		1,			0,		1};
 array<int> mat_metal_val = 			{0, 	0, 		0, 			0, 		0, 		0,		50,		50};
+array<int> builder_val = 			{50, 	50, 	0, 			0, 		0, 		0,		0,		0,		0,			0,		0,				0,			10};//Corpse, essentially
 
 array<CMeltableItem> meltlist = 
 {
@@ -148,6 +149,11 @@ array<CMeltableItem> meltlist =
 	CMeltableItem(
 	"mat_metal",
 	@mat_metal_val
+	),
+	
+	CMeltableItem(
+	"builder",
+	@builder_val
 	)
 };
 
@@ -300,7 +306,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 				array<int> valcopy;
 				for (uint i = 0; i < values.length; i++)
 				{
-					valcopy.push_back(values[i] * count);
+					valcopy.push_back(values[i] * count * 2);
 				}
 				this.add_u16("burncooldown", getTotal(@valcopy));
 				addToTank(tank, valcopy);
