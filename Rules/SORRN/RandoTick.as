@@ -22,7 +22,7 @@ void onTick(CRules@ this)
 	CMap@ map = getMap();
 	Noise noise(0x8008135F);//lel
 	float sample = (noise.Sample(getGameTime() / 5000.0, 0) - 0.5) * 4;
-	print("" + sample);
+	//print("" + sample);
 	float rainratio = Maths::Clamp(sample, 0, 1);
 	int raincount = 16 * rainratio;
 	this.set_u16("raincount", raincount);
