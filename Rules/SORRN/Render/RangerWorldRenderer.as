@@ -4,18 +4,21 @@
 
 #include "WorldRenderCommon.as";
 
-const bool noerase = true;
+const bool noerase = false;
 
 void onInit(CRules@ this)
 {
 	array<RenderList@> listt();
 	array<RenderList@> listr();
 	array<RenderList@> listg();
+	array<RenderList@> listb();
 	this.set("RLtick", @listt);
 	this.set("RLrender", @listr);
 	this.set("RLgui", @listg);
+	this.set("RLbg", @listb);
 	Render::addScript(Render::layer_objects, "RangerWorldRenderer.as", "renderLists", 0);
 	Render::addScript(Render::layer_posthud, "RangerWorldRenderer.as", "renderGUI", 0);
+	Render::addScript(Render::layer_background, "RangerWorldRenderer.as", "renderBG", 0);
 }
 
 void onTick(CRules@ this)
@@ -114,7 +117,31 @@ void renderGUI(int id)
 			list[i].timetodie--;
 		}
 	}
+}
 
+void renderBG(int id)
+{
+	Render::SetTransformScreenspace();
+	Render::SetAlphaBlend(true);
+	array<RenderList@>@ list;
+	CRules@ rules = getRules();
+	//GUI Rendering
+	rules.get("RLbg", @list);
+	for(int i = 0; i < list.length(); i++)
+	{
+		//print("Rendering");
+		Render::RawQuads(list[i].sprite, list[i].verts);
+		
+		//if(list[i].timetodie <= 0)
+		{
+			list.removeAt(i);
+			i--;
+		}
+		//else
+		//{
+		//	list[i].timetodie--;
+		//}
+	}
 }
 
 

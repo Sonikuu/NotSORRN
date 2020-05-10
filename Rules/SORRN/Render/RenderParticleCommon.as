@@ -229,6 +229,9 @@ shared class CRenderParticleDrop : CRenderParticleBase
 	Vec2f lastpos;
 	
 	bool defvert;
+	int dieat;
+	
+	array<int>@ heightdata;
 
 	CRenderParticleDrop(float scale, bool collides, bool dieoncollide, int timelimit, float gravity, SColor color, bool rotates, u32 randoseed)
 	{
@@ -244,7 +247,11 @@ shared class CRenderParticleDrop : CRenderParticleBase
 		{
 			deathtime--;
 			if(deathtime == 0)
+			{
+				//if(XORRandom(3) == 0)
+					//ParticlePixel(position + Vec2f(XORRandom(5) - 2, XORRandom(5) - 2), Vec2f(XORRandom(16) - 8, XORRandom(16) - 16) / 16.0, color, false, 5);
 				return false;
+			}
 			return true;
 		}
 	
@@ -257,7 +264,7 @@ shared class CRenderParticleDrop : CRenderParticleBase
 		{
 			//if(dieoncollide)
 			{
-				if(map.isTileSolid(position))
+				if((position.y + velocity.y) / 8 > heightdata[position.x / 8])
 				{
 					startDeath();
 					return true;

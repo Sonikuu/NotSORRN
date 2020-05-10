@@ -67,7 +67,7 @@ array<CBurnableItem@> burnlist =
 	"unstablecore",
 	1,
 	1,
-	100),
+	100)
 };
 
 CBurnableItem@ getBurnable(string input)
@@ -75,6 +75,7 @@ CBurnableItem@ getBurnable(string input)
 	for (int i = 0; i < burnlist.length; i++)
 	{
 		if(input == burnlist[i].input)
+		
 			return @burnlist[i];
 	}
 	return null;

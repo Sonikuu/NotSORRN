@@ -47,6 +47,17 @@ shared void addToGuiList(RenderList newlist)
 	list.insertLast(@newlist);
 }
 
+
+shared void addToBGList(RenderList newlist)
+{
+	if(!getNet().isClient())
+		return;
+	array<RenderList@>@ list;
+	CRules@ rules = getRules();
+	rules.get("RLbg", @list);
+	list.insertLast(@newlist);
+}
+
 shared void addVertsToExistingRender(array<Vertex>@ verts, string sprite, string listname = "RLrender")//default arg is what it is cause im lazy
 {
 	if(!getNet().isClient())

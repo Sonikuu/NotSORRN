@@ -5,6 +5,21 @@
 
 bool onMapTileCollapse(CMap@ map, u32 offset)
 {
+	array<int>@ heightdata;
+	map.get("heightdata", @heightdata);
+	if(heightdata[offset % map.tilemapwidth] <= offset / map.tilemapwidth)
+	{
+		bool loopsie = true;
+		while (loopsie)
+		{
+			offset += map.tilemapwidth;
+			if(map.hasTileFlag(offset, Tile::SOLID) || offset > map.tilemapwidth * map.tilemapheight)
+			{
+				heightdata[offset % map.tilemapwidth] = offset / map.tilemapwidth;
+				loopsie = false;
+			}
+		}
+	}
 	if(isDummyTile(map.getTile(offset).type))
 	{
 		CBlob@ blob = getBlobByNetworkID(server_getDummyGridNetworkID(offset));
@@ -130,6 +145,14 @@ TileType server_onTileHit(CMap@ this, f32 damage, u32 index, TileType oldTileTyp
 
 void onSetTile(CMap@ map, u32 index, TileType tile_new, TileType tile_old)
 {
+	array<int>@ heightdata;
+	map.get("heightdata", @heightdata);
+	if(heightdata is null)
+	{
+		@heightdata = @array<int>(map.tilemapwidth, 999);
+		map.set("heightdata", @heightdata);
+	}
+	
 	if(isDummyTile(tile_new))
 	{
 		map.SetTileSupport(index, 10);
@@ -177,6 +200,22 @@ void onSetTile(CMap@ map, u32 index, TileType tile_new, TileType tile_old)
 		}
 			//YEET
 		updateAllNeighbors(index, map);
+	}
+	
+	if(heightdata[index % map.tilemapwidth] > index / map.tilemapwidth && map.hasTileFlag(index, Tile::SOLID))
+		heightdata[index % map.tilemapwidth] = index / map.tilemapwidth;
+	else if(heightdata[index % map.tilemapwidth] == index / map.tilemapwidth && !map.hasTileFlag(index, Tile::SOLID))
+	{
+		bool loopsie = true;
+		while (loopsie)
+		{
+			index += map.tilemapwidth;
+			if(map.hasTileFlag(index, Tile::SOLID) || index > map.tilemapwidth * map.tilemapheight)
+			{
+				heightdata[index % map.tilemapwidth] = index / map.tilemapwidth;
+				loopsie = false;
+			}
+		}
 	}
 }
 
