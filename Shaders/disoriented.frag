@@ -18,7 +18,7 @@ void main()
 
     float x = texture_coordinate.x;
     float y = texture_coordinate.y;
-    vec4 tex = texture2D(baseMap,vec2(x, y));
+    vec4 tex = texture2D(baseMap,texture_coordinate);
 
     tex.r *= sqrt(pow(_1 - x,2) + pow(_2 - y,2))*abs(sin(time*.9));
     tex.g *= sqrt(pow(_3 - x,2) + pow(_4 - y,2))*abs(cos(time*.8));

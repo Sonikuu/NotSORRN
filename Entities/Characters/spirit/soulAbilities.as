@@ -1,6 +1,6 @@
 #include "AbilitiesCommon.as"
 
-class CSoulDisorient : CAbilityBase
+class CSoulDisorient : CToggleableAbillityBase
 {
     CSoulDisorient(string _textureName, CBlob@ _blob)
     {
@@ -8,18 +8,9 @@ class CSoulDisorient : CAbilityBase
         @blob = _blob;
     }
 
-    void activate() override
+    void onTick()
     {
-        // CBlob@[] blobs;
-        
-        // getMap().getBlobsInRadius(blob.getPosition(),4,@blobs);
-
-        // for(int i = 0; i < blobs.length; i++)
-        // {
-        
-        // }
-
-        getRules().set_u32("disoriented",30*15);
+        getRules().set_u32("disoriented",activated ? 1 : 0);
     }
 }
 
