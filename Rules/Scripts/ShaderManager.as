@@ -10,7 +10,7 @@ enum EShaderLayer
 void onInit(CRules@ this)
 {
     this.set_bool("SoulVisionRunning",false);
-    this.set_bool("testShader",true);
+    this.set_bool("testShader",false);
     this.set_u32("disoriented",0);
 
     getDriver().SetShader("hq2x",false);//ew blury
