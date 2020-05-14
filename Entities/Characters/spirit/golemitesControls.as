@@ -10,9 +10,9 @@ void onTick(CMovement@ this)
 {
     CBlob@ b = this.getBlob();
 
-    f32 speed = 0.2;
+    f32 speed = 0.05;
     f32 acellBoost = 4;
-    f32 dashSpeed = 8;
+    f32 dashSpeed = 1;
     s32 dashRate = 30/4;
 
     Vec2f deltaV = Vec2f_zero;

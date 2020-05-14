@@ -1,8 +1,8 @@
 #include "AbilitiesCommon.as"
 
-class CSoulDisorient : CToggleableAbillityBase
+class CGolemitesDisorient : CToggleableAbillityBase
 {
-    CSoulDisorient(string _textureName, CBlob@ _blob)
+    CGolemitesDisorient(string _textureName, CBlob@ _blob)
     {
         textureName = _textureName;
         @blob = _blob;
@@ -22,7 +22,7 @@ void onInit(CBlob@ this)
     CAbilityManager manager;
     manager.onInit(this);
 
-    CSoulDisorient@ ability = CSoulDisorient("Disorient.png",this);
+    CGolemitesDisorient@ ability = CGolemitesDisorient("Disorient.png",this);
     manager.abilities.push_back(ability);
     manager.abilities.push_back(ability);
     manager.abilities.push_back(ability);
