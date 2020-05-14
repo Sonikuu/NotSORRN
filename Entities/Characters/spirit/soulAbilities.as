@@ -10,13 +10,17 @@ class CSoulDisorient : CToggleableAbillityBase
 
     void onTick()
     {
-        getRules().set_u32("disoriented",activated ? 1 : 0);
+        if(blob.getPlayer() !is null && blob.getPlayer() is getLocalPlayer())
+        {
+            getRules().set_u32("disoriented",activated ? 1 : 0);
+        }
     }
 }
 
 void onInit(CBlob@ this)
 {
     CAbilityManager manager;
+    manager.onInit(this);
 
     CSoulDisorient@ ability = CSoulDisorient("Disorient.png",this);
     manager.abilities.push_back(ability);
@@ -42,4 +46,12 @@ void onRender(CSprite@ this)
     blob.get("AbilityManager", @manager);
 
     manager.onRender(this);
+}
+
+void onCommand( CBlob@ this, u8 cmd, CBitStream @params )
+{
+    CAbilityManager@ manager;
+    this.get("AbilityManager",@manager);
+
+    manager.onCommand(this,cmd,params);
 }

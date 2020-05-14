@@ -18,6 +18,7 @@ class CAbilityBase : IAbility
     string getTextureName() {return textureName;}
     CBlob@ getBlob() {return blob;}
 
+
     CAbilityBase(string _textureName, CBlob@ _blob)
     {
         textureName = _textureName;
@@ -49,10 +50,32 @@ class CAbilityManager
 {
     IAbility@[] abilities;
     uint selected = 0;
+    CBlob@ blob;
 
     IAbility@ getSelected() {return abilities[selected];}
 
-    void activeAbilityIndex(int i)
+    void onInit(CBlob@ blob)
+    {
+        @this.blob = blob;
+        blob.addCommandID("ActivateAbilityIndex");
+    }
+
+    void sendActivateAbilityIndexCommand(int i)
+    {
+        CBitStream params;
+        params.write_s32(i);
+        this.blob.SendCommand(this.blob.getCommandID("ActivateAbilityIndex"),params);
+    }
+    
+    void onCommand( CBlob@ blob, u8 cmd, CBitStream @params )
+    {
+        if(cmd == blob.getCommandID("ActivateAbilityIndex"))
+        {
+            activateAbilityIndex(params.read_s32());
+        }
+    }
+
+    void activateAbilityIndex(int i)
     {
         if(i > abilities.length())
         {
@@ -70,30 +93,33 @@ class CAbilityManager
             abilities[i].onTick();
         }
         
-        if(getControls().isKeyJustPressed(KEY_KEY_B))
+        if(isMe(blob))
         {
-            getSelected().activate();
-        }
-
-        if(getControls().isKeyJustPressed(KEY_LBUTTON))
-        {
-            Vec2f mpos = getControls().getMouseScreenPos();
-
-            if(mpos.y <= 40 && mpos.y >= 4)
+            if(getControls().isKeyJustPressed(KEY_KEY_B))
             {
-                int index = -1;
-                for(int i = 0; i < abilities.length(); i++)
+                sendActivateAbilityIndexCommand(selected);
+            }
+
+            if(getControls().isKeyJustPressed(KEY_LBUTTON))
+            {
+                Vec2f mpos = getControls().getMouseScreenPos();
+
+                if(mpos.y <= 40 && mpos.y >= 4)
                 {
-                    int x = (4 + 4*i + 32 * i);
-                    if(mpos.x >= x && mpos.x <= x + 32)
+                    int index = -1;
+                    for(int i = 0; i < abilities.length(); i++)
                     {
-                        index = i;
-                        break;
+                        int x = (4 + 4*i + 32 * i);
+                        if(mpos.x >= x && mpos.x <= x + 32)
+                        {
+                            index = i;
+                            break;
+                        }
                     }
-                }
-                if(index > -1)
-                {
-                    selected = index;
+                    if(index > -1)
+                    {
+                        selected = index;
+                    }
                 }
             }
         }
@@ -101,6 +127,7 @@ class CAbilityManager
 
     void onRender(CSprite@ this)
     {
+        if(!isMe(blob)) {return;}
         for(int i = 0; i < abilities.length(); i++)
         {
             GUI::DrawIcon(abilities[i].getTextureName(), 0, Vec2f(16,16), Vec2f(4 + 4*i + 32 * i,4), 1);
@@ -109,4 +136,9 @@ class CAbilityManager
 
         GUI::DrawTextCentered("{B}", Vec2f(16,40), SColor(255,127,127,127));
     }
+}
+
+bool isMe(CBlob@ blob)
+{
+    return blob.getPlayer() !is null && blob.getPlayer() is getLocalPlayer();
 }
