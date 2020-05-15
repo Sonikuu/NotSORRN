@@ -454,9 +454,9 @@ class CGunEquipment : CEquipmentCore
 				}
 			}
 		}
-		blob.set_u16("ammo" + cmdstr, maxammo);
-		ammobak = maxammo;
-		return true;
+		//blob.set_u16("ammo" + cmdstr, maxammo);
+		ammobak = blob.get_u16("ammo" + cmdstr);
+		return gotammo;
 	}
 	
 	void startReload(CBlob@ blob, CBlob@ user)
