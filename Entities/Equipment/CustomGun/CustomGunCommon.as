@@ -184,8 +184,8 @@ array<array<CGunPart>> gunparts = {
 	CGunPart(true, 1, 1, 1, 0.8, 1, 0.75, 0.75, 1, 1, "a Wooden Stock"),//WOOD
 	CGunPart(true, 1, 1, 1, 0.7, 1, 0.5, 0.5, 1, 1, "a Heavy Stock"),//HEAVY
 	CGunPart(true, 1.35, 1.15, 1, 1, 1.2, 0.5, 1.2, 0.8, 1, "an Accelerating Stock"),//ACCELERATED
-	CGunPart(true, 0.75, 1, 1, 1.25, 1, 0.5, 1, 0.8, 1, "a Guiding Stock").setHomingrange(32),//GUIDED
-	CGunPart(true, 1, 1, 1, 1.25, 1, 0.4, 1, 0.8, 1, "a Strange Stock").setBlobFx(@firstDamageBlobHit)//FIRST-SHOT BONUS
+	CGunPart(true, 0.75, 1, 1, 1.25, 1, 0.5, 1, 0.8, 1, "a Guiding Stock").setHomingrange(32)//GUIDED
+	//CGunPart(true, 1, 1, 1, 1.25, 1, 0.4, 1, 0.8, 1, "a Strange Stock").setBlobFx(@firstDamageBlobHit)//FIRST-SHOT BONUS
 },
 //GRIP
 {
