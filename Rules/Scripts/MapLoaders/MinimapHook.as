@@ -55,7 +55,8 @@ void CalculateMinimapColour( CMap@ map, u32 offset, TileType tile, SColor &out c
         (!show_gold && map.isTileGold( tile )) ||
 		//Custom solid tiles
 		(ctile.type >= CCTiles::tile_mar && ctile.type <= CCTiles::tile_mard7) ||
-		(ctile.type >= CCTiles::tile_bas && ctile.type <= CCTiles::tile_basd7)
+		(ctile.type >= CCTiles::tile_bas && ctile.type <= CCTiles::tile_basd7) ||
+		(ctile.type >= CCTiles::tile_gold && ctile.type <= CCTiles::tile_goldd7)
     ) {
 		//Foreground
 		col = color_minimap_solid;

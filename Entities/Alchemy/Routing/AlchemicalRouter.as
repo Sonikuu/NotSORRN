@@ -26,3 +26,4 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 	//caller.CreateGenericButton(2, ap.offset, this, this.getCommandID("attachpart"), "Attach Part", params);
 }
 
+

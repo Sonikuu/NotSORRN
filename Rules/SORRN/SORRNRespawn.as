@@ -139,11 +139,39 @@ void spawnPlayer(CRules@ this, CPlayer@ player)
 	//This can go wrong with no spawnpoints, but if thats the case things have already gone wrong
 	if(spawns.length > 0)
 	{
+		CBlob@ spawnpoint = @spawns[XORRandom(spawns.length)];
 		if(player.getTeamNum() >= 8)
 		{
-			player.server_setTeamNum(8 + XORRandom(245));
+			int num = 8 + XORRandom(244);
+			if(num >= 200)//200 = Spectator team
+				num++;
+			player.server_setTeamNum(num);
 		}
-		CBlob@ spawnpoint = @spawns[XORRandom(spawns.length)];
+		else
+		{
+			array<CBlob@> blobs;
+			array<CBlob@> valid;
+			getBlobsByName("coopkey", @blobs);
+			print("" + blobs.length);
+			for (uint i = 0; i < blobs.length; i++)
+			{
+				if(player.getTeamNum() == blobs[i].getTeamNum())
+				{
+					valid.push_back(@(blobs[i]));
+				}
+			}
+			if(valid.length > 0)
+				@spawnpoint = @valid[XORRandom(valid.length)];
+			else
+			{
+				//Copy pastad cause too lazy
+				int num = 8 + XORRandom(244);
+				if(num >= 200)//200 = Spectator team
+					num++;
+				player.server_setTeamNum(num);
+			}
+		}
+		
 		CBlob@ newblob = server_CreateBlob(default_spawn_blob, player.getTeamNum(), spawnpoint.getPosition());
 		newblob.server_SetPlayer(player);
 	}
