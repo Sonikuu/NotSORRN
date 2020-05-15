@@ -150,11 +150,17 @@ bool isBuildableAtPos(CBlob@ this, Vec2f p, TileType buildTile, CBlob @blob, boo
 	{
 		bool isLadder = false;
 		bool isSpikes = false;
+		float bwidth = 0;
+		float bheight = 0;
+		float maxsize = 0;
 		if (blob !is null)
 		{
 			const string bname = blob.getName();
 			isLadder = bname == "ladder";
 			isSpikes = bname == "spikes";
+			bheight = blob.getShape().getWidth();
+			bwidth = blob.getShape().getWidth();
+			maxsize = Maths::Max(bwidth, bheight);
 		}
 
 		Vec2f middle = p;
@@ -169,7 +175,7 @@ bool isBuildableAtPos(CBlob@ this, Vec2f p, TileType buildTile, CBlob @blob, boo
 
 		const string name = blob !is null ? blob.getName() : "";
 		CBlob@[] blobsInRadius;
-		if (map.getBlobsInRadius(middle, buildSolid ? map.tilesize : 0.0f, @blobsInRadius))
+		if (map.getBlobsInRadius(middle, (blob !is null && blob.hasTag("building")) ? maxsize : buildSolid ? map.tilesize : 0.0f, @blobsInRadius))
 		{
 			for (uint i = 0; i < blobsInRadius.length; i++)
 			{
@@ -184,15 +190,17 @@ bool isBuildableAtPos(CBlob@ this, Vec2f p, TileType buildTile, CBlob @blob, boo
 
 						const string bname = b.getName();
 
-						bool cantBuild = isBlocking(b);
+						bool cantBuild = isBlocking(b) || b.hasTag("building");
 
 						// cant place on any other blob
+						//print("gere");
 						if (cantBuild &&
 							!b.hasTag("dead") &&
 							!b.hasTag("material") &&
 							!b.hasTag("projectile") &&
 							bname != "bush")
 						{
+							//print("asdadasdasd");
 							f32 angle_decomp = Maths::FMod(Maths::Abs(b.getAngleDegrees()), 180.0f);
 							bool rotated = angle_decomp > 45.0f && angle_decomp < 135.0f;
 							f32 width = rotated ? b.getHeight() : b.getWidth();
@@ -232,9 +240,11 @@ bool isBlocking(CBlob@ blob)
 	return blob.isCollidable() || blob.getShape().isStatic();
 }
 
-void SetTileAimpos(CBlob@ this, BlockCursor@ bc)
+void SetTileAimpos(CBlob@ this, BlockCursor@ bc, Vec2f size = Vec2f(8, 8))
 {
 	// calculate tile mouse pos
+	if(size == Vec2f_zero)
+		size.Set(8, 8);
 	Vec2f pos = this.getPosition();
 	Vec2f aimpos = this.getAimPos();
 	Vec2f mouseNorm = aimpos - pos;
@@ -248,11 +258,19 @@ void SetTileAimpos(CBlob@ this, BlockCursor@ bc)
 		Vec2f p = pos + Vec2f(d * mouseNorm.x, d * mouseNorm.y);
 		p = getMap().getTileSpacePosition(p);
 		bc.tileAimPos = getMap().getTileWorldPosition(p);
+		//if(blob !is null)
+		{
+			bc.tileAimPos.x -= (((size.x / int(getMap().tilesize)) + 1) % 2) * getMap().tilesize * 0.5;
+			bc.tileAimPos.y -= (((size.y / int(getMap().tilesize)) + 1) % 2) * getMap().tilesize * 0.5;
+		}
 	}
 	else
 	{
 		bc.tileAimPos = getMap().getTileSpacePosition(aimpos);
 		bc.tileAimPos = getMap().getTileWorldPosition(bc.tileAimPos);
+
+		bc.tileAimPos.x -= (((size.x / int(getMap().tilesize)) + 1) % 2) * getMap().tilesize * 0.5;
+		bc.tileAimPos.y -= (((size.y / int(getMap().tilesize)) + 1) % 2) * getMap().tilesize * 0.5;
 	}
 
 	bc.cursorClose = (mouseLen < getMaxBuildDistance(this));

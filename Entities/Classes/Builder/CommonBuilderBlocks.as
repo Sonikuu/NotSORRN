@@ -346,7 +346,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			BuildBlock b(0, "alchemyrouter", "$alchemyrouter$", "Alchemic Router\nMoves essence");
 			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 20);
 			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 10);
-			b.buildOnGround = true;
+			b.buildOnGround = false;
 			b.size.Set(8, 16);
 			blocks[1].push_back(b);
 			AddIconToken("$alchemyrouter$", "AlchemyRouter.png", Vec2f(8, 16), 0);
@@ -355,7 +355,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			BuildBlock b(0, "alchemysorter", "$alchemysorter$", "Alchemic Sorter\nAllows essence to be sorted into 3 different outputs");
 			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 100);
 			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 50);
-			b.buildOnGround = true;
+			b.buildOnGround = false;
 			b.size.Set(32, 16);
 			blocks[1].push_back(b);
 			AddIconToken("$alchemysorter$", "AlchemySorter.png", Vec2f(32, 16), 0);
@@ -384,7 +384,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			BuildBlock b(0, "alchemysplitter", "$alchemysplitter$", "Alchemical Splitter\nDistributes essence between two outputs");
 			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 40);
 			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 20);
-			b.buildOnGround = true;
+			b.buildOnGround = false;
 			b.size.Set(16, 16);
 			blocks[1].push_back(b);
 			AddIconToken("$alchemysplitter$", "AlchemySplitter.png", Vec2f(16, 16), 0);
@@ -402,7 +402,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			BuildBlock b(0, "alchemymixer", "$alchemymixer$", "Alchemical Mixer\nMixes essence into more advanced elements");
 			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 50);
 			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 50);
-			b.buildOnGround = true;
+			b.buildOnGround = false;
 			b.size.Set(16, 16);
 			blocks[1].push_back(b);
 			AddIconToken("$alchemymixer$", "AlchemyMixer.png", Vec2f(16, 16), 0);

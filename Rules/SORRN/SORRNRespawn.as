@@ -141,7 +141,10 @@ void spawnPlayer(CRules@ this, CPlayer@ player)
 	{
 		if(player.getTeamNum() >= 8)
 		{
-			player.server_setTeamNum(8 + XORRandom(245));
+			int num = 8 + XORRandom(244);
+			if(num >= 200)//200 = Spectator team
+				num++;
+			player.server_setTeamNum(num);
 		}
 		CBlob@ spawnpoint = @spawns[XORRandom(spawns.length)];
 		CBlob@ newblob = server_CreateBlob(default_spawn_blob, player.getTeamNum(), spawnpoint.getPosition());
