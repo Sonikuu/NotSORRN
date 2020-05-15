@@ -3,13 +3,13 @@
 enum EShaderLayer
 {
     testShader = 2,//game doesn't like it if you don't start at 2 :v
-    SoulVision,
+    GolemiteVision,
     disoriented
 }
 
 void onInit(CRules@ this)
 {
-    this.set_bool("SoulVisionRunning",false);
+    this.set_bool("GolemiteVisionRunning",false);
     this.set_bool("testShader",false);
     this.set_u32("disoriented",0);
 
@@ -32,23 +32,23 @@ void onTick(CRules@ this)
         getDriver().SetShaderFloat("testShader", "time",getGameTime());
     }
 
-    if(getLocalPlayerBlob() !is null && getLocalPlayerBlob().getConfig() == "soul")
+    if(getLocalPlayerBlob() !is null && getLocalPlayerBlob().getConfig() == "golemites")
     {
-        if(this.get_bool("SoulVisionRunning") == false)
+        if(this.get_bool("GolemiteVisionRunning") == false)
         {
-            this.set_bool("SoulVisionRunning",true);
-            getDriver().AddShader("SoulVision",EShaderLayer::SoulVision);
-            getDriver().SetShader("SoulVision", true);
+            this.set_bool("GolemiteVisionRunning",true);
+            getDriver().AddShader("GolemiteVision",EShaderLayer::GolemiteVision);
+            getDriver().SetShader("GolemiteVision", true);
         }
         else
         {
-            getDriver().SetShaderInt("SoulVision", "time", getGameTime());
+            getDriver().SetShaderFloat("GolemiteVision", "randomVal", XORRandom(1000));
         }
     }
-    else if(this.get_bool("SoulVisionRunning"))
+    else if(this.get_bool("GolemiteVisionRunning"))
     {
-        getDriver().SetShader("SoulVision",false);
-        this.set_bool("SoulVisionRunning",false);
+        getDriver().SetShader("GolemiteVision",false);
+        this.set_bool("GolemiteVisionRunning",false);
     }
 
     if(this.get_u32("disoriented") > 0 && getLocalPlayerBlob() !is null)
