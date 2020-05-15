@@ -42,7 +42,10 @@ void onTick(CRules@ this)
         }
         else
         {
-            getDriver().SetShaderFloat("GolemiteVision", "randomVal", XORRandom(1000));
+			CFileMatcher matchy("Shaders/ExtraTextures/noiseTexture ("+XORRandom(5)+").png");
+		
+
+            getDriver().SetShaderExtraTexture("GolemiteVision", matchy.getFirst());
         }
     }
     else if(this.get_bool("GolemiteVisionRunning"))
