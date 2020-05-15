@@ -442,14 +442,14 @@ class CGunEquipment : CEquipmentCore
 				CBlob@ item = inv.getItem(i);
 				if(item !is null && item.getConfig() == ammotype)
 				{
-					int consumed = Maths::Min(item.getQuantity(), maxammo - blob.get_u16("ammo"));
+					int consumed = Maths::Min(item.getQuantity(), maxammo - blob.get_u16("ammo" + cmdstr));
 					if(consumed < item.getQuantity())
 						item.server_SetQuantity(item.getQuantity() - consumed);
 					else
 						item.server_Die();
 					gotammo = true;
-					blob.add_u16("ammo", consumed);
-					if(blob.get_u16("ammo") >= maxammo)
+					blob.add_u16("ammo" + cmdstr, consumed);
+					if(blob.get_u16("ammo" + cmdstr) >= maxammo)
 						break;
 				}
 			}

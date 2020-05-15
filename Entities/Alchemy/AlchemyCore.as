@@ -454,10 +454,13 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 			//Not gonna check null for this one cause this kinda needs to happen
 			CAlchemyTankController@ controller = getTankController(this);
 			u8 tankid = params.read_u8();
-			CElementalCore@ storage = @controller.tanks[tankid].storage;
-			for (uint j = 0; j < storage.elements.length; j++)
+			if(controller.tanks.length > tankid)
 			{
-				storage.elements[j] = params.read_s32();
+				CElementalCore@ storage = @controller.tanks[tankid].storage;
+				for (uint j = 0; j < storage.elements.length; j++)
+				{
+					storage.elements[j] = params.read_s32();
+				}
 			}
 		}
 	}

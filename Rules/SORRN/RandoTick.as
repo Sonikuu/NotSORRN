@@ -10,7 +10,8 @@ float tickmult = 0.0025;
 void onInit(CRules@ this)
 {
 	CMap@ map = getMap();
-	printInt("Random tile ticks per tick: ", Maths::Ceil(map.tilemapwidth * map.tilemapheight * tickmult));
+	if(map !is null)
+		printInt("Random tile ticks per tick: ", Maths::Ceil(map.tilemapwidth * map.tilemapheight * tickmult));
 	this.set_f32("tickmult", 1);
 	this.set_u16("raincount", 24);
 }
