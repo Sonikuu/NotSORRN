@@ -9,6 +9,8 @@ void onInit(CBlob@ this)
 
     this.set_s32("golemiteMax",1000);
     this.set_s32("golemiteCount",200);
+
+    this.Tag("invincible");
 }
 
 void onTick(CBlob@ this)
