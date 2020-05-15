@@ -293,6 +293,14 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			blocks[0].push_back(b);
 		}
 		{
+			BuildBlock b(0, "coopkey", "$coopkey$", "Co-operation Key\nAssigns you a team, and allows other people to join it");
+			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 200);
+			AddRequirement(b.reqs, "blob", "mat_gold", "Gold", 80);
+			b.buildOnGround = true;
+			b.size.Set(32, 32);
+			blocks[0].push_back(b);
+		}
+		{
 			BuildBlock b(409, "marble_block", "$marble_block$", "Marble Block\nMore durable than stone");
 			AddRequirement(b.reqs, "blob", "mat_marble", "Marble", 5);
 			blocks[0].push_back(b);
