@@ -217,13 +217,15 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 
 								firstrun = true;
 							
-								if(blob.maxQuantity == 1 && tokens.length > 1)
+								if(blob.getName() == "recipe" && tokens.length > 1)
 								{
 									blob.set_u8("aux", total);
 									total = 0;
+									blob.Init();
 								}
 								else
 								{
+									blob.Init();
 									blob.server_SetQuantity(Maths::Min(blob.maxQuantity, total));
 									total -= blob.maxQuantity;
 								}
@@ -289,7 +291,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 									}
 								}
 								@newlyMade = blob;
-								blob.Init();
+								//blob.Init();
 							}
 							else
 								break;
