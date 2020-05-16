@@ -43,6 +43,10 @@ array<int> mat_marble_val = 		{0, 	0, 		0, 			0, 		0, 		0,		1,		1,		0,			0,		0,	
 array<int> mat_basalt_val = 		{0, 	0, 		0, 			0, 		0, 		0,		1,		0,		1,			0,		1};
 array<int> mat_metal_val = 			{0, 	0, 		0, 			0, 		0, 		0,		50,		50};
 array<int> builder_val = 			{50, 	50, 	0, 			0, 		0, 		0,		0,		0,		0,			0,		0,				0,			10};//Corpse, essentially
+array<int> fish_val = 				{0, 	25, 	0, 			0, 		0, 		0,		0,		0,		0,			50,		0,				0,			5};
+array<int> heart_val = 				{0, 	25, 	0, 			0, 		0, 		0,		0,		0,		0,			0,		0,				0,			10};
+array<int> chicken_val = 			{0, 	25, 	10, 		0, 		25, 	0,		0,		0,		0,			0,		0,				0,			5};
+array<int> grain_val = 				{0, 	25, 	25, 		0, 		10};
 
 array<CMeltableItem> meltlist = 
 {
@@ -154,6 +158,26 @@ array<CMeltableItem> meltlist =
 	CMeltableItem(
 	"builder",
 	@builder_val
+	),
+
+	CMeltableItem(
+	"fishy",
+	@fish_val
+	),
+
+	CMeltableItem(
+	"heart",
+	@heart_val
+	),
+
+	CMeltableItem(
+	"chicken",
+	@chicken_val
+	),
+
+	CMeltableItem(
+	"grain",
+	@grain_val
 	)
 };
 

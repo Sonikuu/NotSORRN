@@ -28,6 +28,21 @@ void onTick(CRules@ this)
 	int raincount = 16 * rainratio;
 	this.set_u16("raincount", raincount);
 	this.set_f32("rainratio", rainratio);
+	array<int>@ heightdata;
+	map.get("heightdata", @heightdata);
+	//Chicken spawning
+	if(isServer() && XORRandom(1200) == 0)
+	{
+		array<CBlob@> chickens;
+		getBlobsByName("chicken", @chickens);
+		if(chickens.length < 10)
+		{
+			int newx = XORRandom(map.tilemapwidth);
+			server_CreateBlob("chicken", -1, Vec2f(newx, heightdata[newx]) * map.tilesize);
+		}
+	}
+
+
 	if(raincount > 0)
 	{
 		CBlob@ b = getBlobByName("soundblob");
@@ -49,8 +64,7 @@ void onTick(CRules@ this)
 		CCamera@ camera = getCamera();
 		float zoom = camera.targetDistance;
 		Vec2f cpos = camera.getPosition();
-		array<int>@ heightdata;
-		map.get("heightdata", @heightdata);
+		
 		for (int i = 0; i < Maths::Min(raincount, 500); i++)
 		{
 			float scale = (XORRandom(5) + 3) / 12.0;
