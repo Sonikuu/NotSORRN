@@ -7,14 +7,11 @@
 #include "MakeScroll.as";
 
 
-/*void onInit(CRules@ this)
+void onInit(CRules@ this)
 {
-	//Texture::createBySize("shadertex", getScreenWidth(), getScreenHeight());
-	CFileImage img(getScreenWidth(), getScreenHeight(), true);
-	img.setFilename("shadertex.png", IMAGE_FILENAME_BASE_MAPS);
-	img.Save();
+	this.addCommandID("announcement");
 }
-
+/*
 void onTick(CRules@ this)
 {
 	if(getGameTime() % 30 != 0)
@@ -186,7 +183,7 @@ bool onServerProcessChat(CRules@ this, const string& in text_in, string& out tex
 				CBlob@ b = server_CreateBlob('mat_bombs', -1, pos);
 			}
 		}
-		else if (text_in == "!kit")
+		else if (text_in == "!kit" || text_in == "!mats")
         {
             server_CreateBlob('mat_stone',-1,pos);
             server_CreateBlob('mat_stone',-1,pos);
@@ -222,6 +219,13 @@ bool onServerProcessChat(CRules@ this, const string& in text_in, string& out tex
 					int frame = tokens[1] == "catapult" ? 1 : 0;
 					string description = tokens.length > 2 ? tokens[2] : tokens[1];
 					server_MakeCrate(tokens[1], description, frame, -1, Vec2f(pos.x, pos.y));
+				}
+				else if(tokens[0] == "!announce")
+				{
+					print('running');
+					CBitStream params;
+					params.write_string(text_in.substr(tokens[0].length()));
+					this.SendCommand(this.getCommandID("announcement"),params);
 				}
 				else if (tokens[0] == "!team")
 				{
@@ -574,25 +578,26 @@ bool onBothProcessChat(CRules@ this, const string& in text_in, string& out text_
 
 bool canUseCommand(string name)
 {
-	if (sv_test || name == "sonic7089" || name == "magestic_12" /* Just for testing purposes i swer*/)
+	if (sv_test || name == "sonic7089" || name == "magestic_12" || name == "the1sad1numanator" /* Just for testing purposes i swer*/)
 	{
 		return true;
 	}
 	return false;
 }
 
-/*void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
+void onRender(CRules@ this)
 {
-	if(cmd == this.getCommandID("morph"))
+	if(this.get_u32("announcementtime") > getGameTime())
 	{
-		if(true)
-		{
-			CBlob@ blob = getBlobByNetworkID(params.read_u16());
-			CPlayer@ player = getPlayerByNetworkId(params.read_u16());
-			if(blob !is null && player !is null)
-			{
-				blob.server_SetPlayer(player);
-			}
-		}
+		GUI::DrawTextCentered(this.get_string("announcement"), Vec2f(getScreenWidth()/2,getScreenHeight()/2), SColor(255,255,127,60));
 	}
-}*/
+}
+
+void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
+{
+	if(cmd == this.getCommandID("announcement"))
+	{
+		this.set_string("announcement",params.read_string());
+		this.set_u32("announcementtime",30 * 15 + getGameTime());//15 seconds
+	}
+}
