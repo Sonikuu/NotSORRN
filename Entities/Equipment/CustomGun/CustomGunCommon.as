@@ -160,13 +160,13 @@ array<array<CGunPart>> gunparts = {
 //CORES
 {
 	//DAMAGE, FIRERATE, BULLET COUNT, SPREAD, RANGE, MOVE SPEED, RECOIL, MAXAMMO, RELOAD SPEED
-	CGunPart(false, 0.6, 8, 1, 2, 512, 1.5, 3, 1, 1, "Pistol").setBarrel(Vec2f(1, 0)).setStock(Vec2f(-2, 0)).setMag(Vec2f(0, 1)).setSemi(true).setTileDamageChance(1),//PISTOL
-	CGunPart(false, 0.5, 4, 1, 3, 512, 1.2, 6, 1.25, 1.5, "Assault Rifle").setBarrel(Vec2f(4, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(0, 2)).setTileDamageChance(0.7).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//ASSUALT RIFLE
+	CGunPart(false, 0.5, 8, 1, 2, 512, 1.5, 3, 1, 1, "Pistol").setBarrel(Vec2f(1, 0)).setStock(Vec2f(-2, 0)).setMag(Vec2f(0, 1)).setSemi(true).setTileDamageChance(1),//PISTOL
+	CGunPart(false, 0.4, 4, 1, 3, 512, 1.2, 6, 1.25, 1.5, "Assault Rifle").setBarrel(Vec2f(4, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(0, 2)).setTileDamageChance(0.7).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//ASSUALT RIFLE
 	CGunPart(false, 0.3, 2, 1, 4, 512, 1, 6, 1.5, 2, "Sprayer").setBarrel(Vec2f(2, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(1, 2)).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//SOMETHING, UZI MAYBE
-	CGunPart(false, 1.5, 30, 1, 1, 512, 1, 20, 0.75, 1.75, "Charge Rifle").setBarrel(Vec2f(3, 0)).setStock(Vec2f(-5, -2)).setMag(Vec2f(-4, -1)).setGuntype(1).setTileDamageChance(3).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//CHARGE RIFLE
-	CGunPart(false, 0.4, 25, 6, 12, 400, 1, 40, 0.5, 1, "Shotgun").setBarrel(Vec2f(5, -1)).setStock(Vec2f(-6, 0)).setMag(Vec2f(-1, 0)).setSemi(true).setTileDamageChance(1).setAmmoGUI("AmmoGUIShotgun.png", Vec2f(7, 14)),//SHOTGUN
-	CGunPart(false, 1.0, 20, 1, 1, 512, 1, 40, 0.5, 1.5, "Sniper Rifle").setBarrel(Vec2f(5, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-2, 0)).setSemi(true).setTileDamageChance(2.5).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//SNIPER RIFLE
-	CGunPart(false, 0.4, 10, 1, 5, 512, 0.9, 4, 2.5, 2.5, "Gatling").setBarrel(Vec2f(6, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-3, 3)).setGuntype(2).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8))//GATLING
+	CGunPart(false, 1.2, 30, 1, 1, 512, 1, 16, 0.75, 1.75, "Charge Rifle").setBarrel(Vec2f(3, 0)).setStock(Vec2f(-5, -2)).setMag(Vec2f(-4, -1)).setGuntype(1).setTileDamageChance(3).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//CHARGE RIFLE
+	CGunPart(false, 0.3, 25, 6, 30, 400, 1, 40, 0.5, 1, "Shotgun").setBarrel(Vec2f(5, -1)).setStock(Vec2f(-6, 0)).setMag(Vec2f(-1, 0)).setSemi(true).setTileDamageChance(1).setAmmoGUI("AmmoGUIShotgun.png", Vec2f(7, 14)),//SHOTGUN
+	CGunPart(false, 0.9, 20, 1, 1, 512, 1, 40, 0.5, 1.5, "Sniper Rifle").setBarrel(Vec2f(5, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-2, 0)).setSemi(true).setTileDamageChance(2.5).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//SNIPER RIFLE
+	CGunPart(false, 0.4, 10, 1, 5, 512, 0.9, 4, 5.0, 2.5, "Gatling").setBarrel(Vec2f(6, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-3, 3)).setGuntype(2).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8))//GATLING
 },
 //BARRELS
 {
@@ -175,7 +175,7 @@ array<array<CGunPart>> gunparts = {
 	CGunPart(true, 0.75, 1.2, 2, 1.5, 0.9, 0.9, 1.5, 0.5, 1, "Double-Barreled").setGrip(Vec2f(3, 2)),//SPLIT LUL
 	CGunPart(true, 1.75, 1.5, 1, 1, 1.75, 0.8, 1.5, 0.8, 1.2, "Accelerated-Barrel").setGrip(Vec2f(4, 1)),//ACCELERATED
 	CGunPart(true, 0.75, 0.5, 1, 1.25, 0.9, 1, 1.0, 1.5, 1.25, "Unstable").setGrip(Vec2f(2, 1)),//UNSTABLE?
-	CGunPart(true, 0.75, 1, 1, 1.25, 1, 0.9, 2, 0.8, 1.25, "Guided").setGrip(Vec2f(4, 1)).setHomingrange(32)//GUIDED
+	CGunPart(true, 0.5, 1, 1, 1.25, 1, 0.9, 2, 0.8, 1.25, "Guided").setGrip(Vec2f(4, 1)).setHomingrange(32)//GUIDED
 },
 //STOCK
 {
@@ -184,7 +184,7 @@ array<array<CGunPart>> gunparts = {
 	CGunPart(true, 1, 1, 1, 0.8, 1, 0.75, 0.75, 1, 1, "a Wooden Stock"),//WOOD
 	CGunPart(true, 1, 1, 1, 0.7, 1, 0.5, 0.5, 1, 1, "a Heavy Stock"),//HEAVY
 	CGunPart(true, 1.35, 1.15, 1, 1, 1.2, 0.5, 1.2, 0.8, 1, "an Accelerating Stock"),//ACCELERATED
-	CGunPart(true, 0.75, 1, 1, 1.25, 1, 0.5, 1, 0.8, 1, "a Guiding Stock").setHomingrange(32)//GUIDED
+	CGunPart(true, 0.5, 1, 1, 1.25, 1, 0.5, 1, 0.8, 1, "a Guiding Stock").setHomingrange(32)//GUIDED
 	//CGunPart(true, 1, 1, 1, 1.25, 1, 0.4, 1, 0.8, 1, "a Strange Stock").setBlobFx(@firstDamageBlobHit)//FIRST-SHOT BONUS
 },
 //GRIP

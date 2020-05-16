@@ -217,7 +217,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 
 								firstrun = true;
 							
-								if(blob.getName() == "recipe" && tokens.length > 1)
+								if(tokens[0] == "recipe" && tokens.length > 1)
 								{
 									blob.set_u8("aux", total);
 									total = 0;
