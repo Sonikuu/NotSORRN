@@ -396,7 +396,7 @@ bool onBothProcessChat(CRules@ this, const string& in text_in, string& out text_
 	if(blob is null)
 		return true;
 		
-	if (false)//(canUseCommand(player.getUsername()))//TODO, fix. - Numan
+	if (canUseCommand(player.getUsername()))
 	{
 		Vec2f pos = blob.getPosition();
 		int team = blob.getTeamNum();
