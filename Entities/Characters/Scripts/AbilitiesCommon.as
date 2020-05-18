@@ -31,6 +31,18 @@ class CAbilityBase : IAbility
     }
 }
 
+class CAbilityEmpty : CAbilityBase
+{
+	string getTextureName() override
+	{
+		return "abilityEmpty.png";
+	}
+	void activate() override
+	{
+		//I know this part may be hard to under stand, a lot is going on here but I think you can work through it if you try
+	}
+}
+
 class CToggleableAbillityBase : CAbilityBase
 {
     CToggleableAbillityBase()
@@ -49,13 +61,23 @@ class CToggleableAbillityBase : CAbilityBase
 class CAbilityManager
 {
     IAbility@[] abilities;
+	IAbility@[] abilityBar;
     uint selected = 0;
     CBlob@ blob;
+	bool menuOpen = false;
 
-    IAbility@ getSelected() {return abilities[selected];}
+    IAbility@ getSelected() {return abilityBar[selected];}
 
     void onInit(CBlob@ blob)
-    {
+    {	
+		CAbilityEmpty ability;
+		for(int i = 0; i < 5; i++)
+		{
+			abilityBar.push_back(ability);
+		}
+		abilities.push_back(ability);
+		
+
         @this.blob = blob;
         blob.addCommandID("ActivateAbilityIndex");
     }
@@ -77,14 +99,16 @@ class CAbilityManager
 
     void activateAbilityIndex(int i)
     {
-        if(i > abilities.length())
+        if(i > abilityBar.length())
         {
             error("Attempted to run ability out of index");
             return;
         }
 
-        abilities[i].activate();
+        abilityBar[i].activate();
     }
+
+	int holdingIndex;
 
     void onTick(CBlob@ blob)
     {
@@ -95,6 +119,11 @@ class CAbilityManager
         
         if(isMe(blob))
         {
+			if(getControls().isKeyJustPressed(KEY_KEY_I))
+			{
+				start = getControls().getMouseScreenPos();
+				menuOpen = !menuOpen;
+			}
             if(getControls().isKeyJustPressed(KEY_KEY_B))
             {
                 sendActivateAbilityIndexCommand(selected);
@@ -103,38 +132,131 @@ class CAbilityManager
             if(getControls().isKeyJustPressed(KEY_LBUTTON))
             {
                 Vec2f mpos = getControls().getMouseScreenPos();
+				
+				int newselection = getAbilityIndexHovered(mpos);
+                selected = newselection > -1 ? newselection : selected;
 
-                if(mpos.y <= 40 && mpos.y >= 4)
-                {
-                    int index = -1;
-                    for(int i = 0; i < abilities.length(); i++)
-                    {
-                        int x = (4 + 4*i + 32 * i);
-                        if(mpos.x >= x && mpos.x <= x + 32)
-                        {
-                            index = i;
-                            break;
-                        }
-                    }
-                    if(index > -1)
-                    {
-                        selected = index;
-                    }
-                }
+				if(menuOpen)
+				{
+					holdingIndex = getAbilityMenuIndexHovered(mpos);
+				}
+
             }
+
+			if(!getControls().isKeyPressed(KEY_LBUTTON))
+			{
+				if(holdingIndex > -1)
+				{
+					int abilityBarIndex = getAbilityIndexHovered(getControls().getMouseScreenPos());
+					if(abilityBarIndex > -1)
+					{
+						@abilityBar[abilityBarIndex] = abilities[holdingIndex];
+					}
+				}
+				holdingIndex = -1;
+			}
         }
     }
 
+    Vec2f getAbilityPos(int index)
+    {
+        return Vec2f(4 + 4*index + 32 * index, 4);
+    }
+
+    int getAbilityIndexHovered(Vec2f pos)
+    {
+		int index = -1;
+        if(pos.y <= 40 && pos.y >= 4)
+        {
+            for(int i = 0; i < abilityBar.length(); i++)
+            {
+                int x = (4 + 4*i + 32 * i);
+                if(pos.x >= x && pos.x <= x + 32)
+                {
+                    index = i;
+                    break;
+                }
+            }
+        }
+		return index;
+    }
+
+	int getAbilityMenuIndexHovered(Vec2f pos)
+	{
+		int index = -1;
+
+		for(int i = 0; i < abilities.length(); i++)
+		{
+			Vec2f abilityPos = Vec2f(i%numColumns * 36, i / numColumns * 36) + start + Vec2f(4,4);
+
+			if(pos.x >= abilityPos.x && pos.x <= abilityPos.x + 32 && pos.y >= abilityPos.y && pos.y <= abilityPos.y + 32)
+			{
+				index = i;
+				break;
+			}
+		}
+
+		return index;
+	}
+
+	u32 numColumns = 4;
+
+	Vec2f start;
+	Vec2f end;
+	int getRowCount()
+	{
+		int rowCount;
+		float fNumColumns = numColumns;
+		float rowsUneven = (abilities.length() / fNumColumns );
+		rowCount = Maths::Ceil(rowsUneven);
+		return rowCount;
+	}
     void onRender(CSprite@ this)
     {
         if(!isMe(blob)) {return;}
-        for(int i = 0; i < abilities.length(); i++)
+        for(int i = 0; i < abilityBar.length(); i++)//draw toolbar abilities
         {
-            GUI::DrawIcon(abilities[i].getTextureName(), 0, Vec2f(16,16), Vec2f(4 + 4*i + 32 * i,4), 1);
+            GUI::DrawIcon(abilityBar[i].getTextureName(), 0, Vec2f(16,16), getAbilityPos(i), 1);
+			int hovered = getAbilityIndexHovered(getControls().getMouseScreenPos());
+			if(hovered > -1)
+			{
+				GUI::DrawIcon(abilityBar[hovered].getBorder(),0,Vec2f(18,18), Vec2f(2 + 4*hovered + 32 * hovered,2),1,SColor(127,127,127,127));
+			}
         }
-        GUI::DrawIcon(getSelected().getBorder(),0,Vec2f(18,18), Vec2f(2 + 4*selected + 32 * selected,2),1);
+        GUI::DrawIcon(getSelected().getBorder(),0,Vec2f(18,18), Vec2f(2 + 4*selected + 32 * selected,2),1);// draw toolbar selected
 
-        GUI::DrawTextCentered("{B}", Vec2f(16,40), SColor(255,127,127,127));
+        GUI::DrawText("Activate: {B}\nManage: {I}", Vec2f(16,40), SColor(255,127,127,127));
+
+		if(menuOpen)//menu rendering
+		{
+			end = Vec2f(start.x + numColumns * 4 + numColumns * 32 +4,start.y + getRowCount() * 36 + 4);
+
+			GUI::DrawRectangle(start,end);
+
+			for(int i = 0; i < abilities.length; i++)
+			{
+				Vec2f iconPos = Vec2f(i%numColumns * 36, i / numColumns * 36) + start + Vec2f(4,4);
+				if(holdingIndex > -1 && holdingIndex == i)
+				{
+					GUI::DrawIcon(abilities[i].getTextureName(), 0, Vec2f(16,16), iconPos, 1,SColor(127,60,60,60));
+				}
+				else
+				{
+					GUI::DrawIcon(abilities[i].getTextureName(), 0, Vec2f(16,16), iconPos, 1);
+				}
+			}
+
+			int hovered = holdingIndex > -1 ? holdingIndex : getAbilityMenuIndexHovered(getControls().getMouseScreenPos());
+			if(hovered > -1)
+			{
+				GUI::DrawIcon(getSelected().getBorder(),0,Vec2f(18,18), start + Vec2f(2,2) + Vec2f(hovered%numColumns * 36, hovered/numColumns * 36),1);
+			}
+		}
+
+		if(holdingIndex > -1)
+		{
+			GUI::DrawIcon(abilities[holdingIndex].getTextureName(),0,Vec2f(16,16),getControls().getMouseScreenPos() - Vec2f(16,16),1);
+		}
     }
 }
 
