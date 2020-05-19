@@ -7,6 +7,7 @@ interface IAbility
     void onRender(CSprite@ sprite);
     void onCommand(CBlob@ blob, u8 cmd, CBitStream @params);
     string getBorder();
+    string getDescription();
 }
 
 class CAbilityBase : IAbility
@@ -15,9 +16,11 @@ class CAbilityBase : IAbility
     string getBorder(){return border;}
     string textureName;
     string border = "Border.png";
+    string description = "Description not added";
     CBlob@ blob;
 
     string getTextureName() {return textureName;}
+    string getDescription(){return description;}
     CBlob@ getBlob() {return blob;}
 
 
@@ -47,6 +50,11 @@ class CAbilityEmpty : CAbilityBase
 	{
 		//I know this part may be hard to under stand, a lot is going on here but I think you can work through it if you try
 	}
+
+    string getDescription() override
+    {
+        return "Empty";
+    }
 }
 
 class CToggleableAbillityBase : CAbilityBase
@@ -77,12 +85,14 @@ class CAbilityManager
     void onInit(CBlob@ blob)
     {	
 		CAbilityEmpty abilityEmpty;
-		for(int i = 0; i < 5; i++)
+        CPoint abilityPoint(blob,"abilityPoint.png");
+
+        abilityBar.push_back(abilityPoint);
+		for(int i = 0; i < 4; i++)
 		{
 			abilityBar.push_back(abilityEmpty);
 		}
 		abilities.push_back(abilityEmpty);
-        CPoint abilityPoint(blob,"abilityPoint.png");
         abilities.push_back(abilityPoint);
 		
 
@@ -154,7 +164,21 @@ class CAbilityManager
 				if(menuOpen)
 				{
 					holdingIndex = getAbilityMenuIndexHovered(mpos);
+
+                    if(mpos.x < start.x || mpos.x > end.x || mpos.y > end.y || mpos.y < start.y)
+                    {
+                        menuOpen = false;
+                    }
 				}
+                
+                Vec2f buttonDimentions = Vec2f(32,16);
+                Vec2f drawPos = Vec2f(4,40);
+
+                if(mpos.x > drawPos.x && mpos.x < buttonDimentions.x*2 + drawPos.x && mpos.y > drawPos.y && mpos.y < drawPos.y + buttonDimentions.y *2)
+                {
+                    menuOpen = true;
+                    start = drawPos;
+                }
 
             }
 
@@ -214,7 +238,7 @@ class CAbilityManager
 		return index;
 	}
 
-	u32 numColumns = 4;
+	u32 numColumns = 5;
 
 	Vec2f start;
 	Vec2f end;
@@ -245,7 +269,18 @@ class CAbilityManager
         }
         GUI::DrawIcon(getSelected().getBorder(),0,Vec2f(18,18), Vec2f(2 + 4*selected + 32 * selected,2),1);// draw toolbar selected
 
-        GUI::DrawText("Activate: {B}\nManage: {I}", Vec2f(16,40), SColor(255,127,127,127));
+        //GUI::DrawText("Activate: {B}\nManage: {I}", Vec2f(16,40), SColor(255,127,127,127));
+        Vec2f mpos = getControls().getMouseScreenPos();
+        Vec2f buttonDimentions = Vec2f(32,16);
+        Vec2f drawPos = Vec2f(4,40);
+        if(mpos.x > drawPos.x && mpos.x < buttonDimentions.x*2 + drawPos.x && mpos.y > drawPos.y && mpos.y < drawPos.y + buttonDimentions.y *2) //all *2 because default scale is *2
+        {
+            GUI::DrawIcon("Manage.png",0, buttonDimentions, drawPos,1,SColor(127,127,127,127));
+        }
+        else
+        {
+            GUI::DrawIcon("Manage.png",0, buttonDimentions, drawPos,1);
+        }
 
 		if(menuOpen)//menu rendering
 		{
@@ -270,6 +305,8 @@ class CAbilityManager
 			if(hovered > -1)
 			{
 				GUI::DrawIcon(getSelected().getBorder(),0,Vec2f(18,18), start + Vec2f(2,2) + Vec2f(hovered%numColumns * 36, hovered/numColumns * 36),1);
+
+                GUI::DrawText(abilities[hovered].getDescription(),start + Vec2f(0,-12),SColor(255,250,250,255));
 			}
 		}
 
@@ -306,6 +343,11 @@ class CPoint : CAbilityBase
     {
         get{return _tpos;}
         set{CBitStream params; params.write_Vec2f(value); blob.SendCommand(blob.getCommandID("CPoint_tposSync"),params);}
+    }
+
+    string getDescription() override
+    {
+        return "Point";
     }
 
     void activate() override
