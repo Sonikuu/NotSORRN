@@ -86,14 +86,17 @@ class CAbilityManager
     {	
 		CAbilityEmpty abilityEmpty;
         CPoint abilityPoint(blob,"abilityPoint.png");
+        CConsume abilityConsume("abilityConsume.png",blob);
 
         abilityBar.push_back(abilityPoint);
-		for(int i = 0; i < 4; i++)
+        abilityBar.push_back(abilityConsume);
+		for(int i = 0; i < 3; i++)
 		{
 			abilityBar.push_back(abilityEmpty);
 		}
 		abilities.push_back(abilityEmpty);
         abilities.push_back(abilityPoint);
+        abilities.push_back(abilityConsume);
 		
 
         @this.blob = blob;
@@ -374,4 +377,98 @@ class CPoint : CAbilityBase
         if(cmd == blob.getCommandID("CPoint_timeSync")){ _time = params.read_u32();}
         else if(cmd == blob.getCommandID("CPoint_tposSync")){ _tpos = params.read_Vec2f();}
     }
+}
+
+class CConsume : CAbilityBase
+{
+    int stomachItems = 0;
+    int stomachMax = 10;
+    CConsume(string _textureName, CBlob@ _blob)
+    {
+        super(_textureName,_blob);
+        blob.addCommandID("CONSUME_held_item");
+    }
+
+    void activate() override
+    {
+        blob.SendCommand(blob.getCommandID("CONSUME_held_item"));
+    }
+
+    void onTick() override
+    {
+        if(getGameTime() % (30*60) == 0)
+        {
+            stomachItems = Maths::Max(stomachItems--,0);
+        } 
+    }
+
+    void onCommand(CBlob@ blob, u8 cmd, CBitStream@ params)
+    {
+        if(cmd == blob.getCommandID("CONSUME_held_item"))
+        {
+            string itemName;
+            CBlob@ held = blob.getCarriedBlob();
+            if(held is null){itemName = "nothing";}
+            else
+            {
+                itemName = held.getConfig();
+            }
+
+            if(stomachItems < stomachMax)
+            {
+
+                if(itemName == "fishy")
+                {   
+                    addToMyChat("The fish" + (held.hasTag("dead") ? " slowly slides " : " agressivly wiggles ") + "down your throat nearly causing to to gag\nYou feel fuller but not much else");
+                    stomachItems++;
+                    held.server_Die();
+                } else if(itemName == "grain")
+                {
+                    addToMyChat("The grain is dry but you manage to get it down\nYou feel fuller but not much else");
+                    stomachItems++;
+                    held.server_Die();
+                } else if(itemName == "builder")
+                {
+                    addToMyChat("The fact that eating someone is crossing your mind is scary but you want to see what happens\nUpon eating the body you feel more evil inside");
+                    stomachItems++;
+                    held.server_Die();
+
+                } else if(itemName == "log")
+                {
+                    addToMyChat("You attempt to eat the log but you can't fit it in your mouth");
+                } else if(itemName == "chicken")
+                {
+                    addToMyChat("You attempt to eat this poor chicken but it's moving too much to get a good grip on it");
+                } else if(itemName == "souldust")
+                {
+                    addToMyChat("You manage to eat this strange substance but to your surprise it has fallen right through your stomach and is now on the floor");
+                } else if(itemName == "seed")
+                {
+                    addToMyChat("You eat the seed and with a bitter aftertaste you feel more... natural");
+                    held.server_Die();
+                    stomachItems++;
+                } else if(itemName == "unstablecore")
+                {
+                    addToMyChat("You think about eating this explosive rock but then decide that wouldn't be a good idea");
+                } else if(itemName == "thisisntajokeitem")
+                {
+                    addToMyChat("Instead of eating the infinity dildo you think of a better idea and shove it in the other end\nYou feel excited and powerful");
+                    held.server_Die();
+                    stomachItems++;
+                }
+                else if(itemName == "nothing") {addToMyChat("You prepare to take a big bite but then chop down on nothing\nYou can't eat nothing");}
+            }
+            else{addToMyChat("You don't think you can eat anymore for a while");}
+
+        }
+    }
+
+    void addToMyChat(string msg)
+    {
+        if(blob.isMyPlayer())
+        {
+            client_AddToChat(msg, SColor(255,60,60,255));
+        }
+    }
+
 }
