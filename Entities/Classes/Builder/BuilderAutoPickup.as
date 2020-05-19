@@ -26,7 +26,7 @@ bool isMatch(CBlob@ this, CBlob@ blob)
 {
 	const string blobName = blob.getName();
 	CPlayer@ p = this.getPlayer();
-	if(p !is null && getRules().get_bool(p.getUsername() + "_NewPickupOn"))
+	if(true || p !is null && getRules().get_bool(p.getUsername() + "_NewPickupOn")) //todo fix settings
 	{
 		CInventory@ inv = this.getInventory();
 		for(int i = 0; i < inv.getItemsCount(); i++)
