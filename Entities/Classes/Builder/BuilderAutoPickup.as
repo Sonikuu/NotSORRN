@@ -8,14 +8,8 @@ void onInit(CBlob@ this)
 
 void Take(CBlob@ this, CBlob@ blob)
 {
-	const string blobName = blob.getName();
 
-	if (blobName == "mat_gold" || blobName == "mat_stone" ||
-	        blobName == "mat_wood" || /*blobName == "grain" ||*/
-			blobName == "mat_sand" || blobName == "mat_charcoal" ||
-			blobName == "mat_glass" || blobName == "mat_gunpowder" ||
-			blobName == "mat_metal" || blobName == "mat_marble" ||
-			blobName == "mat_basalt")
+	if (isMatch(this,blob))
 	{
 		if ((this.getDamageOwnerPlayer() is blob.getPlayer()) || getGameTime() > blob.get_u32("autopick time"))
 		{
@@ -25,6 +19,33 @@ void Take(CBlob@ this, CBlob@ blob)
 				//thats what she said
 			}
 		}
+	}
+}
+
+bool isMatch(CBlob@ this, CBlob@ blob)
+{
+	const string blobName = blob.getName();
+	CPlayer@ p = this.getPlayer();
+	if(p !is null && getRules().get_bool(p.getUsername() + "_NewPickupOn"))
+	{
+		CInventory@ inv = this.getInventory();
+		for(int i = 0; i < inv.getItemsCount(); i++)
+		{
+			if(inv.getItem(i).getConfig() == blob.getConfig())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	else
+	{
+			return blobName == "mat_gold" || blobName == "mat_stone" ||
+	        blobName == "mat_wood" || /*blobName == "grain" ||*/
+			blobName == "mat_sand" || blobName == "mat_charcoal" ||
+			blobName == "mat_glass" || blobName == "mat_gunpowder" ||
+			blobName == "mat_metal" || blobName == "mat_marble" ||
+			blobName == "mat_basalt";
 	}
 }
 
@@ -69,12 +90,7 @@ void IgnoreCollisionLonger(CBlob@ this, CBlob@ blob)
 
 	const string blobName = blob.getName();
 
-	if (blobName == "mat_gold" || blobName == "mat_stone" ||
-	        blobName == "mat_wood" || blobName == "grain" ||
-			blobName == "mat_sand" || blobName == "mat_charcoal" ||
-			blobName == "mat_glass" || blobName == "mat_gunpowder" ||
-			blobName == "mat_metal" || blobName == "mat_marble" ||
-			blobName == "mat_basalt")
+	if (isMatch(this,blob))
 	{
 		blob.set_u32("autopick time", getGameTime() +  getTicksASecond() * 7);
 		blob.SetDamageOwnerPlayer(blob.getPlayer());
