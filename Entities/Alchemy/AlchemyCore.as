@@ -223,6 +223,8 @@ void onTick(CBlob@ this)
 
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
+	if(this.hasTag("building") && this.isAttached())
+		return;
 	CAlchemyTankController@ controller = getTankController(this);
 	
 	if(controller is null)

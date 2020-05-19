@@ -9,6 +9,7 @@ float tickmult = 0.0025;
 
 void onInit(CRules@ this)
 {
+	onRestart(this);
 	CMap@ map = getMap();
 	if(map !is null)
 		printInt("Random tile ticks per tick: ", Maths::Ceil(map.tilemapwidth * map.tilemapheight * tickmult));
@@ -16,14 +17,20 @@ void onInit(CRules@ this)
 	this.set_u16("raincount", 24);
 }
 
+void onRestart(CRules@ this)
+{
+	this.set_u32("rainseed", XORRandom(0x7FFFFFFF));
+	this.Sync("rainseed", true);
+}
+
 void onTick(CRules@ this)
 {
 	//Going to move rain stuff to another file eventually
 	//i swear
 	CMap@ map = getMap();
-	Noise noise(0x8008135F);//lel
+	Noise noise(this.get_u32("rainseed"));//lel
 	float sample = (noise.Sample(getGameTime() / 5000.0, 0) - 0.5) * 4;
-	//print("" + sample);
+	print("" + sample);
 	float rainratio = Maths::Clamp(sample, 0, 1);
 	int raincount = 16 * rainratio;
 	this.set_u16("raincount", raincount);
