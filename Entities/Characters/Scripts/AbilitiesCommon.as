@@ -7,6 +7,7 @@ interface IAbility
     void onRender(CSprite@ sprite);
     void onCommand(CBlob@ blob, u8 cmd, CBitStream @params);
     string getBorder();
+    string getDescription();
 }
 
 class CAbilityBase : IAbility
@@ -15,9 +16,11 @@ class CAbilityBase : IAbility
     string getBorder(){return border;}
     string textureName;
     string border = "Border.png";
+    string description = "Description not added";
     CBlob@ blob;
 
     string getTextureName() {return textureName;}
+    string getDescription(){return description;}
     CBlob@ getBlob() {return blob;}
 
 
@@ -47,6 +50,11 @@ class CAbilityEmpty : CAbilityBase
 	{
 		//I know this part may be hard to under stand, a lot is going on here but I think you can work through it if you try
 	}
+
+    string getDescription() override
+    {
+        return "Empty";
+    }
 }
 
 class CToggleableAbillityBase : CAbilityBase
@@ -272,6 +280,8 @@ class CAbilityManager
 			if(hovered > -1)
 			{
 				GUI::DrawIcon(getSelected().getBorder(),0,Vec2f(18,18), start + Vec2f(2,2) + Vec2f(hovered%numColumns * 36, hovered/numColumns * 36),1);
+
+                GUI::DrawText(abilities[hovered].getDescription(),start + Vec2f(0,-12),SColor(255,250,250,255));
 			}
 		}
 
@@ -308,6 +318,11 @@ class CPoint : CAbilityBase
     {
         get{return _tpos;}
         set{CBitStream params; params.write_Vec2f(value); blob.SendCommand(blob.getCommandID("CPoint_tposSync"),params);}
+    }
+
+    string getDescription() override
+    {
+        return "Point";
     }
 
     void activate() override
