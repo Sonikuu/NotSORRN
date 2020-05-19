@@ -4,6 +4,8 @@ interface IAbility
     CBlob@ getBlob();
     void activate();
     void onTick();
+    void onRender(CSprite@ sprite);
+    void onCommand(CBlob@ blob, u8 cmd, CBitStream @params);
     string getBorder();
 }
 
@@ -29,6 +31,10 @@ class CAbilityBase : IAbility
     {
         print("Base ability activated for some reason on blob " + blob.getConfig());
     }
+
+    void onRender(CSprite@ sprite){}
+
+    void onCommand(CBlob@ blob, u8 cmd, CBitStream @params ){}
 }
 
 class CAbilityEmpty : CAbilityBase
@@ -70,12 +76,14 @@ class CAbilityManager
 
     void onInit(CBlob@ blob)
     {	
-		CAbilityEmpty ability;
+		CAbilityEmpty abilityEmpty;
 		for(int i = 0; i < 5; i++)
 		{
-			abilityBar.push_back(ability);
+			abilityBar.push_back(abilityEmpty);
 		}
-		abilities.push_back(ability);
+		abilities.push_back(abilityEmpty);
+        CPoint abilityPoint(blob,"abilityPoint.png");
+        abilities.push_back(abilityPoint);
 		
 
         @this.blob = blob;
@@ -94,6 +102,13 @@ class CAbilityManager
         if(cmd == blob.getCommandID("ActivateAbilityIndex"))
         {
             activateAbilityIndex(params.read_s32());
+        }
+        else
+        {
+            for(int i = 0; i < abilities.length(); i++)
+            {
+                abilities[i].onCommand(blob,cmd,params);
+            }
         }
     }
 
@@ -213,6 +228,11 @@ class CAbilityManager
 	}
     void onRender(CSprite@ this)
     {
+        for(int i = 0; i < abilities.length(); i++)
+        {
+            abilities[i].onRender(this);
+        }
+
         if(!isMe(blob)) {return;}
         for(int i = 0; i < abilityBar.length(); i++)//draw toolbar abilities
         {
@@ -263,4 +283,53 @@ class CAbilityManager
 bool isMe(CBlob@ blob)
 {
     return blob.getPlayer() !is null && blob.getPlayer() is getLocalPlayer();
+}
+
+class CPoint : CAbilityBase
+{
+    CPoint(CBlob@ blob, string textureName)
+    {
+        super(textureName,blob);
+
+        blob.addCommandID("CPoint_timeSync");
+        blob.addCommandID("CPoint_tposSync");
+    }
+
+    u32 _time = 0;
+    u32 time
+    {
+        get{return _time;}
+        set{CBitStream params; params.write_u32(value); blob.SendCommand(blob.getCommandID("CPoint_timeSync"),params);}
+    }
+    Vec2f _tpos;
+    Vec2f tpos 
+    {
+        get{return _tpos;}
+        set{CBitStream params; params.write_Vec2f(value); blob.SendCommand(blob.getCommandID("CPoint_tposSync"),params);}
+    }
+
+    void activate() override
+    {
+        time = getGameTime() + 30*5;
+
+        CPlayer@ p = blob.getPlayer();
+        if(p !is null && p.isMyPlayer())
+        {
+            tpos = getControls().getMouseWorldPos();
+        }
+    }
+
+    void onRender(CSprite@ sprite) override
+    {
+        if(time > getGameTime())
+        {
+            GUI::DrawSplineArrow(sprite.getBlob().getPosition(), tpos, SColor(255,255,127,127));
+        }
+    }
+
+    void onCommand(CBlob@ blob, u8 cmd, CBitStream@ params)
+    {
+        if(cmd == blob.getCommandID("CPoint_timeSync")){ _time = params.read_u32();}
+        else if(cmd == blob.getCommandID("CPoint_tposSync")){ _tpos = params.read_Vec2f();}
+    }
 }
