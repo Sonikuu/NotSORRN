@@ -74,7 +74,7 @@ void padLife(CBlob@ blob, int power, CBlob@ pad)
 void padEcto(CBlob@ blob, int power, CBlob@ pad)
 {
 	//900 = 30 seconds, should be a good amount?
-	applyFxLowGrav(blob, power * 180, Maths::Ceil(float(power) / 5.0));
+	applyFxLowGrav(blob, power * 180 * 5, Maths::Ceil(float(power) / 5.0));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -121,7 +121,7 @@ void padIgnis(CBlob@ blob, int power, CBlob@ pad)
 
 void padTerra(CBlob@ blob, int power, CBlob@ pad)
 {
-	applyFxDamageReduce(blob, power * 180, Maths::Ceil(float(power) / 5.0));
+	applyFxDamageReduce(blob, power * 180 * 5, Maths::Ceil(float(power) / 5.0));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -137,7 +137,7 @@ void padTerra(CBlob@ blob, int power, CBlob@ pad)
 
 void padNatura(CBlob@ blob, int power, CBlob@ pad)//Nature gives regen? 100% not a ros ripoff
 {
-	applyFxRegen(blob, power * 180, Maths::Ceil(float(power) / 5.0));
+	applyFxRegen(blob, power * 180 * 2, Maths::Ceil(float(power) / 5.0));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -202,7 +202,7 @@ void padAqua(CBlob@ blob, int power, CBlob@ pad)
 void padCorruption(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxCorrupt(blob, 180 * power, power * 0.4);
+	applyFxCorrupt(blob, 180 * power * 5, power * 0.4);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -218,7 +218,7 @@ void padCorruption(CBlob@ blob, int power, CBlob@ pad)
 void padPurity(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxPure(blob, 180 * power, power * 0.4);
+	applyFxPure(blob, 180 * power * 10, power * 0.4);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -234,7 +234,7 @@ void padPurity(CBlob@ blob, int power, CBlob@ pad)
 void padHoly(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxHoly(blob, 180 * power, power);
+	applyFxHoly(blob, 180 * power * 5, power);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -250,7 +250,7 @@ void padHoly(CBlob@ blob, int power, CBlob@ pad)
 void padUnholy(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxUnholy(blob, 180 * power, power);
+	applyFxUnholy(blob, 180 * power * 5, power);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -450,37 +450,8 @@ void wardOrder(float radius, int power, CBlob@ ward)
 		float rotation = rando.NextFloat() * Maths::Pi * 2 - Maths::Pi;
 		float length = rando.NextFloat() * radius;
 		Vec2f pos = Vec2f(Maths::Cos(rotation) * length, Maths::Sin(rotation) * length) + ward.getPosition();
-		Tile tile = map.getTile(pos);
-		
-		//STONE
-		if(tile.type <= 63 && tile.type >= 58)
-		{
-			if(tile.type == 58)
-				map.server_SetTile(pos, 48);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//WOOD
-		else if(tile.type <= 203 && tile.type >= 200)
-		{
-			if(tile.type == 200)
-				map.server_SetTile(pos, 196);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//STONE BG
-		else if(tile.type <= 79 && tile.type >= 76)
-		{
-			if(tile.type == 76)
-				map.server_SetTile(pos, 64);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//WOOD BG
-		else if(tile.type == 207)
-		{
-			map.server_SetTile(pos, 205);
-		}
+
+		orderEffect(map, pos);
 	}
 }
 
@@ -497,43 +468,24 @@ void wardEntropy(float radius, int power, CBlob@ ward) //probobly broken code :D
 		float rotation = rando.NextFloat() * Maths::Pi * 2 - Maths::Pi;
 		float length = rando.NextFloat() * radius;
 		Vec2f pos = Vec2f(Maths::Cos(rotation) * length, Maths::Sin(rotation) * length) + ward.getPosition();
-		Tile tile = map.getTile(pos);
-		
-		//STONE
-		if((tile.type <= 62 && tile.type >= 58) || tile.type == 48)
-		{
-			if(tile.type == 48)
-				map.server_SetTile(pos, 58);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//WOOD
-		else if((tile.type <= 202 && tile.type >= 200) || tile.type == 196)
-		{
-			if(tile.type == 196)
-				map.server_SetTile(pos, 200);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//STONE BG
-		else if((tile.type <= 78 && tile.type >= 76) || tile.type == 64)
-		{
-			if(tile.type == 64)
-				map.server_SetTile(pos, 76);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//WOOD BG
-		else if(tile.type == 205)
-		{
-			map.server_SetTile(pos, 207);
-		}
+
+		entropyEffect(map, pos);
 	}
 }
 
 void wardAqua(float radius, int power, CBlob@ ward)
 {
 	CMap@ map = getMap();
+	Random rando(XORRandom(0x7FFFFFFF));
+	for(int i = 0; i < power; i++)
+	{
+		float rotation = rando.NextFloat() * Maths::Pi * 2 - Maths::Pi;
+		float length = rando.NextFloat() * radius;
+		Vec2f pos = Vec2f(Maths::Cos(rotation) * length, Maths::Sin(rotation) * length) + ward.getPosition();
+		Tile tile = map.getTile(pos);
+		if((tile.flags & Tile::FLAMMABLE != 0) && map.isInFire(pos))
+			map.server_setFireWorldspace(pos, false);
+	}
 	if(getGameTime() % 30 == 0)
 	{
 		CBlob@[] blobs;
@@ -776,37 +728,8 @@ void sprayOrder(int power, float aimdir, float spread, float range, CBlob@ spray
 	for(int i = 0; i < power; i++)
 	{
 		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 1000.0) + user.getPosition();
-		Tile tile = map.getTile(pos);
 		
-		//STONE
-		if(tile.type <= 63 && tile.type >= 58)
-		{
-			if(tile.type == 58)
-				map.server_SetTile(pos, 48);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//WOOD
-		else if(tile.type <= 203 && tile.type >= 200)
-		{
-			if(tile.type == 200)
-				map.server_SetTile(pos, 196);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//STONE BG
-		else if(tile.type <= 79 && tile.type >= 76)
-		{
-			if(tile.type == 76)
-				map.server_SetTile(pos, 64);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//WOOD BG
-		else if(tile.type == 207)
-		{
-			map.server_SetTile(pos, 205);
-		}
+		orderEffect(map, pos);
 	}
 	if(getNet().isClient())
 	{
@@ -829,37 +752,10 @@ void sprayEntropy(int power, float aimdir, float spread, float range, CBlob@ spr
 	for(int i = 0; i < power; i++)
 	{
 		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 1000.0) + user.getPosition();
-		Tile tile = map.getTile(pos);
 		
-		//STONE
-		if((tile.type <= 62 && tile.type >= 58) || tile.type == 48)
-		{
-			if(tile.type == 48)
-				map.server_SetTile(pos, 58);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//WOOD
-		else if((tile.type <= 202 && tile.type >= 200) || tile.type == 196)
-		{
-			if(tile.type == 196)
-				map.server_SetTile(pos, 200);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//STONE BG
-		else if((tile.type <= 78 && tile.type >= 76) || tile.type == 64)
-		{
-			if(tile.type == 64)
-				map.server_SetTile(pos, 76);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//WOOD BG
-		else if(tile.type == 205)
-		{
-			map.server_SetTile(pos, 207);
-		}
+		
+		entropyEffect(map, pos);
+		
 	}
 	if(getNet().isClient())
 	{
@@ -1034,10 +930,16 @@ void sprayIgnis(int power, float aimdir, float spread, float range, CBlob@ spray
 void sprayAqua(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	CMap@ map = getMap();
+	for(int i = 0; i < power; i++)
+	{
+		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 1000.0) + user.getPosition();
+		Tile tile = map.getTile(pos);
+		if((tile.flags & Tile::FLAMMABLE != 0) && map.isInFire(pos))
+			map.server_setFireWorldspace(pos, false);
+	}
 	if(true)
 	{
 		HitInfo@[] list;
-		CMap@ map = getMap();
 		if(map.getHitInfosFromArc(user.getPosition(), aimdir, spread, range, user, @list))
 		{
 			for (int i = 0; i < list.length; i++)
@@ -1081,20 +983,25 @@ void sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spray
 	{
 		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * ((XORRandom(800) / 1000.0) + 0.2) + user.getPosition();
 		Vec2f mappos = pos / map.tilesize;
-		mappos.x = int(mappos.x);
-		mappos.y = int(mappos.y);
-		mapdata.setPixelPosition(mappos);
-		SColor tilecol = mapdata.readPixel();
-		//printVec2f("Pos: ", mapdata.getPixelPosition());
-		//print("Col: R:" + tilecol.getRed() + " G:" + tilecol.getGreen() + " B:" + tilecol.getBlue());
-		if(tilecol == map_colors::tile_ground)
-			map.server_SetTile(pos, CMap::tile_ground);
-		else if(tilecol == map_colors::tile_stone && getGameTime() % (10 / power) == 0)
-			map.server_SetTile(pos, CMap::tile_stone);
-		else if(tilecol == map_colors::tile_thickstone && getGameTime() % (15 / power) == 0)
-			map.server_SetTile(pos, CMap::tile_thickstone);
-		else if(tilecol == map_colors::tile_gold && getGameTime() % (30 / power) == 0)
-			map.server_SetTile(pos, CMap::tile_gold);
+
+		Tile tile = map.getTileFromTileSpace(mappos);
+		if((tile.type == 0 || tile.type == CMap::tile_ground_back || (tile.type >= 406 && tile.type <= 408)) && map.getSectorAtPosition(pos, "no build") is null)
+		{
+			mappos.x = int(mappos.x);
+			mappos.y = int(mappos.y);
+			mapdata.setPixelPosition(mappos);
+			SColor tilecol = mapdata.readPixel();
+			//printVec2f("Pos: ", mapdata.getPixelPosition());
+			//print("Col: R:" + tilecol.getRed() + " G:" + tilecol.getGreen() + " B:" + tilecol.getBlue());
+			if(tilecol == map_colors::tile_ground)
+				map.server_SetTile(pos, CMap::tile_ground);
+			else if(tilecol == map_colors::tile_stone && getGameTime() % (10 / power) == 0)
+				map.server_SetTile(pos, CMap::tile_stone);
+			else if(tilecol == map_colors::tile_thickstone && getGameTime() % (15 / power) == 0)
+				map.server_SetTile(pos, CMap::tile_thickstone);
+			else if(tilecol == map_colors::tile_gold && getGameTime() % (30 / power) == 0)
+				map.server_SetTile(pos, CMap::tile_gold);
+		}
 	}
 	
 	if(getNet().isClient())
@@ -1109,5 +1016,152 @@ void sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spray
 	}
 }
 
+void entropyEffect(CMap@ map, Vec2f pos)
+{
+	Tile tile = map.getTile(pos);
+	//STONE
+	if((tile.type <= 62 && tile.type >= 58) || tile.type == 48)
+	{
+		if(tile.type == 48)
+			map.server_SetTile(pos, 58);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//WOOD
+	else if((tile.type <= 202 && tile.type >= 200) || tile.type == 196)
+	{
+		if(tile.type == 196)
+			map.server_SetTile(pos, 200);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//STONE BG
+	else if((tile.type <= 78 && tile.type >= 76) || tile.type == 64)
+	{
+		if(tile.type == 64)
+			map.server_SetTile(pos, 76);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//WOOD BG
+	else if(tile.type == 205)
+	{
+		map.server_SetTile(pos, 207);
+	}
+	//WOH MODDED BLOCKS ?!?!?!?!?
+	//MARBLE
+	else if(tile.type <= 417 && tile.type >= 409)
+	{
+		if(tile.type <= 411)
+			map.server_SetTile(pos, 412);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//MARBLE BG
+	else if(tile.type <= 426 && tile.type >= 419)
+	{
+		if(tile.type <= 422)
+			map.server_SetTile(pos, 423);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//BASALT
+	else if(tile.type <= 436 && tile.type >= 428)
+	{
+		if(tile.type <= 430)
+			map.server_SetTile(pos, 431);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//BASALT BG
+	else if(tile.type <= 444 && tile.type >= 438)
+	{
+		if(tile.type <= 440)
+			map.server_SetTile(pos, 441);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//GOLD
+	else if(tile.type <= 460 && tile.type >= 452)
+	{
+		if(tile.type <= 454)
+			map.server_SetTile(pos, 455);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+}
 
-
+void orderEffect(CMap@ map, Vec2f pos)
+{
+	Tile tile = map.getTile(pos);
+	//STONE
+	if(tile.type <= 63 && tile.type >= 58)
+	{
+		if(tile.type == 58)
+			map.server_SetTile(pos, 48);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//WOOD
+	else if(tile.type <= 203 && tile.type >= 200)
+	{
+		if(tile.type == 200)
+			map.server_SetTile(pos, 196);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//STONE BG
+	else if(tile.type <= 79 && tile.type >= 76)
+	{
+		if(tile.type == 76)
+			map.server_SetTile(pos, 64);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//WOOD BG
+	else if(tile.type == 207)
+	{
+		map.server_SetTile(pos, 205);
+	}
+	//WOH MODDED BLOCKS ?!?!?!?!?
+	//MARBLE
+	else if(tile.type <= 418 && tile.type >= 412)
+	{
+		if(tile.type == 412)
+			map.server_SetTile(pos, 409);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//MARBLE BG
+	else if(tile.type <= 427 && tile.type >= 422)
+	{
+		if(tile.type == 422)
+			map.server_SetTile(pos, 419);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//BASALT
+	else if(tile.type <= 437 && tile.type >= 431)
+	{
+		if(tile.type == 431)
+			map.server_SetTile(pos, 428);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//BASALT BG
+	else if(tile.type <= 445 && tile.type >= 441)
+	{
+		if(tile.type == 441)
+			map.server_SetTile(pos, 438);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//GOLD
+	else if(tile.type <= 461 && tile.type >= 455)
+	{
+		if(tile.type == 455)
+			map.server_SetTile(pos, 452);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+}
