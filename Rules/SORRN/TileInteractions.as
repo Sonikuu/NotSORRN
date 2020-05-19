@@ -8,7 +8,7 @@ void corruptTile(Vec2f tilepos, CMap@ map)
 	{
 		Tile tile = map.getTileFromTileSpace(tilepos);
 		//Doesnt corrupt itself or purified dust
-		if(map.isTileSolid(tile) && (tile.type < 400 || tile.type > 408) && !(tile.type >= 106 && tile.type <= 111))
+		if(map.isTileSolid(tile) && (tile.type < 400 || tile.type > 408) && !(tile.type >= 106 && tile.type <= 111) && map.getSectorAtPosition(tilepos * 8, "no build") is null)
 		{
 			map.server_SetTile(tilepos * map.tilesize, 400 + XORRandom(3));
 			Tile gtile = map.getTileFromTileSpace(tilepos - Vec2f(0, 1));
@@ -25,6 +25,8 @@ void corruptTick(Vec2f tilepos, CMap@ map)
 	if(isServer())
 	{
 		tilepos += Vec2f(XORRandom(3) - 1, XORRandom(3) - 1);
+		if(tilepos.x > map.tilemapwidth || tilepos.y > map.tilemapheight || tilepos.x < 0 || tilepos.y < 0)
+			return;
 		corruptTile(tilepos, map);
 		
 		//Damage effect

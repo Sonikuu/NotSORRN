@@ -1081,20 +1081,25 @@ void sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spray
 	{
 		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * ((XORRandom(800) / 1000.0) + 0.2) + user.getPosition();
 		Vec2f mappos = pos / map.tilesize;
-		mappos.x = int(mappos.x);
-		mappos.y = int(mappos.y);
-		mapdata.setPixelPosition(mappos);
-		SColor tilecol = mapdata.readPixel();
-		//printVec2f("Pos: ", mapdata.getPixelPosition());
-		//print("Col: R:" + tilecol.getRed() + " G:" + tilecol.getGreen() + " B:" + tilecol.getBlue());
-		if(tilecol == map_colors::tile_ground)
-			map.server_SetTile(pos, CMap::tile_ground);
-		else if(tilecol == map_colors::tile_stone && getGameTime() % (10 / power) == 0)
-			map.server_SetTile(pos, CMap::tile_stone);
-		else if(tilecol == map_colors::tile_thickstone && getGameTime() % (15 / power) == 0)
-			map.server_SetTile(pos, CMap::tile_thickstone);
-		else if(tilecol == map_colors::tile_gold && getGameTime() % (30 / power) == 0)
-			map.server_SetTile(pos, CMap::tile_gold);
+
+		Tile tile = map.getTileFromTileSpace(mappos);
+		if(tile.type == 0 || tile.type == CMap::tile_ground_back || (tile.type >= 406 && tile.type <= 408))
+		{
+			mappos.x = int(mappos.x);
+			mappos.y = int(mappos.y);
+			mapdata.setPixelPosition(mappos);
+			SColor tilecol = mapdata.readPixel();
+			//printVec2f("Pos: ", mapdata.getPixelPosition());
+			//print("Col: R:" + tilecol.getRed() + " G:" + tilecol.getGreen() + " B:" + tilecol.getBlue());
+			if(tilecol == map_colors::tile_ground)
+				map.server_SetTile(pos, CMap::tile_ground);
+			else if(tilecol == map_colors::tile_stone && getGameTime() % (10 / power) == 0)
+				map.server_SetTile(pos, CMap::tile_stone);
+			else if(tilecol == map_colors::tile_thickstone && getGameTime() % (15 / power) == 0)
+				map.server_SetTile(pos, CMap::tile_thickstone);
+			else if(tilecol == map_colors::tile_gold && getGameTime() % (30 / power) == 0)
+				map.server_SetTile(pos, CMap::tile_gold);
+		}
 	}
 	
 	if(getNet().isClient())
