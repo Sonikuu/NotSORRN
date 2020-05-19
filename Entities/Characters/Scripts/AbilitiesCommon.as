@@ -164,7 +164,21 @@ class CAbilityManager
 				if(menuOpen)
 				{
 					holdingIndex = getAbilityMenuIndexHovered(mpos);
+
+                    if(mpos.x < start.x || mpos.x > end.x || mpos.y > end.y || mpos.y < start.y)
+                    {
+                        menuOpen = false;
+                    }
 				}
+                
+                Vec2f buttonDimentions = Vec2f(32,16);
+                Vec2f drawPos = Vec2f(4,40);
+
+                if(mpos.x > drawPos.x && mpos.x < buttonDimentions.x*2 + drawPos.x && mpos.y > drawPos.y && mpos.y < drawPos.y + buttonDimentions.y *2)
+                {
+                    menuOpen = true;
+                    start = drawPos;
+                }
 
             }
 
@@ -224,7 +238,7 @@ class CAbilityManager
 		return index;
 	}
 
-	u32 numColumns = 4;
+	u32 numColumns = 5;
 
 	Vec2f start;
 	Vec2f end;
@@ -255,7 +269,18 @@ class CAbilityManager
         }
         GUI::DrawIcon(getSelected().getBorder(),0,Vec2f(18,18), Vec2f(2 + 4*selected + 32 * selected,2),1);// draw toolbar selected
 
-        GUI::DrawText("Activate: {B}\nManage: {I}", Vec2f(16,40), SColor(255,127,127,127));
+        //GUI::DrawText("Activate: {B}\nManage: {I}", Vec2f(16,40), SColor(255,127,127,127));
+        Vec2f mpos = getControls().getMouseScreenPos();
+        Vec2f buttonDimentions = Vec2f(32,16);
+        Vec2f drawPos = Vec2f(4,40);
+        if(mpos.x > drawPos.x && mpos.x < buttonDimentions.x*2 + drawPos.x && mpos.y > drawPos.y && mpos.y < drawPos.y + buttonDimentions.y *2) //all *2 because default scale is *2
+        {
+            GUI::DrawIcon("Manage.png",0, buttonDimentions, drawPos,1,SColor(127,127,127,127));
+        }
+        else
+        {
+            GUI::DrawIcon("Manage.png",0, buttonDimentions, drawPos,1);
+        }
 
 		if(menuOpen)//menu rendering
 		{
