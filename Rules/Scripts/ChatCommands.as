@@ -130,7 +130,7 @@ bool onServerProcessChat(CRules@ this, const string& in text_in, string& out tex
 	//--------MAKING CUSTOM COMMANDS-------//
 	// Inspect commented out !nextmap command
     // It will show you the basics
-
+    
 	if (player is null)
 		return true;
 
@@ -183,7 +183,8 @@ bool onServerProcessChat(CRules@ this, const string& in text_in, string& out tex
 
 
         //Legacy commands, do not edit.
-		if (tokens[0] == "!allmats")//What you have to type in chat to use this command
+		if (tokens[0] == "!allmats" || tokens[0] == "!kit" || tokens[0] == "!mats")//What you have to type in chat to use this command
+		//Sorry numan, i need these aliases
 		{
 			commandenum = AllMats;//What command it activates
             permlevel = Moderator;
@@ -715,7 +716,8 @@ bool onServerProcessChat(CRules@ this, const string& in text_in, string& out tex
         //Legacy code:
 
 		//If the gamemode is sandbox
-		if (this.gamemode_name == "Sandbox")
+		//if (this.gamemode_name == "Sandbox")
+        //Disabled, its mod only anyway
 		{
 			switch(commandenum)
 			{
