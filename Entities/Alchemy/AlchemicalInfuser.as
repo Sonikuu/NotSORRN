@@ -46,6 +46,16 @@ array<CAlchemyInfuse@> infuserecipes =
 	25,//output amount
 	25//processing time
 	),
+
+	@CAlchemyInfuse(
+	"purity",//input element
+	"mat_gold",//input item
+	"mat_purifiedgold",//output item
+	400,//element amount
+	250,//item amount
+	1,//output amount
+	1800//processing time
+	),
 	
 	@CAlchemyInfuse(
 	"corruption",//input element
