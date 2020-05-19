@@ -77,12 +77,14 @@ class CAbilityManager
     void onInit(CBlob@ blob)
     {	
 		CAbilityEmpty abilityEmpty;
-		for(int i = 0; i < 5; i++)
+        CPoint abilityPoint(blob,"abilityPoint.png");
+
+        abilityBar.push_back(abilityPoint);
+		for(int i = 0; i < 4; i++)
 		{
 			abilityBar.push_back(abilityEmpty);
 		}
 		abilities.push_back(abilityEmpty);
-        CPoint abilityPoint(blob,"abilityPoint.png");
         abilities.push_back(abilityPoint);
 		
 
