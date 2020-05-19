@@ -133,7 +133,7 @@ class CAbilityManager
         abilityBar[i].activate();
     }
 
-	int holdingIndex;
+	int holdingIndex = -1;
 
     void onTick(CBlob@ blob)
     {
