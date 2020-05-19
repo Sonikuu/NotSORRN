@@ -10,7 +10,7 @@ void onInit(CBlob@ this)
 
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
-	if(caller.getTeamNum() > 7)
+	if(caller.getTeamNum() > 7 && this.isOverlapping(caller))
 	{
 		CBitStream params;
 		params.write_u16(caller.getNetworkID());

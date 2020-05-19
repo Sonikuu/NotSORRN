@@ -223,7 +223,7 @@ void onTick(CBlob@ this)
 
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
-	if(this.hasTag("building") && this.isAttached())
+	if((this.hasTag("building") && this.isAttached()) || (this.getTeamNum() != caller.getTeamNum() && !(this.getTeamNum() > 7 && caller.getTeamNum() > 7)))
 		return;
 	CAlchemyTankController@ controller = getTankController(this);
 	

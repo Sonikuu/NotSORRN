@@ -19,7 +19,7 @@ void onInit(CBlob@ this)
 
 void onTick(CBlob@ this)
 {
-	if((getGameTime() + this.getNetworkID() * 10) % 900 == 0)
+	if(isServer() && (getGameTime() + this.getNetworkID() * 10) % 900 == 0)
 	{
 		CMap@ map = getMap();
 		CBlob@[] blobs;

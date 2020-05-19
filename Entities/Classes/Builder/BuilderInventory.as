@@ -274,6 +274,8 @@ void onCommand(CInventory@ this, u8 cmd, CBitStream@ params)
 	}
 	else if(cmd == Builder::TOOL_CLEAR)
 	{
+		blob.set_bool("connectingalchemy", false);
+
 		u16 id;
 		if(!params.saferead_u16(id)) return;
 

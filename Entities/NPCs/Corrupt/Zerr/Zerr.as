@@ -66,7 +66,7 @@ void onTick(CBlob@ this)
 	if(this.get_u8("spitcoold") != 0)
 		this.sub_u8("spitcoold", 1);
 	
-	if(this.isKeyJustPressed(key_action2) && this.get_u8("spitcoold") == 0)
+	if(isServer() && this.isKeyJustPressed(key_action2) && this.get_u8("spitcoold") == 0)
 	{
 		this.set_u8("spitcoold", 60);
 		CBlob@ b = server_CreateBlob("spit", this.getTeamNum(), this.getPosition());
