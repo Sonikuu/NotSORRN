@@ -78,32 +78,32 @@ class CToggleableAbillityBase : CAbilityBase
 class CAbilityManager
 {
     IAbility@[] abilities;
-	IAbility@[] abilityBar;
+	u32[] abilityBar;
     uint selected = 0;
     CBlob@ blob;
 	bool menuOpen = false;
 
-    IAbility@ getSelected() {return abilityBar[selected];}
+    IAbility@ getSelected() {return abilities[abilityBar[selected]];}
 
     void onInit(CBlob@ blob)
     {	
-		CAbilityEmpty abilityEmpty;
-        CPoint abilityPoint(blob,"abilityPoint.png");
-        CConsume abilityConsume("abilityConsume.png",blob);
 
-        abilityBar.push_back(abilityPoint);
-        abilityBar.push_back(abilityConsume);
-		for(int i = 0; i < 3; i++)
-		{
-			abilityBar.push_back(abilityEmpty);
-		}
-		abilities.push_back(abilityEmpty);
-        abilities.push_back(abilityPoint);
-        abilities.push_back(abilityConsume);
+        abilities.push_back(CAbilityEmpty());//0
+        abilities.push_back(CPoint(blob,"abilityPoint.png"));//1
+        abilities.push_back(CConsume("abilityConsume.png",blob));//2
+
+        abilityBar.push_back(1);
+        abilityBar.push_back(2);
+        abilityBar.push_back(0);
+        abilityBar.push_back(0);
+        abilityBar.push_back(0);
+
+
 		
 
         @this.blob = blob;
         blob.addCommandID("ActivateAbilityIndex");
+        blob.addCommandID("syncAbilityBar");
     }
 
     void sendActivateAbilityIndexCommand(int i)
@@ -113,11 +113,29 @@ class CAbilityManager
         this.blob.SendCommand(this.blob.getCommandID("ActivateAbilityIndex"),params);
     }
     
+    void syncAbilityBar()
+    {
+        CBitStream params;
+        for(int i = 0; i < abilityBar.length(); i++)
+        {
+            params.write_u32(abilityBar[i]);
+        }
+
+        blob.SendCommand(blob.getCommandID("syncAbilityBar"),params);
+    }
+
     void onCommand( CBlob@ blob, u8 cmd, CBitStream @params )
     {
         if(cmd == blob.getCommandID("ActivateAbilityIndex"))
         {
             activateAbilityIndex(params.read_s32());
+        }
+        else if(cmd == blob.getCommandID("syncAbilityBar"))
+        {
+            for(int i = 0; i < abilityBar.length(); i++)
+            {
+                abilityBar[i] = params.read_u32();
+            }
         }
         else
         {
@@ -136,7 +154,7 @@ class CAbilityManager
             return;
         }
 
-        abilityBar[i].activate();
+        abilities[abilityBar[i]].activate();
     }
 
 	int holdingIndex = -1;
@@ -195,7 +213,8 @@ class CAbilityManager
 					int abilityBarIndex = getAbilityIndexHovered(getControls().getMouseScreenPos());
 					if(abilityBarIndex > -1)
 					{
-						@abilityBar[abilityBarIndex] = abilities[holdingIndex];
+						abilityBar[abilityBarIndex] = holdingIndex;
+                        syncAbilityBar();
 					}
 				}
 				holdingIndex = -1;
@@ -266,11 +285,11 @@ class CAbilityManager
         if(!isMe(blob)) {return;}
         for(int i = 0; i < abilityBar.length(); i++)//draw toolbar abilities
         {
-            GUI::DrawIcon(abilityBar[i].getTextureName(), 0, Vec2f(16,16), getAbilityPos(i), 1);
+            GUI::DrawIcon(abilities[abilityBar[i]].getTextureName(), 0, Vec2f(16,16), getAbilityPos(i), 1);
 			int hovered = getAbilityIndexHovered(getControls().getMouseScreenPos());
 			if(hovered > -1)
 			{
-				GUI::DrawIcon(abilityBar[hovered].getBorder(),0,Vec2f(18,18), Vec2f(2 + 4*hovered + 32 * hovered,2),1,SColor(127,127,127,127));
+				GUI::DrawIcon(abilities[abilityBar[hovered]].getBorder(),0,Vec2f(18,18), Vec2f(2 + 4*hovered + 32 * hovered,2),1,SColor(127,127,127,127));
 			}
         }
         GUI::DrawIcon(getSelected().getBorder(),0,Vec2f(18,18), Vec2f(2 + 4*selected + 32 * selected,2),1);// draw toolbar selected
@@ -398,7 +417,11 @@ class CConsume : CAbilityBase
 
     void activate() override
     {
-        blob.SendCommand(blob.getCommandID("CONSUME_held_item"));
+        if(blob.isMyPlayer())
+        {
+            blob.SendCommand(blob.getCommandID("CONSUME_held_item"));
+        }
+
     }
 
     void onTick() override
@@ -460,7 +483,7 @@ class CConsume : CAbilityBase
                 } else if(itemName == "unstablecore")
                 {
                     addToMyChat("You consider to do the unthinkable and the next thing you know it's over\nYou feel unstable\nYou've gained a new ability: Self Destruct!");
-                    manager.abilities.push_back(CSelfDescruct("abilitySelfDestruct.png",blob));
+                    manager.abilities.push_back(CSelfDestcruct("abilitySelfDestruct.png",blob));
                     held.server_Die();
                 } else if(itemName == "thisisntajokeitem")
                 {
@@ -485,9 +508,9 @@ class CConsume : CAbilityBase
 
 }
 
-class CSelfDescruct : CAbilityBase
+class CSelfDestcruct : CAbilityBase
 {
-    CSelfDescruct(string textureName, CBlob@ blob)
+    CSelfDestcruct(string textureName, CBlob@ blob)
     {
         super(textureName,blob);
     }
