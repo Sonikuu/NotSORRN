@@ -22,7 +22,7 @@ void InitWorkshop(CBlob@ this)
 	InitCosts(); //read from cfg
 
 	this.set_Vec2f("shop offset", Vec2f_zero);
-	this.set_Vec2f("shop menu size", Vec2f(6, 6));
+	this.set_Vec2f("shop menu size", Vec2f(6, 7));
 
 	{
 		ShopItem@ s = addShopItem(this, "Lantern", "$lantern$", "lantern", Descriptions::lantern, false);
@@ -124,6 +124,33 @@ void InitWorkshop(CBlob@ this)
 		
 		AddIconToken("$mat_explosiveammo$", "MaterialExplosiveAmmo.png", Vec2f(16, 16), 3);
 		AddIconToken("$blazecore$", "BlazeCore.png", Vec2f(8, 8), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Wooden Sword", "$woodsword$", "woodsword", "Basic Wooden Sword", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 80);
+		
+		AddIconToken("$woodsword$", "WoodSword.png", Vec2f(24, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Dagger", "$dagger$", "dagger", "Dagger, for Stabbing", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 20);
+		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 40);
+		
+		AddIconToken("$dagger$", "Dagger.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Spear", "$spear$", "spear", "Poke people with murderous intent", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 80);
+		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 40);
+		
+		AddIconToken("$spear$", "PokingStick.png", Vec2f(32, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Cleaver", "$cleaver$", "cleaver", "Heavy melee weapon, sacrifices speed for damage", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 50);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 4);
+		
+		AddIconToken("$cleaver$", "Cleaver.png", Vec2f(32, 16), 0);
 	}
 	/*{
 		ShopItem@ s = addShopItem(this, "Soul Dust", "$souldust$", "souldust-3", "Smash a soul shard into dust", false);

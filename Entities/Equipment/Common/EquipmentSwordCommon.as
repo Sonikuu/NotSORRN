@@ -346,18 +346,18 @@ class CSwordEquipment : CEquipmentCore
 				{
 					float currcoolratio = float(Maths::Abs(chargetime)) / float(jabtime);
 					if(chargetime < jabtime)
-						frame = 1 + currcoolratio * 7;
+						frame = 2 + int(currcoolratio * 8) * 2;
 					if(chargetime == jabtime)
-						frame = 9;
+						frame = 1;
 					if(chargetime == 0)
 						frame = 0;
 				}
 				else
 				{
 					if(chargetime > 0 && timetocharge != 0)
-						frame = 1 + float(chargetime) / float(timetocharge) * 7;
+						frame = 2 + int(float(chargetime) / float(timetocharge) * 8) * 2;
 					if(chargetime >= timetocharge)
-						frame = 9;
+						frame = 1;
 					if(chargetime == 0)
 						frame = 0;
 				}
