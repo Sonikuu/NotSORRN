@@ -46,7 +46,7 @@ f32 onHit( CBlob@ this, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hit
 	//print("running onhit");
 	if(this.get_u16("fxdamagereducetime") != 0)
 	{
-		damage /= float(this.get_u16("fxdamagereducepower"));
+		damage /= float(this.get_u16("fxdamagereducepower") + 1);
 	}
 	
 	if(this.get_u16("fxcorrupttime") != 0)

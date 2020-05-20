@@ -110,15 +110,17 @@ void corruptTick(Vec2f tilepos, CMap@ map)
 	}
 }
 
-void purifyTile(Vec2f tilepos, CMap@ map)
+bool purifyTile(Vec2f tilepos, CMap@ map)
 {
-	if(isServer())
+	//if(isServer())
 	{
 		Tile tile = map.getTileFromTileSpace(tilepos);
 		if(map.isTileSolid(tile) && (tile.type >= 400 && tile.type <= 405))
 		{
 			map.server_SetTile(tilepos * map.tilesize, 406 + XORRandom(3));
+			return true;
 		}
 	}
+	return false;
 }
 

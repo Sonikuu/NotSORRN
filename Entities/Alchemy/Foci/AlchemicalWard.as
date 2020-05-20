@@ -24,6 +24,8 @@ void onInit(CBlob@ this)
 	this.set_TileType("background tile", 0);
 	
 	this.set_u8("lasteleid", 255);
+
+	this.set_f32("leftovers", 0);
 }
 
 void onInit(CSprite@ this)
@@ -113,9 +115,13 @@ void onTick(CBlob@ this)
 			if(tank.storage.elements[i] >= 1)
 			{
 				this.set_u8("lasteleid", i);
-				elementlist[i].wardbehavior(wardrange, 5, this);
-				if(getGameTime() % 5 == 0)
-					tank.storage.elements[i] -= 1;
+				float minout = this.get_f32("leftovers");
+				minout += elementlist[i].wardbehavior(wardrange, 5, this) / 5.0;
+
+				tank.storage.elements[i] -= int(minout);
+				minout -= int(minout);
+				this.set_f32("leftovers", minout);
+
 				break;
 			}
 		}

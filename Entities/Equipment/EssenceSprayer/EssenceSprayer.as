@@ -18,6 +18,8 @@ void onInit(CBlob@ this)
 	this.set_bool("equipped", false);
 	
 	this.getShape().getConsts().mapCollisions = true;
+
+	this.set_f32("leftovers", 0);
 }
 
 void onTick(CBlob@ this)
