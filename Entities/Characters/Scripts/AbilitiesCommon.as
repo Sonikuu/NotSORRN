@@ -513,6 +513,23 @@ class CSelfDestcruct : CAbilityBase
     CSelfDestcruct(string textureName, CBlob@ blob)
     {
         super(textureName,blob);
+
+        blob.SetLightColor(SColor(255, 252, 86, 10));
+        blob.SetLightRadius(24.0f);
+	    blob.SetLight(true);
+    }
+
+    void onTick()
+    {
+        CBlob@ blob = this.getBlob();
+        if(getGameTime() % 10 == 0)
+        {
+            CParticle@ p = ParticlePixel(blob.getPosition() + Vec2f(XORRandom(8) - 4, XORRandom(8) - 4), Vec2f(XORRandom(16) - 8, XORRandom(16) - 8) / 16.0, SColor(255, 200 + XORRandom(50), 100 + XORRandom(50), 50 + XORRandom(25)), true, 60);
+            if(p !is null)
+            {
+                p.gravity = Vec2f_zero;
+            }
+        }
     }
 
     string getDescription() override
