@@ -146,13 +146,13 @@ void InitWorkshop(CBlob@ this)
 		
 		AddIconToken("$raildrill$", "RailDrill.png", Vec2f(32, 16), 0);
 	}
-	{
-		ShopItem@ s = addShopItem(this,  "Golemite Dust", "$golemitedust$", "GolemiteDust", "A mysterious substance that wiggles when you touch it", false);
-		AddRequirement(s.requirements, "blob", "mat_purifiedgold", "Purified Gold", 1);
-		AddRequirement(s.requirements, "blob", "mat_sand", "Sand", 250);
+	// {
+	// 	ShopItem@ s = addShopItem(this,  "Golemite Dust", "$golemitedust$", "GolemiteDust", "A mysterious substance that wiggles when you touch it", false);
+	// 	AddRequirement(s.requirements, "blob", "mat_purifiedgold", "Purified Gold", 1);
+	// 	AddRequirement(s.requirements, "blob", "mat_sand", "Sand", 250);
 		
-		AddIconToken("$golemitedust$", "GolemiteDust.png", Vec2f(16, 16), 0);
-	}
+	// 	AddIconToken("$golemitedust$", "GolemiteDust.png", Vec2f(16, 16), 0);
+	// }
 }
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
