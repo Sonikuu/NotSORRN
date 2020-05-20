@@ -1,3 +1,6 @@
+#include "Hitters.as"
+#include "ExplosionCommon.as"
+
 interface IAbility
 {
     string getTextureName();
@@ -388,6 +391,10 @@ class CConsume : CAbilityBase
         super(_textureName,_blob);
         blob.addCommandID("CONSUME_held_item");
     }
+    string getDescription() override
+    {
+        return "Consume";
+    }
 
     void activate() override
     {
@@ -405,7 +412,10 @@ class CConsume : CAbilityBase
     void onCommand(CBlob@ blob, u8 cmd, CBitStream@ params)
     {
         if(cmd == blob.getCommandID("CONSUME_held_item"))
-        {
+        {   
+            CAbilityManager@ manager;
+            blob.get("AbilityManager",@manager);
+
             string itemName;
             CBlob@ held = blob.getCarriedBlob();
             if(held is null){itemName = "nothing";}
@@ -449,7 +459,9 @@ class CConsume : CAbilityBase
                     stomachItems++;
                 } else if(itemName == "unstablecore")
                 {
-                    addToMyChat("You think about eating this explosive rock but then decide that wouldn't be a good idea");
+                    addToMyChat("You consider to do the unthinkable and the next thing you know it's over\nYou feel unstable\nYou've gained a new ability: Self Destruct!");
+                    manager.abilities.push_back(CSelfDescruct("abilitySelfDestruct.png",blob));
+                    held.server_Die();
                 } else if(itemName == "thisisntajokeitem")
                 {
                     addToMyChat("Instead of eating the infinity dildo you think of a better idea and shove it in the other end\nYou feel excited and powerful");
@@ -471,4 +483,23 @@ class CConsume : CAbilityBase
         }
     }
 
+}
+
+class CSelfDescruct : CAbilityBase
+{
+    CSelfDescruct(string textureName, CBlob@ blob)
+    {
+        super(textureName,blob);
+    }
+
+    string getDescription() override
+    {
+        return "Self Destruct";
+    }
+
+    void activate() override
+    {
+        Explode(blob, blob.getPosition(), 80, 6, "Bomb.ogg", 16 * 5, 1.0, true, Hitters::explosion, true);
+        blob.server_Hit(blob, blob.getPosition(), Vec2f_zero, 3.0, Hitters::explosion, true);
+    }
 }
