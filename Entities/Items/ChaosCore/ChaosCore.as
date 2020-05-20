@@ -5,6 +5,9 @@ void onInit(CBlob@ this)
 {
 	//Make this emit particles eventually
 	this.getShape().SetRotationsAllowed(true);
+	this.SetLightColor(SColor(255, 163, 10, 252));
+	this.SetLightRadius(24.0f);
+	this.SetLight(true);
 }
 
 void onTick(CSprite@ this)
