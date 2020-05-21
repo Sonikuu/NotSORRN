@@ -99,7 +99,7 @@ void onTick(CRules@ this)
 		Random rando(XORRandom(0x7FFFFFFF));
 		Vec2f nexttile(rando.NextRanged(map.tilemapwidth), rando.NextRanged(map.tilemapheight));
 		Tile tile = map.getTileFromTileSpace(nexttile);
-		if(tile.type >= 400 && tile.type <= 405)
+		if(tile.type >= 400 && tile.type <= 405 && getGameTime() % 2 == 0)
 		{
 			corruptTick(nexttile, map);
 		}
