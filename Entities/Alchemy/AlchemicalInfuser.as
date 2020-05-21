@@ -108,6 +108,26 @@ array<CAlchemyInfuse@> infuserecipes =
 	10,//output amount
 	90//processing time
 	),
+
+	@CAlchemyInfuse(
+	"life",//input element
+	"log",//input item
+	"tree_pine",//output item
+	25,//element amount
+	1,//item amount
+	1,//output amount
+	30//processing time
+	),
+
+	@CAlchemyInfuse(
+	"life",//input element
+	"heart",//input item
+	"chicken",//output item
+	25,//element amount
+	1,//item amount
+	1,//output amount
+	30//processing time
+	),
 	
 	@CAlchemyInfuse(
 	"yeet",//input element
