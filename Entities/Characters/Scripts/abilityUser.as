@@ -34,7 +34,7 @@ void onCommand( CBlob@ this, u8 cmd, CBitStream @params )
     manager.onCommand(this,cmd,params);
 }
 
-void onReceiveCreateData(CBlob@ this, CBitStream@ steam)
+void onReceiveCreateData(CBlob@ this, CBitStream@ stream)
 {
     CAbilityManager@ manager;
     this.get("AbilityManager",@manager);

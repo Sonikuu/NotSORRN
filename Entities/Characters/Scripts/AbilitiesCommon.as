@@ -7,6 +7,7 @@ interface IAbility
     CBlob@ getBlob();
     void activate();
     void onTick();
+    void onReceiveCreateData(CBitStream@ steam);
     void onRender(CSprite@ sprite);
     void onCommand(CBlob@ blob, u8 cmd, CBitStream @params);
     string getBorder();
@@ -37,7 +38,7 @@ class CAbilityBase : IAbility
     {
         print("Base ability activated for some reason on blob " + blob.getConfig());
     }
-
+    void onReceiveCreateData(CBitStream@ steam){}
     void onRender(CSprite@ sprite){}
 
     void onCommand(CBlob@ blob, u8 cmd, CBitStream @params ){}
@@ -557,11 +558,6 @@ class CSelfDestcruct : CAbilityBase
         blob.SetLightColor(SColor(255, 252, 86, 10));
         blob.SetLightRadius(24.0f);
 	    blob.SetLight(true);
-    }
-
-    void sync override
-    {
-
     }
 
     void onTick()
