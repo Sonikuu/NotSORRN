@@ -523,7 +523,7 @@ class CConsume : CAbilityBase
                     blob.server_Heal(99999999);
                 } else if (held !is null && held.hasTag("Eatable"))
                 {
-                    blob.server_Heal(held.get_f32("heal amount"));
+                    blob.server_Heal(2);
                     held.server_Die();
                     stomachItems++;
                 }
