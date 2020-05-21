@@ -311,12 +311,13 @@ class CAbilityManager
         Vec2f drawPos = Vec2f(4,40);
         if(mpos.x > drawPos.x && mpos.x < buttonDimentions.x*2 + drawPos.x && mpos.y > drawPos.y && mpos.y < drawPos.y + buttonDimentions.y *2) //all *2 because default scale is *2
         {
-            GUI::DrawIcon("Manage.png",0, buttonDimentions, drawPos,1,SColor(127,127,127,127));
+            GUI::DrawIcon("Manage.png",0, buttonDimentions, drawPos,1,SColor(255,127,127,127));
         }
         else
         {
             GUI::DrawIcon("Manage.png",0, buttonDimentions, drawPos,1);
         }
+        GUI::DrawText("Press B to activate ability",Vec2f(drawPos + Vec2f(4,4 + buttonDimentions.y * 2)), SColor(255,255,255,255));
 
 		if(menuOpen)//menu rendering
 		{
