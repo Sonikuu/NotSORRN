@@ -84,7 +84,7 @@ class CSprayerEquipment : CEquipmentCore
 				if(tank.storage.elements[i] >= drain && tank.storage.elements[i] != 0)
 				{
 					float minout = blob.get_f32("leftovers");
-					minout += elementlist[i].spraybehavior(power, angle, spread, range, blob, user);
+					minout += elementlist[i].spraybehavior(power, angle, spread, range, blob, user) * drain;
 					
 					//draindec += drain;
 					
