@@ -121,6 +121,7 @@ class CAbilityManager
         {
             params.write_u32(abilityBar[i]);
         }
+        params.write_u32(selected);
 
         blob.SendCommand(blob.getCommandID("syncAbilityBar"),params);
     }
@@ -137,6 +138,7 @@ class CAbilityManager
             {
                 abilityBar[i] = params.read_u32();
             }
+            selected = params.read_u32();
         }
         else
         {
@@ -360,6 +362,8 @@ class CAbilityManager
         {
             abilities[i].onReceiveCreateData( stream);
         }
+
+        syncAbilityBar();
     }
 }
 
