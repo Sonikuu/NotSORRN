@@ -490,6 +490,12 @@ class CConsume : CAbilityBase
                     addToMyChat("Instead of eating the infinity dildo you think of a better idea and shove it in the other end\nYou feel excited and powerful");
                     held.server_Die();
                     stomachItems++;
+                } else if (itemName == "lifefruit")
+                {
+                    addToMyChat("The fruit magicall heals your wounds");
+                    held.server_Die();
+                    stomachItems++;
+                    blob.server_Heal(99999999);
                 }
                 else if(itemName == "nothing") {addToMyChat("You prepare to take a big bite but then chop down on nothing\nYou can't eat nothing");}
             }
