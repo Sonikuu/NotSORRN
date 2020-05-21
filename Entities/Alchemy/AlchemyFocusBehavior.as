@@ -814,7 +814,7 @@ float sprayAer(int power, float aimdir, float spread, float range, CBlob@ spray,
 			@user = @attp.getBlob();
 	}
 	user.setVelocity(user.getVelocity() + Vec2f(1, 0).RotateBy(aimdir + 180) * power * 0.1);
-	return 1;
+	return 2;
 }
 
 float sprayOrder(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
