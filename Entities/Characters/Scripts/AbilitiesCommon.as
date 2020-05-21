@@ -449,7 +449,7 @@ class CConsume : CAbilityBase
 
             if(stomachItems < stomachMax)
             {
-
+                int stomachItemsBefore = stomachItems;
                 if(itemName == "fishy")
                 {   
                     addToMyChat("The fish" + (held.hasTag("dead") ? " slowly slides " : " agressivly wiggles ") + "down your throat nearly causing to to gag\nYou feel fuller but not much else");
@@ -496,12 +496,23 @@ class CConsume : CAbilityBase
                     held.server_Die();
                     stomachItems++;
                     blob.server_Heal(99999999);
+                } else if (held.hasTag("Eatable"))
+                {
+                    blob.server_Heal(held.get_f32("heal amount"));
+                    held.server_Die();
+                    stomachItems++;
                 }
                 else if(itemName == "nothing") {addToMyChat("You prepare to take a big bite but then chop down on nothing\nYou can't eat nothing");}
+                if(stomachItems > stomachItemsBefore){nomSound(held);}
             }
             else{addToMyChat("You don't think you can eat anymore for a while");}
 
         }
+    }
+
+    void nomSound(CBlob@ held)
+    {
+        blob.getSprite().PlaySound(held.get_string("eat sound"));
     }
 
     void addToMyChat(string msg)
