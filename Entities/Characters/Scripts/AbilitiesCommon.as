@@ -517,7 +517,7 @@ class CConsume : CAbilityBase
                     held.server_Die();
                     stomachItems++;
                     blob.server_Heal(99999999);
-                } else if (held.hasTag("Eatable"))
+                } else if (held !is null && held.hasTag("Eatable"))
                 {
                     blob.server_Heal(held.get_f32("heal amount"));
                     held.server_Die();
@@ -533,7 +533,10 @@ class CConsume : CAbilityBase
 
     void nomSound(CBlob@ held)
     {
-        blob.getSprite().PlaySound(held.get_string("eat sound"));
+        if(held !is null)
+        {
+            blob.getSprite().PlaySound(held.get_string("eat sound"));
+        }
     }
 
     void addToMyChat(string msg)
