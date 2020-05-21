@@ -352,6 +352,14 @@ class CAbilityManager
 			GUI::DrawIcon(abilities[holdingIndex].getTextureName(),0,Vec2f(16,16),getControls().getMouseScreenPos() - Vec2f(16,16),1);
 		}
     }
+
+    void onReceiveCreateData(CBitStream@ stream )
+    {
+        for(int i = 0; i < abilities.length(); i++)
+        {
+            abilities[i].onReceiveCreateData( stream);
+        }
+    }
 }
 
 bool isMe(CBlob@ blob)
@@ -542,10 +550,18 @@ class CSelfDestcruct : CAbilityBase
     CSelfDestcruct(string textureName, CBlob@ blob)
     {
         super(textureName,blob);
+    }
 
+    void onReceiveCreateData(CBitStream@ steam)
+    {
         blob.SetLightColor(SColor(255, 252, 86, 10));
         blob.SetLightRadius(24.0f);
 	    blob.SetLight(true);
+    }
+
+    void sync override
+    {
+
     }
 
     void onTick()
