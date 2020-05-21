@@ -165,22 +165,24 @@ class CAbilityManager
         {
             abilities[i].onTick();
         }
+
+        CControls@ controls = getControls();
         
         if(isMe(blob))
         {
-			if(getControls().isKeyJustPressed(KEY_KEY_I))
+			if(controls.isKeyJustPressed(KEY_KEY_I))
 			{
-				start = getControls().getMouseScreenPos();
+				start = controls.getMouseScreenPos();
 				menuOpen = !menuOpen;
 			}
-            if(getControls().isKeyJustPressed(KEY_KEY_B))
+            if(controls.isKeyJustPressed(KEY_KEY_B))
             {
                 sendActivateAbilityIndexCommand(selected);
             }
 
-            if(getControls().isKeyJustPressed(KEY_LBUTTON))
+            if(controls.isKeyJustPressed(KEY_LBUTTON))
             {
-                Vec2f mpos = getControls().getMouseScreenPos();
+                Vec2f mpos = controls.getMouseScreenPos();
 				
 				int newselection = getAbilityIndexHovered(mpos);
                 selected = newselection > -1 ? newselection : selected;
@@ -206,11 +208,11 @@ class CAbilityManager
 
             }
 
-			if(!getControls().isKeyPressed(KEY_LBUTTON))
+			if(!controls.isKeyPressed(KEY_LBUTTON))
 			{
 				if(holdingIndex > -1)
 				{
-					int abilityBarIndex = getAbilityIndexHovered(getControls().getMouseScreenPos());
+					int abilityBarIndex = getAbilityIndexHovered(controls.getMouseScreenPos());
 					if(abilityBarIndex > -1)
 					{
 						abilityBar[abilityBarIndex] = holdingIndex;
@@ -219,6 +221,15 @@ class CAbilityManager
 				}
 				holdingIndex = -1;
 			}
+            if(controls.isKeyPressed(KEY_LCONTROL))
+            {
+                if(controls.isKeyJustPressed(KEY_KEY_1)) {selected = 0;}
+                if(controls.isKeyJustPressed(KEY_KEY_2)) {selected = 1;}
+                if(controls.isKeyJustPressed(KEY_KEY_3)) {selected = 2;}
+                if(controls.isKeyJustPressed(KEY_KEY_4)) {selected = 3;}
+                if(controls.isKeyJustPressed(KEY_KEY_5)) {selected = 4;}
+
+            }
         }
     }
 
