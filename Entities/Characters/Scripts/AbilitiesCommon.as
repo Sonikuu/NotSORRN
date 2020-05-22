@@ -151,7 +151,7 @@ class CAbilityManager
 
     void activateAbilityIndex(int i)
     {
-        if(i > abilityBar.length())
+        if(i > abilities.length())
         {
             error("Attempted to run ability out of index");
             return;
@@ -362,8 +362,6 @@ class CAbilityManager
         {
             abilities[i].onReceiveCreateData( stream);
         }
-
-        syncAbilityBar();
     }
 }
 
@@ -558,13 +556,6 @@ class CSelfDestcruct : CAbilityBase
     CSelfDestcruct(string textureName, CBlob@ blob)
     {
         super(textureName,blob);
-    }
-
-    void onReceiveCreateData(CBitStream@ steam)
-    {
-        blob.SetLightColor(SColor(255, 252, 86, 10));
-        blob.SetLightRadius(24.0f);
-	    blob.SetLight(true);
     }
 
     void onTick()
