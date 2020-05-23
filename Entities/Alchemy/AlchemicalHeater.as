@@ -40,6 +40,7 @@ void onTick(CBlob@ this)
 						{
 							int toadd = Maths::Min(eachdisperse, 1000 / 2.5 - fuelblobs[i].get_f32("fuel") / 2.5);
 							fuelblobs[i].set_f32("fuel", fuelblobs[i].get_f32("fuel") + toadd * 2.5);
+							fuelblobs[i].Sync("fuel", true);
 							dispersed += toadd;
 							if(toadd > 0) 
 								makeIgnisPacket(this, fuelblobs[i].getPosition());
@@ -55,7 +56,7 @@ void onTick(CBlob@ this)
 void makeIgnisPacket(CBlob@ this, const Vec2f topos)
 {
 	CRenderParticleBlazing p(2, false, false, 300, 0, SColor(150, 255, 150, 20), false, 0);
-	p.position = this.getPosition();
+	p.position = this.getPosition() - Vec2f(0, 9.5);
 	p.topos = topos;
 	addParticleToList(p);
 }
