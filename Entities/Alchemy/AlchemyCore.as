@@ -213,6 +213,8 @@ void onTick(CBlob@ this)
 				{
 					if(controller.tanks[i].connection.singleelement)
 						transferOnly(controller.tanks[i], controller.tanks[i].connection, this.get_u16("transferrate"), firstId(controller.tanks[i].connection));
+					else if(controller.tanks[i].connection.onlyele < elementlist.length)
+						transferOnly(controller.tanks[i], controller.tanks[i].connection, this.get_u16("transferrate"), controller.tanks[i].connection.onlyele);
 					else
 						transferSimple(controller.tanks[i], controller.tanks[i].connection, this.get_u16("transferrate"));
 				}
