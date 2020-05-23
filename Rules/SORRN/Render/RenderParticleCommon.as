@@ -214,6 +214,150 @@ shared class CRenderParticleArrow : CRenderParticleBase
 	}
 }
 
+shared class CRenderParticleBlazing : CRenderParticleBase
+{
+	Vec2f topos;
+	array<Vec2f> partposes;
+	array<Vec2f> partvel;
+	array<int> parttimes;
+	CRenderParticleBlazing(float scale, bool collides, bool dieoncollide, int timelimit, float gravity, SColor color, bool rotates, u32 randoseed)
+	{
+		super(scale, collides, dieoncollide, timelimit, gravity, color, rotates, randoseed);
+		updatedeath = true;
+		topos = Vec2f_zero;
+	}
+
+	bool onTick()
+	{
+		if(deathtime > 0)
+		{
+			//if(updatedeath)
+			{
+			//	velocity.y += gravity;
+			//	position += velocity;
+			}
+			deathtime--;
+			//color.setAlpha(Maths::Max(color.getAlpha() - 30, 0));
+			if(deathtime == 0)
+				return false;
+			//return true;
+		}
+		else
+		{
+			velocity = Vec2f_lengthdir(2, (topos - position).Angle() * -1);
+			position += velocity;
+			if((position - topos).Length() < 4)
+				startDeath();
+
+			//if(XORRandom(2) == 0)
+			{
+				partposes.push_back(position + Vec2f(XORRandom(10) - 5, XORRandom(10) - 5) / 3.0);
+				parttimes.push_back(15 + XORRandom(15));
+				partvel.push_back(Vec2f(XORRandom(100) - 50, XORRandom(100) - 50) / 500.0);
+			}
+		}
+
+		for(int i = 0; i < parttimes.length; i++)
+		{
+			parttimes[i]--;
+			partposes[i] += partvel[i];
+			if(parttimes[i] == 0)
+			{
+				parttimes.removeAt(i);
+				partposes.removeAt(i);
+				partvel.removeAt(i);
+				i--;
+			}
+		}
+
+		if(deathtime <= 0)
+		{
+			timelimit--;
+			if(timelimit < 0)
+				startDeath();
+		}
+		return true;
+	}
+
+	void startDeath()
+	{
+		for(int i = 0; i < 16; i++)
+		{
+			partposes.push_back(position + Vec2f(XORRandom(10) - 5, XORRandom(10) - 5) / 3.0);
+			parttimes.push_back(15 + XORRandom(15));
+			partvel.push_back(Vec2f(XORRandom(100) - 50, XORRandom(100) - 50) / 150.0);
+		}
+		deathtime = 30;
+	}
+
+	void appendVerts(array<Vertex>@ verts)
+	{
+		//Vec2f tempvel = velocity;
+		//tempvel.y += gravity * getInterpolationFactor();
+		
+		//Vec2f temppos = deathtime > 0 ? position : position + velocity * getInterpolationFactor();
+		
+		//float rotation = rotates ? (tempvel.getAngle() / 180.0) * Maths::Pi : Maths::Pi / 2;
+		//rotation *= -1;
+		//rotation -= Maths::Pi / 4;
+		//float rotdeg = (tempvel.getAngle() - 90) * -1;
+		//ul, ur, lr, and ll mean this
+		//Upper left
+		//Upper right
+		//Lower right
+		//Lower left
+		//Makes this easier
+		Vec2f sul(0, 0);
+		Vec2f sur(1, 0);
+		Vec2f slr(1, 1);
+		Vec2f sll(0, 1);
+
+		for(int i = 0; i < partposes.length; i++)
+		{
+			Vec2f temppos = partposes[i];
+			Vec2f ul = Vec2f(-scale, -scale);
+			ul += temppos;
+			
+			Vec2f ur = Vec2f(scale, -scale);
+			ur += temppos;
+			
+			Vec2f lr = Vec2f(scale, scale);
+			lr += temppos;
+			
+			Vec2f ll = Vec2f(-scale, scale);
+			ll += temppos;
+
+			verts.push_back(Vertex(ul, 0, sul, color));
+			verts.push_back(Vertex(ur, 0, sur, color));
+			verts.push_back(Vertex(lr, 0, slr, color));
+			verts.push_back(Vertex(ll, 0, sll, color));
+		}
+		
+		
+		//CMap@ map = getMap();
+		//SColor maplight = map.getColorLight((deathtime > 0 ? temppos - velocity : temppos));
+		
+		//u32 colorint = (color.getAlpha() << 24) + ((color.getRed() * maplight.getRed()) / 255 << 16) + ((color.getGreen() * maplight.getGreen()) / 255 << 8) + ((color.getBlue() * maplight.getBlue()) / 255);
+		
+		/*Vec2f ul = Vec2f(0, scale * -0.125 * velocity.Length()).RotateBy(rotdeg);
+		ul += temppos;
+		
+		Vec2f ur = Vec2f(2 * scale, scale * 0.25 * velocity.Length()).RotateBy(rotdeg);
+		ur += temppos;
+		
+		Vec2f lr = Vec2f(0, 0).RotateBy(rotdeg);
+		lr += temppos;
+		
+		Vec2f ll = Vec2f(-2 * scale, scale * 0.25 * velocity.Length()).RotateBy(rotdeg);
+		ll += temppos;
+		
+		verts.push_back(Vertex(ul, 0, sul, colorint));
+		verts.push_back(Vertex(ur, 0, sur, colorint));
+		verts.push_back(Vertex(lr, 0, slr, colorint));
+		verts.push_back(Vertex(ll, 0, sll, colorint));*/
+	}
+}
+
 shared class CRenderParticleDrop : CRenderParticleBase
 {
 	Vec2f ul;

@@ -18,6 +18,7 @@ class CAlchemyTank
 	bool singleelement;
 	bool unmixedstorage;
 	int maxelements;
+	u8 onlyele;
 	CAlchemyTank(string name, bool input, Vec2f offset)
 	{
 		this.name = name;
@@ -30,6 +31,7 @@ class CAlchemyTank
 		singleelement = false;
 		maxelements = 100;
 		unmixedstorage = false;
+		onlyele = 255;
 	}
 	
 }
@@ -81,7 +83,7 @@ class CAlchemyTankController
 	}
 	CAlchemyTank@ getTank(int id)
 	{
-		if(id <= elementlist.length && id >= 0)
+		if(id < tanks.length && id >= 0)
 			return tanks[id];
 		else
 			print("Outside of bounds");

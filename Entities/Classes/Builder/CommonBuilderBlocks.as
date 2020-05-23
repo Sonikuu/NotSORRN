@@ -459,6 +459,15 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			blocks[1].push_back(b);
 			AddIconToken("$alchemyburner$", "AlchemyBurner.png", Vec2f(16, 32), 0);
 		}
+		{
+			BuildBlock b(0, "alchemyheater", "$alchemyheater$", "Alchemical Heater\nSupplies fuel in the form of ignis for all nearby machines");
+			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 50);
+			AddRequirement(b.reqs, "blob", "mat_metal", "Alchemic Metal Sheet", 6);
+			b.buildOnGround = true;
+			b.size.Set(16, 32);
+			blocks[1].push_back(b);
+			AddIconToken("$alchemyheater$", "AlchemyHeater.png", Vec2f(16, 32), 0);
+		}
 		if(sv_test)
 		{
 			BuildBlock b(0, "alchemycheatmachine", "$alchemycheatmachine$", "dirty dirty cheater");
