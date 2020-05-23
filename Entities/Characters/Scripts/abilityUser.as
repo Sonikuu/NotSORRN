@@ -2,8 +2,8 @@
 
 void onInit(CBlob@ this)
 {
-    CAbilityManager manager;
-    manager.onInit(this);
+    CAbilityManager manager = CAbilityManager(this);
+    manager.onInit();
 
 
     this.set("AbilityManager",manager);

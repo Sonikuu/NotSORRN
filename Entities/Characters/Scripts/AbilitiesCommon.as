@@ -7,9 +7,10 @@ interface IAbility
     CBlob@ getBlob();
     void activate();
     void onTick();
+	void onInit();
     void onReceiveCreateData(CBitStream@ steam);
     void onRender(CSprite@ sprite);
-    void onCommand(CBlob@ blob, u8 cmd, CBitStream @params);
+    void onCommand(u8 cmd, CBitStream @params);
     string getBorder();
     string getDescription();
 }
@@ -17,6 +18,7 @@ interface IAbility
 class CAbilityBase : IAbility
 {
     void onTick(){}
+	void onInit(){}
     string getBorder(){return border;}
     string textureName;
     string border = "Border.png";
@@ -41,7 +43,7 @@ class CAbilityBase : IAbility
     void onReceiveCreateData(CBitStream@ steam){}
     void onRender(CSprite@ sprite){}
 
-    void onCommand(CBlob@ blob, u8 cmd, CBitStream @params ){}
+    void onCommand( u8 cmd, CBitStream @params ){}
 }
 
 class CAbilityEmpty : CAbilityBase
@@ -76,303 +78,9 @@ class CToggleableAbillityBase : CAbilityBase
     }
 }
 
-class CAbilityManager
-{
-    IAbility@[] abilities;
-	u32[] abilityBar;
-    uint selected = 0;
-    CBlob@ blob;
-	bool menuOpen = false;
-
-    IAbility@ getSelected() {return abilities[abilityBar[selected]];}
-
-    void onInit(CBlob@ blob)
-    {	
-
-        abilities.push_back(CAbilityEmpty());//0
-        abilities.push_back(CPoint(blob,"abilityPoint.png"));//1
-        abilities.push_back(CConsume("abilityConsume.png",blob));//2
-
-        abilityBar.push_back(1);
-        abilityBar.push_back(2);
-        abilityBar.push_back(0);
-        abilityBar.push_back(0);
-        abilityBar.push_back(0);
-
-
-		
-
-        @this.blob = blob;
-        blob.addCommandID("ActivateAbilityIndex");
-        blob.addCommandID("syncAbilityBar");
-    }
-
-    void sendActivateAbilityIndexCommand(int i)
-    {
-        CBitStream params;
-        params.write_s32(i);
-        this.blob.SendCommand(this.blob.getCommandID("ActivateAbilityIndex"),params);
-    }
-    
-    void syncAbilityBar()
-    {
-        CBitStream params;
-        for(int i = 0; i < abilityBar.length(); i++)
-        {
-            params.write_u32(abilityBar[i]);
-        }
-        params.write_u32(selected);
-
-        blob.SendCommand(blob.getCommandID("syncAbilityBar"),params);
-    }
-
-    void onCommand( CBlob@ blob, u8 cmd, CBitStream @params )
-    {
-        if(cmd == blob.getCommandID("ActivateAbilityIndex"))
-        {
-            activateAbilityIndex(params.read_s32());
-        }
-        else if(cmd == blob.getCommandID("syncAbilityBar"))
-        {
-            for(int i = 0; i < abilityBar.length(); i++)
-            {
-                abilityBar[i] = params.read_u32();
-            }
-            selected = params.read_u32();
-        }
-        else
-        {
-            for(int i = 0; i < abilities.length(); i++)
-            {
-                abilities[i].onCommand(blob,cmd,params);
-            }
-        }
-    }
-
-    void activateAbilityIndex(int i)
-    {
-        if(i > abilities.length())
-        {
-            error("Attempted to run ability out of index");
-            return;
-        }
-
-        abilities[abilityBar[i]].activate();
-    }
-
-	int holdingIndex = -1;
-
-    void onTick(CBlob@ blob)
-    {
-        for(int i = 0; i < abilities.length(); i++)
-        {
-            abilities[i].onTick();
-        }
-
-        CControls@ controls = getControls();
-        
-        if(isMe(blob))
-        {
-			if(controls.isKeyJustPressed(KEY_KEY_I))
-			{
-				start = controls.getMouseScreenPos();
-				menuOpen = !menuOpen;
-			}
-            if(controls.isKeyJustPressed(KEY_KEY_B))
-            {
-                sendActivateAbilityIndexCommand(selected);
-            }
-
-            if(controls.isKeyJustPressed(KEY_LBUTTON))
-            {
-                Vec2f mpos = controls.getMouseScreenPos();
-				
-				int newselection = getAbilityIndexHovered(mpos);
-                selected = newselection > -1 ? newselection : selected;
-
-				if(menuOpen)
-				{
-					holdingIndex = getAbilityMenuIndexHovered(mpos);
-
-                    if(mpos.x < start.x || mpos.x > end.x || mpos.y > end.y || mpos.y < start.y)
-                    {
-                        menuOpen = false;
-                    }
-				}
-                
-                Vec2f buttonDimentions = Vec2f(32,16);
-                Vec2f drawPos = Vec2f(4,40);
-
-                if(mpos.x > drawPos.x && mpos.x < buttonDimentions.x*2 + drawPos.x && mpos.y > drawPos.y && mpos.y < drawPos.y + buttonDimentions.y *2)
-                {
-                    menuOpen = true;
-                    start = drawPos;
-                }
-
-            }
-
-			if(!controls.isKeyPressed(KEY_LBUTTON))
-			{
-				if(holdingIndex > -1)
-				{
-					int abilityBarIndex = getAbilityIndexHovered(controls.getMouseScreenPos());
-					if(abilityBarIndex > -1)
-					{
-						abilityBar[abilityBarIndex] = holdingIndex;
-                        syncAbilityBar();
-					}
-				}
-				holdingIndex = -1;
-			}
-            if(controls.isKeyPressed(KEY_LCONTROL))
-            {
-                if(controls.isKeyJustPressed(KEY_KEY_1)) {selected = 0;}
-                if(controls.isKeyJustPressed(KEY_KEY_2)) {selected = 1;}
-                if(controls.isKeyJustPressed(KEY_KEY_3)) {selected = 2;}
-                if(controls.isKeyJustPressed(KEY_KEY_4)) {selected = 3;}
-                if(controls.isKeyJustPressed(KEY_KEY_5)) {selected = 4;}
-
-            }
-        }
-    }
-
-    Vec2f getAbilityPos(int index)
-    {
-        return Vec2f(4 + 4*index + 32 * index, 4);
-    }
-
-    int getAbilityIndexHovered(Vec2f pos)
-    {
-		int index = -1;
-        if(pos.y <= 40 && pos.y >= 4)
-        {
-            for(int i = 0; i < abilityBar.length(); i++)
-            {
-                int x = (4 + 4*i + 32 * i);
-                if(pos.x >= x && pos.x <= x + 32)
-                {
-                    index = i;
-                    break;
-                }
-            }
-        }
-		return index;
-    }
-
-	int getAbilityMenuIndexHovered(Vec2f pos)
-	{
-		int index = -1;
-
-		for(int i = 0; i < abilities.length(); i++)
-		{
-			Vec2f abilityPos = Vec2f(i%numColumns * 36, i / numColumns * 36) + start + Vec2f(4,4);
-
-			if(pos.x >= abilityPos.x && pos.x <= abilityPos.x + 32 && pos.y >= abilityPos.y && pos.y <= abilityPos.y + 32)
-			{
-				index = i;
-				break;
-			}
-		}
-
-		return index;
-	}
-
-	u32 numColumns = 5;
-
-	Vec2f start;
-	Vec2f end;
-	int getRowCount()
-	{
-		int rowCount;
-		float fNumColumns = numColumns;
-		float rowsUneven = (abilities.length() / fNumColumns );
-		rowCount = Maths::Ceil(rowsUneven);
-		return rowCount;
-	}
-    void onRender(CSprite@ this)
-    {
-        for(int i = 0; i < abilities.length(); i++)
-        {
-            abilities[i].onRender(this);
-        }
-
-        if(!isMe(blob)) {return;}
-        for(int i = 0; i < abilityBar.length(); i++)//draw toolbar abilities
-        {
-            GUI::DrawIcon(abilities[abilityBar[i]].getTextureName(), 0, Vec2f(16,16), getAbilityPos(i), 1);
-			int hovered = getAbilityIndexHovered(getControls().getMouseScreenPos());
-			if(hovered > -1)
-			{
-				GUI::DrawIcon(abilities[abilityBar[hovered]].getBorder(),0,Vec2f(18,18), Vec2f(2 + 4*hovered + 32 * hovered,2),1,SColor(127,127,127,127));
-			}
-        }
-        GUI::DrawIcon(getSelected().getBorder(),0,Vec2f(18,18), Vec2f(2 + 4*selected + 32 * selected,2),1);// draw toolbar selected
-
-        //GUI::DrawText("Activate: {B}\nManage: {I}", Vec2f(16,40), SColor(255,127,127,127));
-        Vec2f mpos = getControls().getMouseScreenPos();
-        Vec2f buttonDimentions = Vec2f(32,16);
-        Vec2f drawPos = Vec2f(4,40);
-        if(mpos.x > drawPos.x && mpos.x < buttonDimentions.x*2 + drawPos.x && mpos.y > drawPos.y && mpos.y < drawPos.y + buttonDimentions.y *2) //all *2 because default scale is *2
-        {
-            GUI::DrawIcon("Manage.png",0, buttonDimentions, drawPos,1,SColor(255,127,127,127));
-        }
-        else
-        {
-            GUI::DrawIcon("Manage.png",0, buttonDimentions, drawPos,1);
-        }
-        GUI::DrawText("Press B to activate ability",Vec2f(drawPos + Vec2f(4,4 + buttonDimentions.y * 2)), SColor(255,255,255,255));
-
-		if(menuOpen)//menu rendering
-		{
-			end = Vec2f(start.x + numColumns * 4 + numColumns * 32 +4,start.y + getRowCount() * 36 + 4);
-
-			GUI::DrawRectangle(start,end);
-
-			for(int i = 0; i < abilities.length; i++)
-			{
-				Vec2f iconPos = Vec2f(i%numColumns * 36, i / numColumns * 36) + start + Vec2f(4,4);
-				if(holdingIndex > -1 && holdingIndex == i)
-				{
-					GUI::DrawIcon(abilities[i].getTextureName(), 0, Vec2f(16,16), iconPos, 1,SColor(127,60,60,60));
-				}
-				else
-				{
-					GUI::DrawIcon(abilities[i].getTextureName(), 0, Vec2f(16,16), iconPos, 1);
-				}
-			}
-
-			int hovered = holdingIndex > -1 ? holdingIndex : getAbilityMenuIndexHovered(getControls().getMouseScreenPos());
-			if(hovered > -1)
-			{
-				GUI::DrawIcon(getSelected().getBorder(),0,Vec2f(18,18), start + Vec2f(2,2) + Vec2f(hovered%numColumns * 36, hovered/numColumns * 36),1);
-
-                GUI::DrawText(abilities[hovered].getDescription(),start + Vec2f(0,-12),SColor(255,250,250,255));
-			}
-		}
-
-		if(holdingIndex > -1)
-		{
-			GUI::DrawIcon(abilities[holdingIndex].getTextureName(),0,Vec2f(16,16),getControls().getMouseScreenPos() - Vec2f(16,16),1);
-		}
-    }
-
-    void onReceiveCreateData(CBitStream@ stream )
-    {
-        for(int i = 0; i < abilities.length(); i++)
-        {
-            abilities[i].onReceiveCreateData( stream);
-        }
-    }
-}
-
-bool isMe(CBlob@ blob)
-{
-    return blob.getPlayer() !is null && blob.getPlayer() is getLocalPlayer();
-}
-
 class CPoint : CAbilityBase
 {
-    CPoint(CBlob@ blob, string textureName)
+    CPoint(string textureName, CBlob@ blob)
     {
         super(textureName,blob);
 
@@ -417,7 +125,7 @@ class CPoint : CAbilityBase
         }
     }
 
-    void onCommand(CBlob@ blob, u8 cmd, CBitStream@ params)
+    void onCommand( u8 cmd, CBitStream@ params)
     {
         if(cmd == blob.getCommandID("CPoint_timeSync")){ _time = params.read_u32();}
         else if(cmd == blob.getCommandID("CPoint_tposSync")){ _tpos = params.read_Vec2f();}
@@ -455,7 +163,7 @@ class CConsume : CAbilityBase
         } 
     }
 
-    void onCommand(CBlob@ blob, u8 cmd, CBitStream@ params)
+    void onCommand(u8 cmd, CBitStream@ params)
     {
         if(cmd == blob.getCommandID("CONSUME_held_item"))
         {   
@@ -506,7 +214,7 @@ class CConsume : CAbilityBase
                 } else if(itemName == "unstablecore")
                 {
                     addToMyChat("You consider to do the unthinkable and the next thing you know it's over\nYou feel unstable\nYou've gained a new ability: Self Destruct!");
-                    manager.abilities.push_back(CSelfDestcruct("abilitySelfDestruct.png",blob));
+                    manager.abilityMenu.addAbility(EAbilities::SelfDestruct);
                     held.server_Die();
                 } else if(itemName == "thisisntajokeitem")
                 {
@@ -551,16 +259,17 @@ class CConsume : CAbilityBase
 
 }
 
-class CSelfDestcruct : CAbilityBase
+class CSelfDestruct : CAbilityBase
 {
-    CSelfDestcruct(string textureName, CBlob@ blob)
+    CSelfDestruct(string textureName, CBlob@ blob)
     {
         super(textureName,blob);
+
+		blob.addCommandID("SelfDestruct_Activate");
     }
 
     void onTick()
     {
-        CBlob@ blob = this.getBlob();
         if(getGameTime() % 10 == 0)
         {
             CParticle@ p = ParticlePixel(blob.getPosition() + Vec2f(XORRandom(8) - 4, XORRandom(8) - 4), Vec2f(XORRandom(16) - 8, XORRandom(16) - 8) / 16.0, SColor(255, 200 + XORRandom(50), 100 + XORRandom(50), 50 + XORRandom(25)), true, 60);
@@ -578,7 +287,466 @@ class CSelfDestcruct : CAbilityBase
 
     void activate() override
     {
-        Explode(blob, blob.getPosition(), 80, 6, "Bomb.ogg", 16 * 5, 1.0, true, Hitters::explosion, true);
-        blob.server_Hit(blob, blob.getPosition(), Vec2f_zero, 3.0, Hitters::explosion, true);
+		blob.SendCommand(blob.getCommandID("SelfDestruct_Activate"));
     }
+
+	void onCommand(u8 cmd, CBitStream@ params)
+	{
+		if(cmd == blob.getCommandID("SelfDestruct_Activate"))
+		{
+			Explode(blob, blob.getPosition(), 80, 6, "Bomb.ogg", 16 * 5, 1.0, true, Hitters::explosion, true);
+			blob.server_Hit(blob, blob.getPosition(), Vec2f_zero, 3.0, Hitters::explosion, true);
+		}
+	}
+}
+
+
+enum EAbilities
+{
+	Empty = 0,
+	Point = 1,
+	Consume = 2,
+	SelfDestruct = 3
+}
+
+class CAbilityMasterList
+{
+	private IAbility@[] abilities;
+	CBlob@ blob;
+
+	CAbilityMasterList(CBlob@ _blob)
+	{
+		@this.blob = _blob;
+		abilities.push_back(CAbilityEmpty());//order here matters, needs relate to the enum
+		abilities.push_back(CPoint("abilityPoint.png",blob));
+		abilities.push_back(CConsume("abilityConsume.png",blob));
+		abilities.push_back(CSelfDestruct("abilitySelfDestruct",blob));
+	}
+
+	IAbility@ getAbility(int i)
+	{
+		if(i >= abilities.size()){error("Index out of bounds for abilities in CAbilityMasterList");}
+		return abilities[i];
+	}
+
+	void activateAbility(int i)
+	{
+		getAbility(i).activate();
+	}
+}
+
+f32 fDrawScale = 1; // this is actually 2x scale idk why kag does this
+f32 fRealScale = fDrawScale/0.5;
+Vec2f slotDimentions = Vec2f(16,16);
+Vec2f slotSpacing = Vec2f(4,0);
+Vec2f borderDimentions = Vec2f(18,18);
+Vec2f borderOffset = Vec2f(-2,-2);
+class CAbilityBar
+{	
+	CAbilityMasterList@ masterList;
+	CBlob@ blob;
+
+	private Vec2f initialBarOffset = Vec2f(8,8);
+	private f32 backgroundThickness = 4;
+	private u32 selectedSlot = 0;
+	private u32[] slots = {
+		EAbilities::Point,
+		EAbilities::Consume,
+		EAbilities::Empty,
+		EAbilities::Empty,
+		EAbilities::Empty
+	};
+
+
+	CAbilityBar(CAbilityMasterList@ _masterList, CBlob@ blob)
+	{
+		@this.masterList = _masterList;
+		@this.blob = blob;
+	}
+
+	u32 getSlot(u32 i)
+	{
+		if(i >= slots.size()) {error("Index out of bounds for slots");}
+		return slots[i];
+	}
+
+	IAbility@ getAbility(u32 i)
+	{
+		return masterList.getAbility(getSlot(i));
+	}
+
+	IAbility@ getSelectedAbility()
+	{
+		return getAbility(selectedSlot);
+	}
+
+	void activateSelectedAbility()
+	{
+		activateAbility(selectedSlot);
+	}
+
+	void setSlot(u32 slot, u32 i)
+	{
+		if(slot <= slots.length)
+		{
+			slots[slot] = i; 
+		}
+		else 
+		{
+			error("Tried to set slot out of bounds");
+		}
+	}
+
+	void setHoveredSlot(u32 i)
+	{
+		s32 hovered = getHoveredSlot();
+		if(hovered > -1)
+		{
+			setSlot(hovered,i);
+		}
+	}
+
+	void activateAbility(u32 i)//this should only be called client side on the client activating it, the ability *should* handle sending out the activation to the server
+	{
+		masterList.getAbility(getSlot(i)).activate();
+	}
+
+	Vec2f getSlotPosition(u32 i)
+	{
+		return initialBarOffset + (slotSpacing * i) + Vec2f(slotDimentions.x * i * fRealScale, initialBarOffset.y);
+	}
+
+	bool isSlotHovered(u32 i)
+	{
+		Vec2f slotPos = getSlotPosition(i);
+		Vec2f mpos = getControls().getMouseScreenPos();
+
+		return mpos.x >= slotPos.x && mpos.x <= (slotPos.x + slotDimentions.x * fRealScale) && mpos.y >= slotPos.y && mpos.y <= (slotPos.y + slotDimentions.y * fRealScale);
+	}
+
+	int getHoveredSlot()
+	{
+		for(int i = 0; i < slots.size(); i++)
+		{
+			if(isSlotHovered(i)){return i;}
+		}
+
+		return -1;
+	}
+
+	void onTick()
+	{
+		if(blob.isMyPlayer())
+		{
+			CControls@ controls = getControls();
+			if(controls.isKeyJustPressed(KEY_LBUTTON))
+			{
+				int hovered = getHoveredSlot();
+				if(hovered > -1)
+				{
+					selectedSlot = hovered;
+				}
+			}
+			if(controls.isKeyJustPressed(KEY_KEY_B))
+			{
+				activateSelectedAbility();
+			}
+		}
+	}
+	
+	void onRender()
+	{
+		if(blob.isMyPlayer())
+		{
+			GUI::DrawRectangle(initialBarOffset - Vec2f(backgroundThickness,-1), getSlotPosition(slots.length - 1) + slotDimentions * fRealScale + Vec2f(backgroundThickness,backgroundThickness) ); //draw background
+
+			for(int i = 0; i < slots.size(); i++)//draw individual slots
+			{
+				Vec2f drawPos = getSlotPosition(i);
+
+				if(isSlotHovered(i))
+				{
+					GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale,SColor(127,255,255,255));
+				}
+				else
+				{
+					GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale);
+				}
+			}
+
+			GUI::DrawIcon(getSelectedAbility().getBorder(),0,borderDimentions,getSlotPosition(selectedSlot) + borderOffset,fDrawScale);
+		}
+	}
+
+}
+
+class CAbilityMenu //this will act as the "unlocked" abilities and run them every tick as well as acting as a menu to add to the bar
+{
+	CAbilityMasterList@ masterList;
+	CAbilityBar@ bar;
+	CBlob@ blob;
+	private Vec2f menuStartPos = Vec2f(5,52);
+	private Vec2f menuButtonDimentions = Vec2f(32,16);
+	private int columns = 5;
+	bool menuOpen = false;
+	s32 heldItem = -1;
+
+	u32[] list = {
+		EAbilities::Empty,
+		EAbilities::Point,
+		EAbilities::Consume
+	};
+
+	CAbilityMenu(CAbilityMasterList@ _masterList, CAbilityBar@ _bar, CBlob@ _blob)
+	{
+		@this.masterList = _masterList;
+		@this.bar = _bar;
+		@this.blob = _blob;
+
+		for(int i = 0; i < list.size(); i++)
+		{
+			masterList.getAbility(list[i]).onInit();
+		}
+
+		blob.addCommandID("Menu_Sync");
+	}
+
+	void addAbility(u32 i)
+	{
+		list.push_back(i);
+		masterList.getAbility(i).onInit();
+	}
+
+	IAbility@ getAbility(u32 i)
+	{
+		return masterList.getAbility(list[i]);
+	}
+
+	void onTick()
+	{
+		for(int i = 0; i < list.size(); i++)
+		{
+			masterList.getAbility(list[i]).onTick();
+		}
+
+		if(blob.isMyPlayer())
+		{
+			if(getGameTime() % 30 == 0)
+			{
+				sendSync();
+			}
+		
+			CControls@ controls = getControls();
+			if(controls.isKeyJustPressed(KEY_KEY_I))
+			{
+				menuOpen = !menuOpen;
+			}
+			if(controls.isKeyJustPressed(KEY_LBUTTON))
+			{
+				if(menuOpen)
+				{
+					heldItem = getHoveredItem();
+				}
+
+				if(isMenuButtonHovered())
+				{
+					menuOpen = true;
+				}
+				if(!isMenuHovered())
+				{
+					menuOpen = false;
+				}
+			}
+			if(!controls.isKeyPressed(KEY_LBUTTON))
+			{
+				if(menuOpen && heldItem > -1)
+				{
+					bar.setHoveredSlot(heldItem);
+					heldItem = -1;
+				}
+			}
+		}
+	}
+
+	void sendSync()
+	{
+		CBitStream params;
+		params.write_u32(list.size());
+		for(int i = 0; i < list.size(); i++)
+		{
+			params.write_u32(list[i]);
+		}
+
+		blob.SendCommand(blob.getCommandID("Menu_Sync"),params);
+	}
+
+	bool contains(u32[] list, u32 value)
+	{
+		for(int i = 0; i < list.size(); i++)
+		{
+			if(value == list[i])
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void onCommand(u8 cmd, CBitStream@ params)
+	{
+		for(int i = 0; i < list.size(); i++)
+		{
+			masterList.getAbility(list[i]).onCommand(cmd,params);
+		}
+
+		if(cmd == blob.getCommandID("Menu_Sync"))
+		{
+			u32 size = params.read_u32();
+			u32[] oldList = list;
+			list.clear();
+			for(int i = 0; i < size; i++)
+			{
+				list.push_back(i);
+
+				if(!contains(oldList, i))
+				{
+					getAbility(i).onInit();
+				}
+			}
+		}
+	}
+
+	int getRows()
+	{
+		f32 fColumns = columns; //just a way to cast to float
+		return Maths::Ceil(list.size()/fColumns);
+	}
+
+	Vec2f getMenuEndPos()
+	{
+		return menuStartPos + Vec2f(3 + columns * (slotDimentions.x * fRealScale) + columns * slotSpacing.x, getRows() * (slotDimentions.y * fRealScale) + getRows() * slotSpacing.x) + Vec2f(0,4);
+	}
+
+	Vec2f getItemPos(u32 i)
+	{
+		return Vec2f(i%columns * (slotDimentions.x * fRealScale + slotSpacing.x), (getRows() - 1) * (fRealScale * slotDimentions.y)) + menuStartPos + Vec2f(4,4);
+	}
+
+	s32 getHoveredItem()
+	{
+		Vec2f mpos = getControls().getMouseScreenPos();
+		for(int i = 0; i < list.size(); i++)
+		{
+			Vec2f itemPos = getItemPos(i);
+
+			if(mpos.x >= itemPos.x && mpos.x <= itemPos.x + (slotDimentions.x * fRealScale) && mpos.y >= itemPos.y && mpos.y <= itemPos.y + (slotDimentions.y * fRealScale))
+			{
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	bool isMenuHovered()
+	{
+		Vec2f mpos = getControls().getMouseScreenPos();
+		return
+		mpos.x >= menuStartPos.x &&
+		mpos.x <= getMenuEndPos().x &&
+		mpos.y >= menuStartPos.y &&
+		mpos.y <= getMenuEndPos().y;
+	}
+
+	bool isMenuButtonHovered()
+	{
+		Vec2f mpos = getControls().getMouseScreenPos();
+		return 
+		mpos.x >= menuStartPos.x &&
+		mpos.x <= menuStartPos.x + menuButtonDimentions.x * fRealScale &&
+		mpos.y >= menuStartPos.y  &&
+		mpos.y <= menuStartPos.y + menuButtonDimentions.y * fRealScale;
+	}
+
+	void onRender(CSprite@ sprite)
+	{
+		for(int i = 0; i < list.size(); i++)
+		{
+			masterList.getAbility(list[i]).onRender(sprite);
+		}
+
+		if(blob.isMyPlayer())
+		{
+			//menu button icon
+			GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuStartPos,fDrawScale);
+			if(menuOpen)
+			{
+				GUI::DrawRectangle(menuStartPos,getMenuEndPos());//background
+
+				for(int i = 0; i < list.size(); i++)//menu
+				{
+					if(i == heldItem || (heldItem <= -1 && i == getHoveredItem()))
+					{
+						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,getItemPos(i),fDrawScale,SColor(127,255,255,255));
+					}
+					else
+					{
+						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,getItemPos(i),fDrawScale);
+					}
+				}
+
+				//held icon
+				if(heldItem > -1)
+				{
+					GUI::DrawIcon(getAbility(heldItem).getTextureName(), 0, slotDimentions, getControls().getMouseScreenPos() - (slotDimentions * fRealScale)/2,fDrawScale);
+				}
+			}
+		}
+	}
+}
+
+class CAbilityManager
+{
+    CAbilityMasterList@ abilityMasterList;
+    CAbilityMenu@ abilityMenu;
+	CAbilityBar@ abilityBar;
+    CBlob@ blob;
+
+	CAbilityManager(CBlob@ blob)
+	{
+		@this.blob = blob;
+		@abilityMasterList = CAbilityMasterList(blob);
+		@abilityBar = CAbilityBar(abilityMasterList,blob);
+		@abilityMenu = CAbilityMenu(abilityMasterList,abilityBar,blob);
+	}
+
+    void onInit()
+    {	
+
+    }
+
+    void onCommand( CBlob@ blob, u8 cmd, CBitStream @params )
+    {
+		abilityMenu.onCommand(cmd,params);
+    }
+
+    void onTick(CBlob@ blob)
+    {
+		abilityMenu.onTick();
+		abilityBar.onTick();
+    }
+    void onRender(CSprite@ sprite)
+    {
+		abilityBar.onRender();
+		abilityMenu.onRender(sprite);
+    }
+    void onReceiveCreateData(CBitStream@ stream )
+    {
+
+    }
+}
+
+bool isMe(CBlob@ blob)//this is here because I didn't know the function below existed
+{
+    return blob.isMyPlayer();
 }
