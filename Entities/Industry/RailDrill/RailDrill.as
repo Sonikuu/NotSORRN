@@ -18,6 +18,7 @@ const f32 consume_amount = 0.2;
 void onInit(CSprite@ this)
 {
 	this.SetEmitSound("/Drill.ogg");
+	this.SetEmitSoundVolume(0.1);
 }
 
 void onTick(CSprite@ this)
