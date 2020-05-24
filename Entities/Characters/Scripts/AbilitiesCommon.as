@@ -182,17 +182,7 @@ class CConsume : CAbilityBase
             if(stomachItems < stomachMax)
             {
                 int stomachItemsBefore = stomachItems;
-                if(itemName == "fishy")
-                {   
-                    addToMyChat("The fish" + (held.hasTag("dead") ? " slowly slides " : " agressivly wiggles ") + "down your throat nearly causing to to gag\nYou feel fuller but not much else");
-                    stomachItems++;
-                    held.server_Die();
-                } else if(itemName == "grain")
-                {
-                    addToMyChat("The grain is dry but you manage to get it down\nYou feel fuller but not much else");
-                    stomachItems++;
-                    held.server_Die();
-                } else if(itemName == "builder")
+				if(itemName == "builder")
                 {
                     addToMyChat("The fact that eating someone is crossing your mind is scary but you want to see what happens\nUpon eating the body you feel more evil inside");
                     stomachItems++;
@@ -230,7 +220,8 @@ class CConsume : CAbilityBase
                     blob.server_Heal(99999999);
                 } else if (held !is null && held.hasTag("Eatable"))
                 {
-                    blob.server_Heal(2);
+					f32 healAmmount = getHealAmmount(held);
+                    blob.server_Heal(healAmmount == 0 ? 1 : healAmmount);
                     held.server_Die();
                     stomachItems++;
                 }
@@ -257,6 +248,17 @@ class CConsume : CAbilityBase
             client_AddToChat(msg, SColor(255,60,60,255));
         }
     }
+
+	f32 getHealAmmount(CBlob@ item)
+	{
+		string name = item.getConfig();
+		if(name == "grain"){return 1;}
+		if(name == "fishy"){return 1;}
+		if(name == "heart"){return 1;}
+		if(name == "steak"){return 2;}
+		if(name == "food"){return 5;}
+		return 0;
+	}
 
 }
 
