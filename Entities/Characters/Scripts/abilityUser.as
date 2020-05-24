@@ -41,3 +41,11 @@ void onReceiveCreateData(CBlob@ this, CBitStream@ stream)
 
     manager.onReceiveCreateData(stream);
 }
+
+void onDie(CBlob@ this)
+{
+    CAbilityManager@ manager;
+    this.get("AbilityManager",@manager);
+
+    manager.onDie();
+}

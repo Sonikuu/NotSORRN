@@ -7,6 +7,7 @@ interface IAbility
     CBlob@ getBlob();
     void activate();
     void onTick();
+	void onDie();
 	void onInit();
     void onReceiveCreateData(CBitStream@ steam);
     void onRender(CSprite@ sprite);
@@ -18,6 +19,7 @@ interface IAbility
 class CAbilityBase : IAbility
 {
     void onTick(){}
+	void onDie(){}
 	void onInit(){}
     string getBorder(){return border;}
     string textureName;
@@ -297,9 +299,19 @@ class CSelfDestruct : CAbilityBase
 	{
 		if(cmd == blob.getCommandID("SelfDestruct_Activate"))
 		{
-			Explode(blob, blob.getPosition(), 80, 6, "Bomb.ogg", 16 * 5, 1.0, true, Hitters::explosion, true);
-			blob.server_Hit(blob, blob.getPosition(), Vec2f_zero, 3.0, Hitters::explosion, true);
+			activateExplosion();
 		}
+	}
+
+	void activateExplosion()
+	{
+		Explode(blob, blob.getPosition(), 80, 6, "Bomb.ogg", 16 * 5, 1.0, true, Hitters::explosion, true);
+		blob.server_Hit(blob, blob.getPosition(), Vec2f_zero, 3.0, Hitters::explosion, true);
+	}
+
+	void onDie() override
+	{
+		activateExplosion();
 	}
 }
 
@@ -632,6 +644,14 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		}
 	}
 
+	void onDie()
+	{
+		for(int i = 0; i < list.size(); i++)
+		{
+			masterList.getAbility(list[i]).onDie();
+		}
+	}
+
 	int getRows()
 	{
 		f32 fColumns = columns; //just a way to cast to float
@@ -760,6 +780,11 @@ class CAbilityManager
     {
 
     }
+
+	void onDie()
+	{
+		abilityMenu.onDie();
+	}
 }
 
 bool isMe(CBlob@ blob)//this is here because I didn't know the function below existed
