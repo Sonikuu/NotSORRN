@@ -320,10 +320,15 @@ class CAbilityMasterList
 	CAbilityMasterList(CBlob@ _blob)
 	{
 		@this.blob = _blob;
-		abilities.push_back(CAbilityEmpty());//order here matters, needs relate to the enum
-		abilities.push_back(CPoint("abilityPoint.png",blob));
-		abilities.push_back(CConsume("abilityConsume.png",blob));
-		abilities.push_back(CSelfDestruct("abilitySelfDestruct",blob));
+	//order here matters, needs relate to the enum
+		IAbility@[] _abilities = {
+			CAbilityEmpty(),
+			CPoint("abilityPoint.png",blob),
+			CConsume("abilityConsume.png",blob),
+			CSelfDestruct("abilitySelfDestruct",blob)
+		};
+
+		abilities = _abilities;
 	}
 
 	IAbility@ getAbility(int i)
