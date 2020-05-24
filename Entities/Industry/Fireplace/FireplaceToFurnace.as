@@ -12,10 +12,14 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 	CBlob@ held = caller.getCarriedBlob();
 	if(held !is null && held.getConfig() == "mat_stone")
 	{
+		CMap@ map = getMap();
+		Vec2f urpos = this.getPosition() + Vec2f(4, -12);
+		Vec2f ulpos = this.getPosition() + Vec2f(-4, -12);
+		bool isblocked = map.isTileSolid(urpos) || map.isTileSolid(ulpos);
 		CBitStream params;
 		params.write_u16(caller.getNetworkID());
-		CButton@ button = caller.CreateGenericButton("$upgrade_fireplace$", Vec2f(0, 0), this, this.getCommandID("upgrade"), "Build into furnace", params);
-		if(held.getQuantity() < 200)
+		CButton@ button = caller.CreateGenericButton("$upgrade_fireplace$", Vec2f(0, 0), this, this.getCommandID("upgrade"), isblocked ? "Cannot build: Blocked" : "Build into furnace", params);
+		if(held.getQuantity() < 200 || isblocked)
 		{
 			button.SetEnabled(false);
 		}
