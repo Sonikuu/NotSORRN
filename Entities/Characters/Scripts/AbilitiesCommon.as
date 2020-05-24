@@ -291,7 +291,6 @@ enum EElement
 	{
 		CAlchemyTank@ tank = getTank(vial,"input");
 		int id = firstId(tank);
-		print('id ' + id);
 		if(id <= -1){return;}
 		f32 ammount = tank.storage.getElement(id);
 		f32 power = ammount/tank.maxelements;
