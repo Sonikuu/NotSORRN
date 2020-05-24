@@ -133,7 +133,7 @@ void onTick(CRules@ this)
 		}
 		//Managing weights
 		if(weightcache !is null)
-			if(weightcache == weights && map.getDayTime() < 0.93 && raincache == this.get_u16("raincount"))
+			if(weightcache == weights && map.getDayTime() < 0.99 && raincache == this.get_u16("raincount"))
 				return;
 		@weightcache = @weights;
 		raincache = this.get_u16("raincount");
