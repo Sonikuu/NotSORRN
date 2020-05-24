@@ -173,6 +173,12 @@ void InitWorkshop(CBlob@ this)
 		
 		AddIconToken("$raildrill$", "RailDrill.png", Vec2f(32, 16), 0);
 	}
+		{
+		ShopItem@ s = addShopItem(this,  "Element Vial", "$vial$", "vial", "An element holding vial, looks fragile but sturdy enough to drink from ", false);
+		AddRequirement(s.requirements, "blob", "mat_glass", "Glass", 100);
+		
+		AddIconToken("$vial$", "vial.png", Vec2f(8, 8), 0);
+	}
 	// {
 	// 	ShopItem@ s = addShopItem(this,  "Golemite Dust", "$golemitedust$", "GolemiteDust", "A mysterious substance that wiggles when you touch it", false);
 	// 	AddRequirement(s.requirements, "blob", "mat_purifiedgold", "Purified Gold", 1);

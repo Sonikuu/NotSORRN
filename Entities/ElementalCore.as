@@ -41,6 +41,25 @@ class CElementSetup
 //Element list, all other parts should be able to work off of only this
 //When getting data about elements, use the element list
 
+enum EElement
+{
+	ecto = 0,
+	life = 1,
+	natura = 2,
+	force = 3,
+	aer = 4,
+	ignis = 5,
+	terra = 6,
+	order = 7,
+	entropy = 8,
+	aqua = 9,
+	corruption = 10,
+	purity = 11,
+	unholy = 12,
+	holy = 13,
+	yeet = 14
+}
+
 const array<CElementSetup> elementlist = 
 {
 	CElementSetup//0

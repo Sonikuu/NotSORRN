@@ -1,5 +1,7 @@
 #include "Hitters.as"
+#include "AlchemyCommon.as"
 #include "ExplosionCommon.as"
+#include "FxLightFall.as"
 
 interface IAbility
 {
@@ -184,7 +186,11 @@ class CConsume : CAbilityBase
             if(stomachItems < stomachMax)
             {
                 int stomachItemsBefore = stomachItems;
-				if(itemName == "builder")
+
+				if(itemName == "vial")
+				{
+					drinkVial(held);
+				}else if(itemName == "builder")
                 {
                     addToMyChat("The fact that eating someone is crossing your mind is scary but you want to see what happens\nUpon eating the body you feel more evil inside");
                     stomachItems++;
@@ -260,6 +266,84 @@ class CConsume : CAbilityBase
 		if(name == "steak"){return 2;}
 		if(name == "food"){return 5;}
 		return 0;
+	}
+
+/*
+enum EElement
+{
+	ecto = 0,
+	life = 1,
+	natura = 2,
+	force = 3,
+	aer = 4,
+	ignis = 5,
+	terra = 6,
+	order = 7,
+	entropy = 8,
+	aqua = 9,
+	corruption = 10,
+	purity = 11,
+	unholy = 12,
+	holy = 13,
+	yeet = 14
+}*/
+	void drinkVial(CBlob@ vial)
+	{
+		CAlchemyTank@ tank = getTank(vial,"input");
+		int id = firstId(tank);
+		print('id ' + id);
+		if(id <= -1){return;}
+		f32 ammount = tank.storage.getElement(id);
+		f32 power = ammount/tank.maxelements;
+		switch(id)
+		{
+			case EElement::ecto:
+				applyFxGhostlike(blob,900 * power,1);
+				applyFxLowGrav(blob,900 * power,100);
+			break;
+
+			case EElement::life:
+				blob.server_Heal(blob.getInitialHealth() * power);
+			break;
+
+			case EElement::natura:
+				padNatura(blob,power * 5,vial);
+			break;
+
+			case EElement::force:
+				blob.setVelocity(Vec2f(0, -16 * power));
+			break;
+
+			case EElement::aer:
+				applyFxLightFall(blob,900 * power,5 * power);
+			break;
+
+			// case EElement::ignis://no worky
+			// 	padIgnis(blob,power*5,vial);
+			// break;
+
+			case EElement::terra:
+				padTerra(blob,power*5,vial);
+			break;
+
+			case EElement::order:
+				padOrder(blob,power*5,vial);
+			break;
+
+			// case EElement::entropy: //doesn't seem to work
+			// 	padEntropy(blob,power*5,vial);
+			// break;
+
+			case EElement::aqua:
+				padAqua(blob,power*5,vial);
+			break;
+
+			default:
+				addToMyChat("Looks like it did nothing, element effect probably not added yet sorry");
+				return;
+		}
+
+		tank.storage.setElement(id,0);
 	}
 
 }
@@ -785,9 +869,4 @@ class CAbilityManager
 	{
 		abilityMenu.onDie();
 	}
-}
-
-bool isMe(CBlob@ blob)//this is here because I didn't know the function below existed
-{
-    return blob.isMyPlayer();
 }
