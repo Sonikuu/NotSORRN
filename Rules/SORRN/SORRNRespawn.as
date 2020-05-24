@@ -22,7 +22,7 @@ void onInit(CRules@ this)
 	this.set("spawnqueue", @spawnqueue);
 	
 	this.SetCurrentState(GAME);
-	this.server_setShowHoverNames(false);
+	//this.server_setShowHoverNames(false);
 }
 
 void onTick(CRules@ this)
