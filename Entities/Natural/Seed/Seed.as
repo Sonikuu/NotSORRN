@@ -129,10 +129,14 @@ void onTick(CBlob@ this)
 			seed_grow_time -= OPT_TICK;
 		}
 	}
-	else
+	else if(!this.isAttached())
 	{
 		this.getSprite().SetFrameIndex(0);
+		//if(getGameTime() % 150 == 0)
+			this.server_Hit(this, this.getPosition(), Vec2f_zero, 0.125, 31, true);
 	}
+	else
+		this.getSprite().SetFrameIndex(0);
 
 	this.set_u16("seed_grow_time", seed_grow_time);
 

@@ -361,7 +361,7 @@ float wardLife(float radius, int power, CBlob@ ward)
 			{
 				activated = true;
 				if(getGameTime() % 30 == 0)
-					blobs[i].server_Heal(0.04 * power);
+					blobs[i].server_Heal(0.08 * power);
 			}
 		}
 	}
@@ -392,7 +392,7 @@ float wardAer(float radius, int power, CBlob@ ward)
 		}
 	}
 	if(activated)
-		return 1;
+		return 0.5;
 	return 0.1;
 }
 
@@ -435,7 +435,7 @@ float wardIgnis(float radius, int power, CBlob@ ward)
 		{
 			for (int i = 0; i < blobs.length; i++)
 			{
-				if(blobs[i] !is ward && getGameTime() % 30 == 0)
+				if(blobs[i].getTeamNum() != ward.getTeamNum() && getGameTime() % 30 == 0)
 					ward.server_Hit(blobs[i], blobs[i].getPosition(), Vec2f_zero, 0.02 * power, Hitters::fire);
 				activated = true;
 			}

@@ -9,7 +9,8 @@ void onInit(CBlob@ this)
 
 void onTick(CBlob@ this)
 {
-	if(getGameTime() % 30 == 0)
+	CMap@ map = getMap();
+	if(getGameTime() % int(30 / Maths::Max((1.0 - this.getPosition().y / (map.tilemapheight * map.tilesize)) * 2, 1.0)) == 0)
 	{
 		//Using numbers to get tanks is probs faster than strings
 		CAlchemyTank@ tank = getTank(this, 0);

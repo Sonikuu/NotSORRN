@@ -377,7 +377,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			AddIconToken("$alchemysorter$", "AlchemySorter.png", Vec2f(32, 16), 0);
 		}
 		{
-			BuildBlock b(0, "alchemycollector", "$alchemycollector$", "Wind Collector\nCreates aer essence from the wind");
+			BuildBlock b(0, "alchemycollector", "$alchemycollector$", "Wind Collector\nCreates aer essence from the wind\nMore effective the higher it is");
 			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 100);
 			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 100);
 			AddRequirement(b.reqs, "blob", "mat_metal", "Alchemic Metal Sheet", 8);
