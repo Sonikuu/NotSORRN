@@ -204,7 +204,7 @@ class CSwordEquipment : CEquipmentCore
 						
 		if(chargetime < 0)
 		{
-			if(speed + chargetime < 7)
+			if(chargetime - speed < 7)
 				useWeapon(blob, user, true);
 			chargetime++;
 			return;

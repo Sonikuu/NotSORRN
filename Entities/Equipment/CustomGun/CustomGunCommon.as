@@ -75,8 +75,8 @@ class CGunPart
 		
 		semi = false;
 		
-		blobfx = null;
-		tilefx = null;
+		@blobfx = null;
+		@tilefx = null;
 	}
 	CGunPart setBarrel(Vec2f point)
 	{
