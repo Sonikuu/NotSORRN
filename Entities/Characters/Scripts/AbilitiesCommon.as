@@ -159,7 +159,8 @@ class CConsume : CAbilityBase
     {
         if(getGameTime() % (30*60) == 0)
         {
-            stomachItems = Maths::Max(stomachItems--,0);
+			stomachItems--;
+            stomachItems = Maths::Max(stomachItems,0);
         } 
     }
 
