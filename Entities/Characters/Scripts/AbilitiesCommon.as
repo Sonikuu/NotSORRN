@@ -327,8 +327,7 @@ class CAbilityMasterList
 			CConsume("abilityConsume.png",blob),
 			CSelfDestruct("abilitySelfDestruct",blob)
 		};
-
-		abilities = _abilities;
+		abilities = _abilities;//I can't figure out how to do an array litteral outside of right when you create a var so I just copy it into the main one
 	}
 
 	IAbility@ getAbility(int i)
