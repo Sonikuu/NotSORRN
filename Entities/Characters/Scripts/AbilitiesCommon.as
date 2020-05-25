@@ -2,6 +2,7 @@
 #include "AlchemyCommon.as"
 #include "ExplosionCommon.as"
 #include "FxLightFall.as"
+#include "Hitters.as"
 
 interface IAbility
 {
@@ -317,9 +318,9 @@ enum EElement
 				applyFxLightFall(blob,900 * power,5 * power);
 			break;
 
-			// case EElement::ignis://no worky
-			// 	padIgnis(blob,power*5,vial);
-			// break;
+			 case EElement::ignis://no worky
+			 	vial.server_Hit(blob,blob.getPosition(), Vec2f(0,0),1,Hitters::fire);
+			 break;
 
 			case EElement::terra:
 				padTerra(blob,power*5,vial);
