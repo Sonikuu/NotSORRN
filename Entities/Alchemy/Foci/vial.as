@@ -50,7 +50,135 @@ void onTick(CSprite@ this)
     {
         layer.SetVisible(false);
     }
+}
+
+void onCollision( CBlob@ this, CBlob@ blob, bool solid )
+{
+    if(solid)
+    {
+        if(this.getVelocity().Length() > 2)
+        {
+            this.server_Die();
+        }
+    }
+}
+
+void onDie(CBlob@ this)
+{
+    Sound::Play("shatter.ogg", this.getPosition(),1, 0.75 + (XORRandom(25)/100.0));
+
+    CAlchemyTank@ tank = getTank(this,"input");
+    int id = firstId(tank);
+    if(id <= -1){return;}
+    f32 ammount = tank.storage.getElement(id);
+    f32 power = ammount/(tank.maxelements * 2); //less stronk than drinking
 
 
+    CBlob@[] blobs;
+    CMap@ map = getMap();
+    map.getBlobsInRadius(this.getPosition(),24 * (power * 2), @blobs);
+    for(int i = 0; i < blobs.size(); i++)
+    {
+        CBlob@ blob = blobs[i];
+        if(map.rayCastSolidNoBlobs(this.getPosition(),blob.getPosition())){continue;}
 
+        switch(id)
+        {
+            case EElement::ecto:
+                applyFxGhostlike(blob,900 * power,1);
+                applyFxLowGrav(blob,900 * power,100);
+            break;
+
+            case EElement::life:
+                blob.server_Heal(blob.getInitialHealth() * power);
+            break;
+
+            case EElement::natura:
+                padNatura(blob,power * 5,this);
+            break;
+
+            case EElement::force:
+            {
+                Vec2f thisPos = this.getPosition();
+                Vec2f otherPos = blob.getPosition();
+                Vec2f dif = thisPos - otherPos;
+                dif.Normalize();
+
+                blob.setVelocity(blob.getVelocity() + (-dif * power * 32) );
+
+            }
+            break;
+
+            case EElement::aer:
+            {
+                Vec2f thisPos = this.getPosition();
+                Vec2f otherPos = blob.getPosition();
+                Vec2f dif = thisPos - otherPos;
+                dif.Normalize();
+
+                blob.setVelocity(blob.getVelocity() + (dif * power * 32) );
+            }
+            break;
+
+            case EElement::ignis:
+                this.server_Hit(blob,blob.getPosition(), Vec2f(0,0),1,Hitters::fire,true);
+            break;
+
+            case EElement::aqua:
+                padAqua(blob,power*5,this);
+            break;
+        }
+
+    }
+
+    switch(id)
+    {
+        case EElement::terra:
+        {
+            for(int i = 0; i < 50 * power; i++)
+            {
+                sprayTerra(power * 5, 0, 360, 24 * (power * 2), this, this);
+            }
+        }
+        break;
+        case EElement::order:
+        {
+            for(int i = 0; i < 50 * power; i++)
+            {
+                sprayOrder(power * 5, 0, 360, 24 * (power * 2), this, this);
+            }
+        }
+        break;
+        case EElement::entropy:
+        {
+            for(int i = 0; i < 50 * power; i++)
+            {
+                sprayEntropy(power * 5, 0, 360, 24 * (power * 2), this, this);
+            }
+        }
+        break;
+        case EElement::corruption:
+        {
+            for(int i = 0; i < 50 * power; i++)
+            {
+                sprayCorruption(power * 5, 0, 360, 24 * (power * 2), this, this);
+            }
+        }
+        break;
+        case EElement::purity:
+        {
+            for(int i = 0; i < 50 * power; i++)
+            {
+                sprayPurity(power * 5, 0, 360, 24 * (power * 2), this, this);
+            }
+        }
+        break;
+    }
+
+    for(int i = 0; i < 50; i++)
+    {
+        Vec2f vel = getRandomVelocity(0, 5,360);
+        ParticlePixelUnlimited(this.getPosition(),vel, elementlist[id].color, true);
+        ParticlesFromSprite(this.getSprite());
+    }
 }
