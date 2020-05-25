@@ -4,7 +4,7 @@
 #include "BuilderHittable.as";
 #include "ParticleSparks.as";
 #include "MaterialCommon.as";
-#include "AlchemyCommon.as";
+#include "ShieldCommon.as";
 
 const f32 speed_thresh = 2.4f;
 const f32 speed_hard_thresh = 2.6f;
@@ -12,16 +12,16 @@ const f32 speed_hard_thresh = 2.6f;
 const string buzz_prop = "drill timer";
 
 const string heat_prop = "drill heat";
-const u8 heat_max = 240;
+const u8 heat_max = 120;
 
 const string last_drill_prop = "drill last active";
 
-const u8 heat_add = 5;
+const u8 heat_add = 4;
 const u8 heat_add_constructed = 2;
 const u8 heat_add_blob = heat_add * 2;
 const u8 heat_cool_amount = 2;
 
-const u8 heat_cooldown_time = 4;
+const u8 heat_cooldown_time = 5;
 const u8 heat_cooldown_time_water = u8(heat_cooldown_time / 3);
 
 const f32 max_heatbar_view_range = 65;
@@ -29,8 +29,6 @@ const f32 max_heatbar_view_range = 65;
 const bool show_heatbar_when_idle = false;
 
 const string required_class = "builder";
-
-const f32 consume_amount = 0.2;
 
 void onInit(CSprite@ this)
 {
@@ -77,13 +75,6 @@ void onInit(CBlob@ this)
 	AddIconToken("$transparent_heatbar$", "Entities/Industry/Drill/HeatBar.png", Vec2f(24, 6), 1);
 
 	this.set_u32(last_drill_prop, 0);
-	
-	CAlchemyTank@ tank = addTank(this, "input", true, Vec2f(0, 0));
-	//tank.singleelement = true;
-	tank.dynamictank = true;
-	tank.unmixedstorage = true;
-	
-	this.getShape().getConsts().mapCollisions = true;
 }
 
 bool canBePutInInventory( CBlob@ this, CBlob@ inventoryBlob )
@@ -112,7 +103,8 @@ void onThisRemoveFromInventory( CBlob@ this, CBlob@ inventoryBlob )
 		this.set_u8(heat_prop, heat);
 	}
 }
-	
+
+
 void onTick(CSprite@ this)
 {
 	CBlob@ blob = this.getBlob();
@@ -126,6 +118,7 @@ void onTick(CSprite@ this)
 	{
 		this.SetAnimation("default");
 	}
+	
 	CSpriteLayer@ heatlayer = this.getSpriteLayer("heat");
 	if (heatlayer !is null)
 	{
@@ -153,45 +146,20 @@ void onTick(CSprite@ this)
 	}
 }
 
+
 void onTick(CBlob@ this)
 {
-	CAlchemyTank@ tank = getTank(this, 0);
-	if(tank is null)
-		return;
-	
 	u8 heat = this.get_u8(heat_prop);
 	const u32 gametime = getGameTime();
 	bool inwater = this.isInWater();
-	
-	bool hasaqua = tank.storage.elements[9] > 0;
-	bool hasterra = tank.storage.elements[6] > 0;
-	bool hasforce = tank.storage.elements[3] > 0;
 
 	CSprite@ sprite = this.getSprite();
-	
-	if(this.get_f32("consumetimea") > 1.0)
-	{
-		tank.storage.elements[9] -= 1;
-		this.set_f32("consumetimea", 0);
-	}
-	if(this.get_f32("consumetimet") > 1.0)
-	{
-		tank.storage.elements[6] -= 1;
-		this.set_f32("consumetimet", 0);
-	}
-	if(this.get_f32("consumetimef") > 1.0)
-	{
-		tank.storage.elements[3] -= 1;
-		this.set_f32("consumetimef", 0);
-	}
 
 	if (heat > 0)
 	{
-		if(hasaqua)
-			this.add_f32("consumetimea", consume_amount);
 		if (gametime % heat_cooldown_time == 0)
 		{
-			heat -= Maths::Min(hasaqua ? 2 : 1, heat);
+			heat--;
 		}
 
 		if (inwater && heat >= heat_add && gametime % (Maths::Max(heat_cooldown_time_water, 1)) == 0)
@@ -212,21 +180,18 @@ void onTick(CBlob@ this)
 	sprite.SetEmitSoundPaused(true);
 	if (this.isAttached())
 	{
-		this.getCurrentScript().runFlags &= ~(Script::tick_not_sleeping);
 		AttachmentPoint@ point = this.getAttachments().getAttachmentPointByName("PICKUP");
 		CBlob@ holder = point.getOccupied();
 
 		if (holder is null) return;
 
-		AimAtMouse(this, holder);
+		AimAtMouse(this, holder); // aim at our mouse pos
 
 		// cool faster if holder is moving
-		if (heat > 0 && holder.getShape().vellen > 0.01f && getGameTime() % heat_cooldown_time == 0)
+		if (heat > 0 && holder.getShape().vellen > 0.01f && getGameTime() % 3 == 0)
 		{
 			heat--;
 		}
-
-		this.getShape().SetRotationsAllowed(false);
 
 		if (int(heat) >= heat_max - (heat_add * 1.5))
 		{
@@ -261,16 +226,11 @@ void onTick(CBlob@ this)
 			{
 				heat++;
 			}
-			
-			if(hasforce)
-				this.add_f32("consumetimef", consume_amount);
-			if(hasterra)
-				this.add_f32("consumetimet", consume_amount);
-			
-			const u8 delay_amount = (inwater ? 20 : 8) / (hasforce ? 2 : 1);
+
+			const u8 delay_amount = inwater ? 20 : 8;
 			bool skip = (gametime < this.get_u32(last_drill_prop) + delay_amount);
 
-			if(skip)
+			if (skip)
 			{
 				return;
 			}
@@ -305,22 +265,26 @@ void onTick(CBlob@ this)
 							f32 attack_dam = 1.0f;
 							HitInfo@ hi = hitInfos[i];
 							bool hit_constructed = false;
-							if (hi.blob !is null) // blob
+							CBlob@ b = hi.blob;
+							if (b !is null) // blob
 							{
-															// blob ignore list, this stops the drill from overheating f a s t
+								// blob ignore list, this stops the drill from overheating f a s t
 								// or blobs to increase damage to (for the future)
-								string name = hi.blob.getName();
+								string name = b.getName();
 
 								if (name == "mat_stone" || name == "mat_wood" || name == "mat_gold")
 								{
 									continue; // carry on onto the next loop, dont waste time & heat on this
 								}
-								const bool is_ground = hi.blob.hasTag("blocks sword") && !hi.blob.isAttached() && hi.blob.isCollidable();
+
+								//detect
+								const bool is_ground = b.hasTag("blocks sword") && !b.isAttached() && b.isCollidable();
 								if (is_ground)
 								{
 									hit_ground = true;
 								}
-								if (hi.blob.getTeamNum() == holder.getTeamNum() ||
+								
+								if (b.getTeamNum() == holder.getTeamNum() ||
 								        hit_ground && !is_ground)
 								{
 									continue;
@@ -329,16 +293,19 @@ void onTick(CBlob@ this)
 
 								if (isServer())
 								{
-									// Deal extra damage if hot
-									if (int(heat) > heat_max * 0.7f)
+									if (int(heat) > heat_max * 0.7f) // are we at high heat? more damamge!
 									{
 										attack_dam += 0.5f;
 									}
 
-									this.server_Hit(hi.blob, hi.hitpos, attackVel, attack_dam, Hitters::drill);
+									if (b.hasTag("shielded") && blockAttack(b, attackVel, 0.0f)) // are they shielding? reduce damage!
+									{
+										attack_dam /= 2;
+									}
 
-									// Yield half
-									Material::fromBlob(holder, hi.blob, attack_dam * (hasterra ? 1.5f : 1.0f), this);
+									this.server_Hit(b, hi.hitpos, attackVel, attack_dam, Hitters::drill);
+
+									Material::fromBlob(holder, hi.blob, attack_dam, this);
 								}
 
 								hitsomething = true;
@@ -367,12 +334,14 @@ void onTick(CBlob@ this)
 										}
 										else
 										{
-											Material::fromTile(holder, tile, 0.75f * (hasterra ? 1.75f : 1.0f));
+											Material::fromTile(holder, tile, 0.75f);
 										}
+
 									}
+
 								}
-								
-								if(isClient())
+
+								if (isClient())
 								{
 									if (map.isTileBedrock(tile))
 									{
@@ -436,7 +405,6 @@ void onTick(CBlob@ this)
 	}
 	else
 	{
-		this.getShape().SetRotationsAllowed(true);
 		this.set_bool(buzz_prop, false);
 		if (heat <= 0)
 		{
@@ -468,11 +436,25 @@ void onAttach(CBlob@ this, CBlob@ attached, AttachmentPoint @attachedPoint)
 	CPlayer@ player = attached.getPlayer();
 	if (player !is null)
 		this.set_u16("showHeatTo", player.getNetworkID());
+
+	CShape@ shape = this.getShape();
+	if (shape !is null)
+	{
+		this.setPosition(attached.getPosition()); // required to stop the first tick to be out of position
+
+		shape.SetGravityScale(0); // this stops the shape from 'falling' when its attached to something, (helps the heat bar from looking bad above 30 fps)
+	}
 }
 
 void onDetach(CBlob@ this, CBlob@ detached, AttachmentPoint @attachedPoint)
 {
 	this.set_u16("showHeatTo", 0);
+
+	CShape@ shape = this.getShape();
+	if (shape !is null)
+	{
+		shape.SetGravityScale(1);
+	}
 }
 
 void onThisAddToInventory(CBlob@ this, CBlob@ blob)
@@ -512,7 +494,9 @@ void onRender(CSprite@ this)
 		u8 heat = blob.get_u8(heat_prop);
 		f32 percentage = Maths::Min(1.0, f32(heat) / f32(heat_max));
 
-		Vec2f pos = blob.getScreenPos() + Vec2f(-22, 16);
+		//Vec2f pos = blob.getScreenPos() + Vec2f(-22, 16);
+
+		Vec2f pos = holderBlob.getInterpolatedScreenPos() + (blob.getScreenPos() - holderBlob.getScreenPos()) + Vec2f(-22, 16);
 		Vec2f dimension = Vec2f(42, 4);
 		Vec2f bar = Vec2f(pos.x + (dimension.x * percentage), pos.y + dimension.y);
 

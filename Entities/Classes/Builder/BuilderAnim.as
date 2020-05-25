@@ -96,6 +96,7 @@ void onTick(CSprite@ this)
 		const bool down = blob.isKeyPressed(key_down);
 		const bool inair = (!blob.isOnGround() && !blob.isOnLadder());
 		Vec2f pos = blob.getPosition();
+		CBlob@ b = blob.getCarriedBlob();
 
 		RunnerMoveVars@ moveVars;
 		if (!blob.get("moveVars", @moveVars))
@@ -122,8 +123,10 @@ void onTick(CSprite@ this)
 		{
 			this.SetAnimation("strike");
 		}
-		else if (action1  || (this.isAnimation("build") && !this.isAnimationEnded()))
+		else if ((action1  || (this.isAnimation("build") && !this.isAnimationEnded())) && ((b !is null && b.getShape() !is null && b.getShape().getConsts().snapToGrid) || blob.get_TileType("buildtile") != 0))
 		{
+			
+			//if
 			this.SetAnimation("build");
 		}
 		else if (inair)

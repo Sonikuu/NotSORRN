@@ -408,7 +408,7 @@ shared class CRenderParticleDrop : CRenderParticleBase
 		{
 			//if(dieoncollide)
 			{
-				if((position.y + velocity.y) / 8 > heightdata[position.x / 8])
+				if(position.x < 0 || position.x / 8 > heightdata.size() - 1 || (position.y + velocity.y) / 8 > heightdata[position.x / 8])
 				{
 					startDeath();
 					return true;

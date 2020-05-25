@@ -53,7 +53,7 @@ void onTick(CRules@ this)
 	if(raincount > 0)
 	{
 		CBlob@ b = getBlobByName("soundblob");
-		if(b is null)
+		if(b is null && isServer())
 			server_CreateBlob("soundblob");
 	}
 	if(getNet().isClient())
