@@ -423,6 +423,12 @@ shared class CRenderParticleDrop : CRenderParticleBase
 
 	void appendVerts(array<Vertex>@ verts)
 	{
+		CCamera@ cam = getCamera();
+		Vec2f campos = cam.getPosition();
+		//if(XORRandom(100) == 0) print("" + (cam.getPosition().y - getScreenHeight() / 4.0 / cam.targetDistance) + ":" + (cam.getPosition().y + getScreenHeight() / 4.0 / cam.targetDistance));
+		if(campos.y - getScreenHeight() / 4.0 / cam.targetDistance > position.y || campos.y + getScreenHeight() / 4.0 / cam.targetDistance < position.y ||
+		campos.x - getScreenWidth() / 4.0 / cam.targetDistance > position.x || campos.x + getScreenWidth() / 4.0 / cam.targetDistance < position.x)
+			return;
 		Vec2f temppos = deathtime > 0 ? position : position + velocity * getInterpolationFactor();
 		if(lastpos == Vec2f_zero)
 			lastpos = temppos;
