@@ -295,6 +295,7 @@ enum EElement
 		if(id <= -1){return;}
 		f32 ammount = tank.storage.getElement(id);
 		f32 power = ammount/tank.maxelements;
+
 		switch(id)
 		{
 			case EElement::ecto:
@@ -318,7 +319,7 @@ enum EElement
 				applyFxLightFall(blob,900 * power,5 * power);
 			break;
 
-			 case EElement::ignis://no worky
+			 case EElement::ignis:
 			 	vial.server_Hit(blob,blob.getPosition(), Vec2f(0,0),1,Hitters::fire);
 			 break;
 
@@ -330,9 +331,9 @@ enum EElement
 				padOrder(blob,power*5,vial);
 			break;
 
-			// case EElement::entropy: //doesn't seem to work
-			// 	padEntropy(blob,power*5,vial);
-			// break;
+			case EElement::entropy: 
+				vial.server_Hit(blob, blob.getPosition(), Vec2f_zero, 6 * power, Hitters::spikes);
+			break;
 
 			case EElement::aqua:
 				padAqua(blob,power*5,vial);
