@@ -156,7 +156,14 @@ void onTick(CBlob@ this)
 				CBlob@ b = p.getBlob();
 				if(b !is null)
 				{
-					float dist = (b.getPosition() - this.getPosition()).Length();
+					Vec2f topos = this.getPosition();
+					if(this.get_bool("equipped"))
+					{
+						CBlob@ equipper = getBlobByNetworkID(this.get_u16("equipper"));
+						if(equipper !is null)
+							topos = equipper.getPosition();
+					}
+					float dist = (b.getPosition() - topos).Length();
 					int modmult = dist < 128 ? 1 : dist < 256 ? 3 : 30;
 					int mod = 30 * modmult;
 					if((this.getNetworkID() * modmult + getGameTime()) % mod == 0)
