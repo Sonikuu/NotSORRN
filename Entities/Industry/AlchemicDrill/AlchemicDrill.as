@@ -189,7 +189,7 @@ void onTick(CBlob@ this)
 	{
 		if(hasaqua)
 			this.add_f32("consumetimea", consume_amount);
-		if (gametime % heat_cooldown_time == 0)
+		if (gametime % int(heat_cooldown_time * (1.0 - rainCoolingAmt(this) / 2.0)) == 0)
 		{
 			heat -= Maths::Min(hasaqua ? 2 : 1, heat);
 		}
@@ -571,4 +571,15 @@ void AimAtMouse(CBlob@ this, CBlob@ holder)
 	if (!this.isFacingLeft()) mouseAngle += 180;
 
 	this.setAngleDegrees(-mouseAngle); // set aim pos
+}
+
+float rainCoolingAmt(CBlob@ this)
+{
+	CMap@ map = getMap();
+	array<int>@ heightdata;
+	map.get("heightdata", @heightdata);
+	Vec2f position = this.getPosition();
+	if((heightdata is null || (position.x < 0 || position.x / 8 > heightdata.size() - 1 || (position.y) / 8 > heightdata[position.x / 8])))
+		return 0;
+	return getRules().get_f32("rainratio");
 }
