@@ -250,7 +250,7 @@ void onCollision(CBlob@ this, CBlob@ blob, bool solid)
 //only pickable by enemies if they are _under_ this
 bool canBePickedUp(CBlob@ this, CBlob@ byBlob)
 {
-	return (byBlob.getTeamNum() == this.getTeamNum() ||
+	return (byBlob.getTeamNum() == this.getTeamNum() || this.getTeamNum() > 6 ||
 	        byBlob.getPosition().y > this.getPosition().y + 4);
 }
 
