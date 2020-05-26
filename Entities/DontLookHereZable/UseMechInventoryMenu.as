@@ -3,7 +3,7 @@
 void onCreateInventoryMenu(CBlob@ this, CBlob@ forBlob, CGridMenu @gridmenu)
 {
 	
-	CBlob@ blob = this.getAttachments().getAttachedBlob("DRIVER");
+	CBlob@ blob = this.getAttachments().getAttachmentPointByName("DRIVER").getOccupied();
 
 	if (blob !is null && this.isMyPlayer())
 	{

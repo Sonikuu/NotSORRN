@@ -201,6 +201,11 @@ class CSwordEquipment : CEquipmentCore
 		keys usekey = attachedPoint == "FRONT_ARM" ? key_action1 :
 						attachedPoint == "BACK_ARM" ? key_action2 :
 						key_action1;
+		
+		bool actionkey = user.isKeyPressed(usekey);
+		
+		if(equipmentBlocked(user))//Override if menu open
+				actionkey = false;
 						
 		if(chargetime < 0)
 		{
@@ -215,12 +220,12 @@ class CSwordEquipment : CEquipmentCore
 		}
 		
 		
-		if(user.isKeyPressed(usekey) && chargetime == 0)
+		if(actionkey && chargetime == 0)
 		{
 			disabled = false;
 			timetocharge = speed;
 		}
-		if(user.isKeyPressed(usekey) && !jabonly)
+		if(actionkey && !jabonly)
 		{
 			if(!disabled)
 			{

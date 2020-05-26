@@ -60,6 +60,9 @@ class CSprayerEquipment : CEquipmentCore
 							attachedPoint == "BACK_ARM" ? user.isKeyPressed(key_action2) :
 							user.isKeyPressed(key_action1);
 
+			if(equipmentBlocked(user))//Override if menu open
+				actionkey = false;
+
 			if(blob !is null)
 			{
 				angle = (((user.getAimPos() - user.getPosition()).Angle() * -1 ) + 360.0) % 360.0;

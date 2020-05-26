@@ -332,6 +332,9 @@ class CGunEquipment : CEquipmentCore
 							(attachedPoint == "FRONT_ARM" ? user.isKeyPressed(key_action1) :
 							attachedPoint == "BACK_ARM" ? user.isKeyPressed(key_action2) :
 							user.isKeyPressed(key_action1)));
+			
+			if(equipmentBlocked(user))//Override if menu open
+				actionkey = false;
 								
 			if(user.isKeyJustReleased(attachedPoint == "FRONT_ARM" ? key_action1 : attachedPoint == "BACK_ARM" ? key_action2 : key_action1))
 				semiready = true;
@@ -407,6 +410,9 @@ class CGunEquipment : CEquipmentCore
 							(attachedPoint == "FRONT_ARM" ? user.isKeyPressed(key_action1) :
 							attachedPoint == "BACK_ARM" ? user.isKeyPressed(key_action2) :
 							user.isKeyPressed(key_action1)));
+
+			if(equipmentBlocked(user))//Override if menu open
+				actionkey = false;
 							
 							
 										

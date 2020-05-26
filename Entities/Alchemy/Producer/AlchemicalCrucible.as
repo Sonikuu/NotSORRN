@@ -323,7 +323,8 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 		u8 count = params.read_u8();
 		if(melted !is null)
 		{
-			array<int>@ values = getElementalValue(melted.getConfig());
+			int id = -1;
+			array<int>@ values = getElementalValue(melted.getConfig(), id);
 			CAlchemyTank@ tank = getTank(this, "output");
 			if(values !is null && tank !is null)
 			{
@@ -351,7 +352,7 @@ bool isInventoryAccessible(CBlob@ this, CBlob@ forBlob)
 	return true;
 }
 
-array<int>@ getElementalValue(string name, int &out id = -1)
+array<int>@ getElementalValue(string name, int &out id)
 {
 	for (uint i = 0; i < meltlist.length; i++)
 	{
@@ -363,9 +364,3 @@ array<int>@ getElementalValue(string name, int &out id = -1)
 	}
 	return null;
 }
-
-
-
-
-
-
