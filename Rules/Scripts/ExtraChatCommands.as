@@ -37,10 +37,11 @@ class AdminPixie : CommandBase
 
 void onInit(CRules@ this)
 {
-    array<ICommand@>@ commands;
-    this.get("ChatCommands",@commands);
-    print('print statement that runs in onInit(CRules@ this)');
-    commands.push_back(AdminPixie());
-
-    print(commands.size() + "");
+    if(isServer())
+    {
+        array<ICommand@>@ commands;
+        this.get("ChatCommands",@commands);
+        if(commands is null){error("COMMANDS WAS NULL ADMINPIXIE COMMAND NOT ADDED!!!"); return;}
+        commands.push_back(AdminPixie());
+    }
 }
