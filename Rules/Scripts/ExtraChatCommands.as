@@ -17,7 +17,6 @@ class AdminPixie : CommandBase
 
     bool CommandCode(CRules@ this, string[]@ tokens, CPlayer@ player, CBlob@ blob, Vec2f pos, int team, CPlayer@ target_player, CBlob@ target_blob) override
     {
-        print('print statement that runs in CommandCode(...)');
         CBlob@ pixie = server_CreateBlob("pixie");
         if(blob is null)
         {
@@ -32,6 +31,12 @@ class AdminPixie : CommandBase
         pixie.SendCommand(pixie.getCommandID("removegod"));
 
         return true;
+    }
+
+    bool canUseCommand(CRules@ rules, string[]@ tokens, CPlayer@ player, CBlob@ blob) override
+    {
+        string name = getSecurity().getPlayerSeclev(player).getName();
+        return (name == "Admin" || name == "Super Admin");
     }
 }
 
