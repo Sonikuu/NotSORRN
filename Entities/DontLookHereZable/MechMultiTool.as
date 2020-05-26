@@ -36,10 +36,18 @@ const string[] PAGE_NAME =
 	"Device"
 };
 
+const string[] PAGE_NAME_SORRN =
+{
+	"Basic",
+	"Alchemic",
+	"Source",
+	"Device"
+};
+
 const u8 GRID_SIZE = 48;
 const u8 GRID_PADDING = 12;
 
-const Vec2f MENU_SIZE(3, 4);
+const Vec2f MENU_SIZE(6, 6);
 const u32 SHOW_NO_BUILD_TIME = 90;
 
 const f32 MAX_MECH_BUILD_LENGTH = 7.0f;
@@ -321,12 +329,12 @@ class CMechTool : CMechCore
 
 		MakeBlocksMenu(inv, driver, INVENTORY_CE, part);
 	}
-	
-	//Taken straight from BuilderInventory.as
+
 	void MakeBlocksMenu(CInventory@ this, CBlob@ blob, const Vec2f &in INVENTORY_CE, CBlob@ part)
 	{
+		const bool SRN = getRules().gamemode_name == "SORRN";
+		
 		//CBlob@ blob = this.getBlob();
-		//Blob should be driver, this should be the mech inventory
 		if(blob is null) return;
 
 		BuildBlock[][]@ blocks;
@@ -335,7 +343,7 @@ class CMechTool : CMechCore
 
 		const Vec2f MENU_CE = Vec2f(0, MENU_SIZE.y * -GRID_SIZE - GRID_PADDING) + INVENTORY_CE;
 
-		CGridMenu@ menu = CreateGridMenu(MENU_CE, part, MENU_SIZE, getTranslatedString("Mech Build"));
+		CGridMenu@ menu = CreateGridMenu(MENU_CE, part, MENU_SIZE, getTranslatedString("Build"));
 		if(menu !is null)
 		{
 			menu.deleteAfterClick = false;
@@ -346,7 +354,6 @@ class CMechTool : CMechCore
 			{
 				BuildBlock@ b = blocks[PAGE][i];
 				if(b is null) continue;
-				if(b.tile == 0) continue;
 				string block_desc = getTranslatedString(b.description);
 				CGridButton@ button = menu.AddButton(b.icon, "\n" + block_desc, Builder::make_block + i);
 				if(button is null) continue;
@@ -363,7 +370,7 @@ class CMechTool : CMechCore
 					button.hoverText = block_desc + "\n" + getButtonRequirementsText(missing, true);
 					button.SetEnabled(false);
 				}
-				
+
 				CBlob@ carryBlob = part.getCarriedBlob();
 				if(carryBlob !is null && carryBlob.getName() == b.name)
 				{
@@ -393,7 +400,8 @@ class CMechTool : CMechCore
 			}
 
 			// index menu only available in sandbox
-			if(getRules().gamemode_name != "Sandbox") return;
+			// Or SORRN
+			if(getRules().gamemode_name != "Sandbox" && !SRN) return;
 
 			const Vec2f INDEX_POS = Vec2f(menu.getLowerRightPosition().x + GRID_PADDING + GRID_SIZE, menu.getUpperLeftPosition().y + GRID_SIZE * Builder::PAGE_COUNT / 2);
 
@@ -407,7 +415,11 @@ class CMechTool : CMechCore
 
 				for(u8 i = 0; i < Builder::PAGE_COUNT; i++)
 				{
-					CGridButton@ button = index.AddButton("$"+PAGE_NAME[i]+"$", PAGE_NAME[i], Builder::PAGE_SELECT + i, Vec2f(2, 1), params);
+					CGridButton@ button;
+					if(SRN)
+						@button = index.AddButton("$"+PAGE_NAME_SORRN[i]+"$", PAGE_NAME_SORRN[i], Builder::PAGE_SELECT + i, Vec2f(2, 1), params);
+					else
+						@button = index.AddButton("$"+PAGE_NAME[i]+"$", PAGE_NAME[i], Builder::PAGE_SELECT + i, Vec2f(2, 1), params);
 					if(button is null) continue;
 
 					button.selectOneOnClick = true;
@@ -420,6 +432,9 @@ class CMechTool : CMechCore
 			}
 		}
 	}
+	
+	//Taken straight from BuilderInventory.as
+	
 	
 	void SetTileAimpos(CBlob@ this, BlockCursor@ bc, Vec2f aimpos)
 	{
@@ -530,14 +545,14 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 			IMechPart@ part = @getMechPart(this);
 			CMechCore@ core = cast<CMechCore>(part);
 			if(core is null) return;
-			CBlob@ blob = this.getAttachments().getAttachedBlob(core.attachedPoint);
+			CBlob@ blob = this.getAttachments().getAttachmentPointByName(core.attachedPoint).getOccupied();
 			
 			if(blob is null) return;
 			
 			BuildBlock@ block = @blocks[PAGE][i];
 
 			//if(!canBuild(blob, @blocks[PAGE], i)) return; dont need this if we're gonna do it the BP way anyway
-
+			print("asdasqqqqqqqqqqqqqq");
 			// put carried in inventory thing first
 			if(isServer)
 			{
@@ -573,6 +588,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 			}
 			else
 			{
+				print("set");
 				this.set_TileType("buildtile", block.tile);
 			}
 		}
@@ -638,7 +654,7 @@ void PlaceBlock(CBlob@ this, u8 index, Vec2f cursorPos)
 	IMechPart@ part = @getMechPart(this);
 	CMechCore@ core = cast<CMechCore>(part);
 	if(core is null) return;
-	CBlob@ blob = this.getAttachments().getAttachedBlob(core.attachedPoint);
+	CBlob@ blob = this.getAttachments().getAttachmentPointByName(core.attachedPoint).getOccupied();;
 	if(blob is null) return;
 	
 	BuildBlock @bc = getBlockByIndex(this, index);

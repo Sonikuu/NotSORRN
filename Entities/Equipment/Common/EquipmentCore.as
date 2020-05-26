@@ -172,6 +172,12 @@ void clearLeftoverBits(u32 bits, CBitStream@ params)
 	}
 }
 
+bool equipmentBlocked(CBlob@ this)
+{
+	CBlob@ holding = this.getCarriedBlob();
+	return this.get_bool("menustate") || (holding !is null && (holding.getConfig().find("drill") >= 0 || holding.isSnapToGrid())) || this.get_TileType("buildtile") != 0;
+}
+
 shared class CShapeManager
 {
 	array<string> shapenames;
