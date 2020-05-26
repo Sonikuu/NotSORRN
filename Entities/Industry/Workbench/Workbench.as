@@ -175,7 +175,7 @@ void InitWorkshop(CBlob@ this)
 	}
 		{
 		ShopItem@ s = addShopItem(this,  "Element Vial", "$vial$", "vial", "An element holding vial, looks fragile but sturdy enough to drink from ", false);
-		AddRequirement(s.requirements, "blob", "mat_glass", "Glass", 100);
+		AddRequirement(s.requirements, "blob", "mat_glass", "Glass", 30);
 		
 		AddIconToken("$vial$", "vial.png", Vec2f(8, 8), 0);
 	}
