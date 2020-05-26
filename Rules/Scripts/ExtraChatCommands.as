@@ -16,7 +16,13 @@ class AdminPixie : CommandBase
     }
 
     bool CommandCode(CRules@ this, string[]@ tokens, CPlayer@ player, CBlob@ blob, Vec2f pos, int team, CPlayer@ target_player, CBlob@ target_blob) override
-    {
+    {   
+        if(blob !is null && blob.getConfig() == "pixie")
+        {
+            blob.server_Die();
+            return true;
+        }
+
         CBlob@ pixie = server_CreateBlob("pixie");
         if(blob is null)
         {
