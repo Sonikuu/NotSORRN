@@ -599,6 +599,9 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	CAbilityBar@ bar;
 	CBlob@ blob;
 	private Vec2f menuStartPos = Vec2f(5,52);
+	private Vec2f menuOpenTargetPos = Vec2f(5,52);
+	private Vec2f menuClosedTargetPos; //set in constructor to prevent null poitner access
+	private Vec2f menuCurrentPos = Vec2f(0,0);
 	private Vec2f menuButtonDimentions = Vec2f(32,16);
 	private int columns = 5;
 	bool menuOpen = false;
@@ -622,6 +625,9 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		}
 
 		blob.addCommandID("Menu_Sync");
+
+		menuClosedTargetPos = Vec2f(-getMenuDimentions().x,52);
+		menuCurrentPos = menuClosedTargetPos;
 	}
 
 	void addAbility(u32 i)
@@ -661,13 +667,13 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 					heldItem = getHoveredItem();
 				}
 
-				if(isMenuButtonHovered())
-				{
-					menuOpen = true;
-				}
 				if(!isMenuHovered())
 				{
 					menuOpen = false;
+				}
+				if(isMenuButtonHovered())
+				{
+					menuOpen = true;
 				}
 			}
 			if(!controls.isKeyPressed(KEY_LBUTTON))
@@ -745,12 +751,17 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 
 	Vec2f getMenuEndPos()
 	{
-		return menuStartPos + Vec2f(3 + columns * (slotDimentions.x * fRealScale) + columns * slotSpacing.x, getRows() * (slotDimentions.y * fRealScale) + getRows() * slotSpacing.x) + Vec2f(0,4);
+		return menuCurrentPos + getMenuDimentions();
+	}
+
+	Vec2f getMenuDimentions()
+	{
+		return  Vec2f(3 + columns * (slotDimentions.x * fRealScale) + columns * slotSpacing.x, getRows() * (slotDimentions.y * fRealScale) + getRows() * slotSpacing.x) + Vec2f(0,4);
 	}
 
 	Vec2f getItemPos(u32 i)
 	{
-		return Vec2f(i%columns * (slotDimentions.x * fRealScale + slotSpacing.x), (getRows() - 1) * (fRealScale * slotDimentions.y)) + menuStartPos + Vec2f(4,4);
+		return Vec2f(i%columns * (slotDimentions.x * fRealScale + slotSpacing.x), (getRows() - 1) * (fRealScale * slotDimentions.y)) + menuCurrentPos + Vec2f(4,4);
 	}
 
 	s32 getHoveredItem()
@@ -773,9 +784,9 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	{
 		Vec2f mpos = getControls().getMouseScreenPos();
 		return
-		mpos.x >= menuStartPos.x &&
+		mpos.x >= menuCurrentPos.x &&
 		mpos.x <= getMenuEndPos().x &&
-		mpos.y >= menuStartPos.y &&
+		mpos.y >= menuCurrentPos.y &&
 		mpos.y <= getMenuEndPos().y;
 	}
 
@@ -783,10 +794,11 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	{
 		Vec2f mpos = getControls().getMouseScreenPos();
 		return 
-		mpos.x >= menuStartPos.x &&
-		mpos.x <= menuStartPos.x + menuButtonDimentions.x * fRealScale &&
-		mpos.y >= menuStartPos.y  &&
-		mpos.y <= menuStartPos.y + menuButtonDimentions.y * fRealScale;
+		mpos.x >= menuOpenTargetPos.x &&
+		mpos.x <= menuOpenTargetPos.x + menuButtonDimentions.x * fRealScale &&
+		mpos.y >= menuOpenTargetPos.y  &&
+		mpos.y <= menuOpenTargetPos.y + menuButtonDimentions.y * fRealScale;
+
 	}
 
 	void onRender(CSprite@ sprite)
@@ -799,10 +811,19 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		if(blob.isMyPlayer())
 		{
 			//menu button icon
-			GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuStartPos,fDrawScale);
-			if(menuOpen)
+			if(isMenuButtonHovered())
 			{
-				GUI::DrawRectangle(menuStartPos,getMenuEndPos());//background
+				GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuOpenTargetPos,fDrawScale,SColor(255,127,127,127));
+			}
+			else
+			{
+				GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuOpenTargetPos,fDrawScale);
+			}
+
+			menuCurrentPos = Vec2f_lerp(menuCurrentPos,menuOpen ? menuOpenTargetPos : menuClosedTargetPos,0.1);
+			if(menuOpen || true)
+			{
+				GUI::DrawRectangle(menuCurrentPos,getMenuEndPos());//background
 
 				for(int i = 0; i < list.size(); i++)//menu
 				{
