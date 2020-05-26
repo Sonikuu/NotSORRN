@@ -38,6 +38,7 @@ void onTick(CBlob@ this)
 						int dispersed = 0;
 						for (int i = 0; i < fuelblobs.length; i++)
 						{
+							if(fuelblobs[i].getTeamNum() != this.getTeamNum()){continue;}
 							int toadd = Maths::Min(eachdisperse, 1000 / 2.5 - fuelblobs[i].get_f32("fuel") / 2.5);
 							fuelblobs[i].set_f32("fuel", fuelblobs[i].get_f32("fuel") + toadd * 2.5);
 							fuelblobs[i].Sync("fuel", true);
