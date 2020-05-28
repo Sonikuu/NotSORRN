@@ -36,6 +36,15 @@ array<CAlchemyInfuse@> infuserecipes =
 	1,//output amount
 	900//processing time
 	),
+	@CAlchemyInfuse(
+	"aer",//input element
+	"lantern",//input item
+	"lum",//output item
+	100,//element amount
+	1,//item amount
+	1,//output amount
+	45//processing time
+	),
 	
 	@CAlchemyInfuse(
 	"purity",//input element
