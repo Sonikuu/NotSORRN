@@ -77,6 +77,10 @@ void onTick(CBlob@ this)
 				client_SendThrowOrActivateCommand(this);
 			}
 		}
+		if(getControls().isKeyJustPressed(KEY_LCONTROL))
+		{
+			this.set_u8("wiringmode",1);
+		}
 	}
 
 	// slow down walking
