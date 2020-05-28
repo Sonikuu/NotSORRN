@@ -290,7 +290,7 @@ enum EElement
 }*/
 	void drinkVial(CBlob@ vial)
 	{
-		CAlchemyTank@ tank = getTank(vial,"input");
+		CAlchemyTank@ tank = getTank(vial,0);
 		int id = firstId(tank);
 		if(id <= -1){return;}
 		f32 ammount = tank.storage.getElement(id);
