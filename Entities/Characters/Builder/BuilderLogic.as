@@ -48,15 +48,12 @@ void onSetPlayer(CBlob@ this, CPlayer@ player)
 	if(player !is null)
 	{
 		player.SetScoreboardVars("ScoreboardIcons.png", 1, Vec2f(16, 16));
+		this.Untag("soulless");
 	}
 }
 
 void onTick(CBlob@ this)
 {
-	if(this.getPlayer() !is null)
-	{
-		this.Untag("soulless");
-	}
 	if(this.isInInventory())
 		return;
 
