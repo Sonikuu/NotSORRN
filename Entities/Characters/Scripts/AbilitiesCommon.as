@@ -579,6 +579,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		}
 
 		blob.addCommandID("Menu_Sync");
+		blob.addCommandID("Server_Menu_Sync");
 
 		menuClosedTargetPos = Vec2f(-getMenuDimentions().x,52);
 		menuCurrentPos = menuClosedTargetPos;
@@ -685,6 +686,13 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 				{
 					getAbility(i).onInit();
 				}
+			}
+		}
+		if(cmd == blob.getCommandID("Server_Menu_Sync"))
+		{
+			if(isServer())
+			{
+				sendSync();
 			}
 		}
 	}

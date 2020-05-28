@@ -62,6 +62,14 @@ void onTick(CSprite@ this)
 {
 	// store some vars for ease and speed
 	CBlob@ blob = this.getBlob();
+	if(blob.get_bool("soulless"))
+	{
+		this.setRenderStyle(RenderStyle::Style::shadow);
+	}
+	else
+	{
+		this.setRenderStyle(RenderStyle::Style::normal);
+	}
 
 	if (blob.hasTag("dead"))
 	{
