@@ -1227,6 +1227,13 @@ bool entropyEffect(CMap@ map, Vec2f pos)
 
 bool orderEffect(CMap@ map, Vec2f pos)
 {
+	CBlob@ blob = map.getBlobAtPosition(pos);
+	if(blob !is null && blob.hasScript("BuildingEffects.as"))//this might not be the best way to check but "too bad"
+	{
+		blob.server_Heal(0.1);
+	}
+
+
 	bool activated = false;
 	Tile tile = map.getTile(pos);
 	//STONE
@@ -1430,7 +1437,7 @@ bool vialSplashNatura(CBlob@ vial, f32 power)
 	for(int i = 0; i < blobs.size(); i++)
 	{
 		CBlob@ blob = blobs[i];
-		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition()) || !blob.hasTag("flesh")){continue;}
 		padNatura(blob,power * 5,vial);
 	}
 	return true;
