@@ -19,6 +19,9 @@
 funcdef float padProto(CBlob@, int, CBlob@);
 funcdef float wardProto(float, int, CBlob@);
 funcdef void bindProto(CBlob@, int, CBlob@);
+funcdef bool vialSplashProto(CBlob@, f32);
+funcdef bool vialIngestProto(CBlob@, CBlob@, f32);
+
 //The three floats should be aimdir, spread, and range
 funcdef float sprayProto(int, float, float, float, CBlob@, CBlob@);
 //uhhh and then...
@@ -1306,4 +1309,243 @@ bool orderEffect(CMap@ map, Vec2f pos)
 			map.server_SetTile(pos, tile.type - 1);
 	}
 	return activated;
+}
+//VIAL INGEST BEHAVIOR HERE
+bool vialIngestBlank(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+
+bool vialIngestEcto(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	applyFxGhostlike(drinker,900 * power,1);
+	applyFxLowGrav(drinker,900 * power,100);
+	return true;
+}
+bool vialIngestLife(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	drinker.server_Heal(drinker.getInitialHealth() * power);
+	return true;
+}
+bool vialIngestNatura(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	padNatura(drinker,power * 5,vial);
+	return true;
+}
+bool vialIngestForce(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	drinker.setVelocity(Vec2f(0, -16 * power));
+	return true;
+}
+bool vialIngestAer(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	applyFxLightFall(drinker,900 * power,5 * power);
+	return true;
+}
+bool vialIngestIgnis(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	vial.server_Hit(drinker,drinker.getPosition(), Vec2f(0,0),1,Hitters::fire,true);
+	return true;
+}
+bool vialIngestTerra(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	padTerra(drinker,power*5,vial);
+	return true;
+}
+bool vialIngestOrder(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	padOrder(drinker,power*5,vial);
+	return true;
+}
+bool vialIngestEntropy(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	vial.server_Hit(drinker, drinker.getPosition(), Vec2f_zero, 6 * power, Hitters::spikes,true);
+	return true;
+}
+bool vialIngestAqua(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	padAqua(drinker,power*5,vial);
+	return true;
+}
+bool vialIngestCorruption(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialIngestPurity(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialIngestUnholy(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialIngestHoly(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialIngestYeet(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+
+//VIAL SPLASH BEHAVIOR HERE
+bool vialSplashBlank(CBlob@ vial, f32 power)
+{
+
+	return true;
+}
+
+bool vialSplashEcto(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		applyFxGhostlike(blob,900 * power,1);	
+		applyFxLowGrav(blob,900 * power,100);
+	}
+	return true;
+}
+bool vialSplashLife(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		blob.server_Heal(blob.getInitialHealth() * power);
+	}
+	return true;
+}
+bool vialSplashNatura(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		padNatura(blob,power * 5,vial);
+	}
+	return true;
+}
+bool vialSplashForce(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		Vec2f thisPos = vial.getPosition();
+		Vec2f otherPos = blob.getPosition();
+		Vec2f dif = thisPos - otherPos;
+		dif.Normalize();
+
+		blob.setVelocity(blob.getVelocity() + (-dif * power * 32) );
+	}
+	return true;
+}
+bool vialSplashAer(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		Vec2f thisPos = vial.getPosition();
+		Vec2f otherPos = blob.getPosition();
+		Vec2f dif = thisPos - otherPos;
+		dif.Normalize();
+
+		blob.setVelocity(blob.getVelocity() + (dif * power * 32) );
+	}
+	return true;
+}
+bool vialSplashIgnis(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		vial.server_Hit(blob,blob.getPosition(), Vec2f(0,0),1,Hitters::fire,true);
+	}
+	return true;
+}
+bool vialSplashTerra(CBlob@ vial, f32 power)
+{
+	for(int i = 0; i < 50 * power; i++)
+	{
+		sprayTerra(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+	}
+	return true;
+}
+bool vialSplashOrder(CBlob@ vial, f32 power)
+{
+	for(int i = 0; i < 50 * power; i++)
+	{
+		sprayOrder(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+	}
+	return true;
+}
+bool vialSplashEntropy(CBlob@ vial, f32 power)
+{
+	for(int i = 0; i < 50 * power; i++)
+	{
+		sprayEntropy(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+	}
+	return true;
+}
+bool vialSplashAqua(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		padAqua(blob,power*5,vial);
+	}
+	return true;
+}
+bool vialSplashCorruption(CBlob@ vial, f32 power)
+{
+	for(int i = 0; i < 50 * power; i++)
+	{
+		sprayCorruption(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+	}
+	return true;
+}
+bool vialSplashPurity(CBlob@ vial, f32 power)
+{
+	for(int i = 0; i < 50 * power; i++)
+	{
+		sprayPurity(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+	}
+	return true;
+}
+bool vialSplashUnholy(CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialSplashHoly(CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialSplashYeet(CBlob@ vial, f32 power)
+{
+	return true;
 }

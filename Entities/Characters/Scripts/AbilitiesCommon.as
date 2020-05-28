@@ -1,7 +1,7 @@
 #include "Hitters.as"
 #include "AlchemyCommon.as"
+#include "ElementalCore.as"
 #include "ExplosionCommon.as"
-#include "FxLightFall.as"
 #include "Hitters.as"
 
 interface IAbility
@@ -296,53 +296,7 @@ enum EElement
 		f32 ammount = tank.storage.getElement(id);
 		f32 power = ammount/tank.maxelements;
 
-		switch(id)
-		{
-			case EElement::ecto:
-				applyFxGhostlike(blob,900 * power,1);
-				applyFxLowGrav(blob,900 * power,100);
-			break;
-
-			case EElement::life:
-				blob.server_Heal(blob.getInitialHealth() * power);
-			break;
-
-			case EElement::natura:
-				padNatura(blob,power * 5,vial);
-			break;
-
-			case EElement::force:
-				blob.setVelocity(Vec2f(0, -16 * power));
-			break;
-
-			case EElement::aer:
-				applyFxLightFall(blob,900 * power,5 * power);
-			break;
-
-			 case EElement::ignis:
-			 	vial.server_Hit(blob,blob.getPosition(), Vec2f(0,0),1,Hitters::fire);
-			 break;
-
-			case EElement::terra:
-				padTerra(blob,power*5,vial);
-			break;
-
-			case EElement::order:
-				padOrder(blob,power*5,vial);
-			break;
-
-			case EElement::entropy: 
-				vial.server_Hit(blob, blob.getPosition(), Vec2f_zero, 6 * power, Hitters::spikes);
-			break;
-
-			case EElement::aqua:
-				padAqua(blob,power*5,vial);
-			break;
-
-			default:
-				addToMyChat("Looks like it did nothing, element effect probably not added yet sorry");
-				return;
-		}
+		elementlist[id].vialIngestbehavior(blob,vial,power);
 
 		tank.storage.setElement(id,0);
 	}
