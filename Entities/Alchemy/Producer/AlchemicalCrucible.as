@@ -325,7 +325,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 		{
 			int id = -1;
 			array<int>@ values = getElementalValue(melted.getConfig(), id);
-			CAlchemyTank@ tank = getTank(this, "output");
+			CAlchemyTank@ tank = getTank(this, 0);
 			if(values !is null && tank !is null)
 			{
 				array<int> valcopy;
