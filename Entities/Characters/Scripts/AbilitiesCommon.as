@@ -510,7 +510,7 @@ class CAbilityBar
 				activateSelectedAbility();
 			}
 
-			if(controls.isKeyPressed(KEY_LCONTROL))
+			if(controls.isKeyPressed(KEY_LSHIFT))
 			{
 				if(controls.isKeyJustPressed(KEY_KEY_1)){selectedSlot = 0;}
 				if(controls.isKeyJustPressed(KEY_KEY_2)){selectedSlot = 1;}

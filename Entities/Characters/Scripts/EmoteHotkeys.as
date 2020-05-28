@@ -73,7 +73,7 @@ void onTick(CBlob@ this)
 	}
 
 	CControls@ controls = getControls();
-	if(!controls.isKeyPressed(KEY_LCONTROL))
+	if(!controls.isKeyPressed(KEY_LSHIFT))
 	{
 		if (controls.isKeyJustPressed(KEY_KEY_1))
 		{
