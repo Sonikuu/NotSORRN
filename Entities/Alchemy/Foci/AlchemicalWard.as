@@ -5,7 +5,7 @@ const float wardrange = 64;
 
 void onInit(CBlob@ this)
 {	
-	CAlchemyTank@ tank = addTank(this, "input", true, Vec2f(0, 4));
+	CAlchemyTank@ tank = addTank(this, "Input", true, Vec2f(0, 4));
 	tank.maxelements = 10;
 	tank.singleelement = true;
 	//getTank(this, 0).dynamictank = true;

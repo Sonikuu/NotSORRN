@@ -2,7 +2,7 @@
 
 void onInit(CBlob@ this)
 {	
-	addTank(this, "output", false, Vec2f(0, 4));
+	addTank(this, "Output, Nerd", false, Vec2f(0, 4));
 	
 	this.set_string("filter", "none");
 	
@@ -16,7 +16,7 @@ void onInit(CBlob@ this)
 
 void onTick(CBlob@ this)
 {
-	CAlchemyTank@ output = getTank(this, "output");
+	CAlchemyTank@ output = getTank(this, 0);
 	
 	for (int i = 0; i < elementlist.length; i++)
 	{

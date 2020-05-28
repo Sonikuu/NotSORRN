@@ -127,7 +127,7 @@ void onTick(CSprite@ this)
 		{
 			this.SetAnimation("crouch");
 		}
-		else if (action2 || (this.isAnimation("strike") && !this.isAnimationEnded()))
+		else if ((action2 || (this.isAnimation("strike") && !this.isAnimationEnded())) && blob.get_u8("wiringmode") == 0)
 		{
 			this.SetAnimation("strike");
 		}

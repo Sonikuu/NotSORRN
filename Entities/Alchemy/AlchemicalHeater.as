@@ -5,7 +5,7 @@
 void onInit(CBlob@ this)
 {	
 	//Setup tanks
-	CAlchemyTank@ tank = addTank(this, "input", true, Vec2f(0, -9.5));
+	CAlchemyTank@ tank = addTank(this, "Input", true, Vec2f(0, -9.5));
 	tank.onlyele = 5;//5 Is ignis
 	tank.maxelements = 250;
 	this.set_u16("dumptotal", 0);
@@ -13,7 +13,7 @@ void onInit(CBlob@ this)
 
 void onTick(CBlob@ this)
 {
-	CAlchemyTank@ input = getTank(this, "input");
+	CAlchemyTank@ input = getTank(this, 0);
 	
 	if(input !is null && getGameTime() % 100 == 0)
 	{

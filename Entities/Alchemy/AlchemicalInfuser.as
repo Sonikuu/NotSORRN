@@ -143,7 +143,7 @@ array<CAlchemyInfuse@> infuserecipes =
 void onInit(CBlob@ this)
 {	
 	//Setup tanks
-	CAlchemyTank@ input = addTank(this, "input", true, Vec2f(0, -8));
+	CAlchemyTank@ input = addTank(this, "Input", true, Vec2f(0, -8));
 	input.singleelement = true;
 	input.maxelements = 1000;
 	//addTank(this, "inputr", true, Vec2f(4, -4));

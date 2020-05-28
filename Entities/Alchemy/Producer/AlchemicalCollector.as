@@ -2,7 +2,7 @@
 
 void onInit(CBlob@ this)
 {	
-	addTank(this, "output", false, Vec2f(0, 12));
+	addTank(this, "Output", false, Vec2f(0, 12));
 	
 	this.set_TileType("background tile", CMap::tile_castle_back);
 }

@@ -3,10 +3,10 @@
 void onInit(CBlob@ this)
 {	
 	//Setup tanks
-	CAlchemyTank@ input = addTank(this, "input", true, Vec2f(0, -4));
-	addTank(this, "output1", false, Vec2f(-10, 4));
-	addTank(this, "output2", false, Vec2f(0, 4));
-	addTank(this, "output3", false, Vec2f(10, 4));
+	CAlchemyTank@ input = addTank(this, "Input", true, Vec2f(0, -4));
+	addTank(this, "Left Output", false, Vec2f(-10, 4));
+	addTank(this, "Middle Output", false, Vec2f(0, 4));
+	addTank(this, "Right Output", false, Vec2f(10, 4));
 	
 	this.set_string("filter1", "none");
 	this.set_string("filter2", "none");
@@ -23,11 +23,11 @@ void onInit(CBlob@ this)
 void onTick(CBlob@ this)
 {
 	
-	CAlchemyTank@ input = getTank(this, "input");
+	CAlchemyTank@ input = getTank(this, "Input");
 	
-	CAlchemyTank@ output1 = getTank(this, "output1");
-	CAlchemyTank@ output2 = getTank(this, "output2");
-	CAlchemyTank@ output3 = getTank(this, "output3");
+	CAlchemyTank@ output1 = getTank(this, "Left Output");
+	CAlchemyTank@ output2 = getTank(this, "Middle Output");
+	CAlchemyTank@ output3 = getTank(this, "Right Output");
 	
 	array<string> blacklist1 = {this.get_string("filter2"), this.get_string("filter3")};
 	array<string> blacklist2 = {this.get_string("filter1"), this.get_string("filter3")};

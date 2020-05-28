@@ -3,7 +3,7 @@
 
 void onInit(CBlob@ this)
 {	
-	CAlchemyTank@ tank = addTank(this, "input", true, Vec2f(12, 0));
+	CAlchemyTank@ tank = addTank(this, "Input", true, Vec2f(12, 0));
 	tank.dynamictank = true;
 	tank.singleelement = true;
 	tank.maxelements = 50;

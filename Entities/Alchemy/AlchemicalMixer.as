@@ -62,17 +62,17 @@ array<CAlchemyMix@> mixrecipes =
 void onInit(CBlob@ this)
 {	
 	//Setup tanks
-	addTank(this, "inputl", true, Vec2f(-4, -4));
-	addTank(this, "inputr", true, Vec2f(4, -4));
-	addTank(this, "output", false, Vec2f(0, 4));
+	addTank(this, "Left Input", true, Vec2f(-4, -4));
+	addTank(this, "Right Input", true, Vec2f(4, -4));
+	addTank(this, "Output", false, Vec2f(0, 4));
 	
 }
 
 void onTick(CBlob@ this)
 {
-	CAlchemyTank@ inputl = getTank(this, "inputl");
-	CAlchemyTank@ inputr = getTank(this, "inputr");
-	CAlchemyTank@ output = getTank(this, "output");
+	CAlchemyTank@ inputl = getTank(this, "Left Input");
+	CAlchemyTank@ inputr = getTank(this, "Right Input");
+	CAlchemyTank@ output = getTank(this, "Output");
 	
 	if(inputl !is null && inputr !is null && output !is null)
 	{

@@ -214,6 +214,7 @@ void onCommand(CInventory@ this, u8 cmd, CBitStream@ params)
 
 	if(cmd >= Builder::make_block && cmd < Builder::make_reserved)
 	{
+		blob.set_u8("wiringmode", 0);
 		const bool isServer = getNet().isServer();
 
 		BuildBlock[][]@ blocks;
@@ -275,6 +276,7 @@ void onCommand(CInventory@ this, u8 cmd, CBitStream@ params)
 	else if(cmd == Builder::TOOL_CLEAR)
 	{
 		blob.set_bool("connectingalchemy", false);
+		blob.set_u8("wiringmode", 0);
 
 		u16 id;
 		if(!params.saferead_u16(id)) return;

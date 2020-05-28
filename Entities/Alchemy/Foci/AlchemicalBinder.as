@@ -2,7 +2,7 @@
 
 void onInit(CBlob@ this)
 {	
-	addTank(this, "input", true, Vec2f(0, 4));
+	addTank(this, "Input", true, Vec2f(0, 4));
 	//getTank(this, 0).dynamictank = true;
 	
 	//this.addCommandID("activate");

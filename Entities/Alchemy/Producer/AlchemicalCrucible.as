@@ -190,7 +190,7 @@ void onInit(CBlob@ this)
 	this.set_u16("burncooldown", 0);
 	
 	//Setup tanks
-	addTank(this, "output", false, Vec2f(0, -12));
+	addTank(this, "Output", false, Vec2f(0, -12));
 	
 	AddIconToken("$add_fuel$", "FireFlash.png", Vec2f(32, 32), 0);
 	
@@ -232,7 +232,7 @@ void onTick(CBlob@ this)
 				
 				int id = -1;
 				array<int>@ values = getElementalValue(invitem.getConfig(), id);
-				CAlchemyTank@ tank = getTank(this, "output");
+				CAlchemyTank@ tank = getTank(this, 0);
 				if(values !is null)
 				{
 					if(getNet().isServer())
