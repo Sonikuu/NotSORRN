@@ -219,7 +219,7 @@ void onTick(CSprite@ this)
 
 void onTick(CBlob@ this)
 {
-	CAlchemyTank@ input = getTank(this, "input");
+	CAlchemyTank@ input = getTank(this, 0);
 	//CAlchemyTank@ inputr = getTank(this, "inputr");
 	//CAlchemyTank@ output = getTank(this, "output");
 	
