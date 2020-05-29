@@ -312,6 +312,13 @@ class CSelfDestruct : CAbilityBase
 		blob.addCommandID("SelfDestruct_Activate");
     }
 
+	void onInit() override
+	{
+		blob.SetLightColor(SColor(255, 252, 86, 10));
+        blob.SetLightRadius(24.0f);
+	    blob.SetLight(true);
+	}
+
     void onTick()
     {
         if(getGameTime() % 10 == 0)
