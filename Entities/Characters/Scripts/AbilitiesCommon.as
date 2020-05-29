@@ -139,6 +139,8 @@ class CPoint : CAbilityBase
 
 class CConsume : CAbilityBase
 {
+	int unstableCoresConsumed = 0;
+
     int stomachItems = 0;
     int stomachMax = 10;
     CConsume(string _textureName, CBlob@ _blob)
@@ -213,10 +215,30 @@ class CConsume : CAbilityBase
                     stomachItems++;
                 } else if(itemName == "unstablecore")
                 {
-                    addToMyChat("You consider to do the unthinkable and the next thing you know it's over\nYou feel unstable\nYou've gained a new ability: Self Destruct!");
-                    manager.abilityMenu.addAbility(EAbilities::SelfDestruct);
+					unstableCoresConsumed++;
+					switch(unstableCoresConsumed)
+					{
+						case 1: addToMyChat("After eating the core you find it strange that it seems to already have left your stomach, almost like it became part of you. You wonder what will happen if you eat more"); break;
+						case 2: addToMyChat("You eat the core more quickly than before. You feel more unstable inside. You wonder what will happen if you eat more"); break;
+						case 3: addToMyChat("You feel like you could explode inside but at the same time in control.\nYou unlocked a new ability!"); 
+						manager.abilityMenu.addAbility(EAbilities::SelfDestruct);
+						break;
+
+						case 4: addToMyChat("After eating yet another core you feel that you're losing control. You worry what would happen if you ate anymore"); break;
+					}
+					if(unstableCoresConsumed > 4)
+					{
+						addToMyChat("You feel incredibly unstable");
+						cast<CSelfDestruct>(manager.abilityMasterList.getAbility(EAbilities::SelfDestruct)).instability++;
+					}
                     held.server_Die();
-                } else if(itemName == "thisisntajokeitem")
+                } else if(itemName == "chaoscore")
+				{
+					manager.abilityMenu.addAbility(EAbilities::SelfDestruct);
+					cast<CSelfDestruct>(manager.abilityMasterList.getAbility(EAbilities::SelfDestruct)).cheaterMode = true;
+					addToMyChat("uh oh someone is going to have a bad time");
+					held.server_Die();
+				} else if(itemName == "thisisntajokeitem")
                 {
                     addToMyChat("Instead of eating the infinity dildo you think of a better idea and shove it in the other end\nYou feel excited and powerful");
                     held.server_Die();
@@ -269,25 +291,6 @@ class CConsume : CAbilityBase
 		return 0;
 	}
 
-/*
-enum EElement
-{
-	ecto = 0,
-	life = 1,
-	natura = 2,
-	force = 3,
-	aer = 4,
-	ignis = 5,
-	terra = 6,
-	order = 7,
-	entropy = 8,
-	aqua = 9,
-	corruption = 10,
-	purity = 11,
-	unholy = 12,
-	holy = 13,
-	yeet = 14
-}*/
 	void drinkVial(CBlob@ vial)
 	{
 		CAlchemyTank@ tank = getTank(vial,0);
@@ -305,6 +308,9 @@ enum EElement
 
 class CSelfDestruct : CAbilityBase
 {
+	f32 instability = 0;
+	bool cheaterMode = false;
+
     CSelfDestruct(string textureName, CBlob@ blob)
     {
         super(textureName,blob);
@@ -329,6 +335,14 @@ class CSelfDestruct : CAbilityBase
                 p.gravity = Vec2f_zero;
             }
         }
+
+		if(instability > 0 && getGameTime() % 30 == 0)
+		{
+			if(XORRandom(30/instability) == 0)
+			{
+				activate();
+			}
+		}
     }
 
     string getDescription() override
@@ -352,7 +366,7 @@ class CSelfDestruct : CAbilityBase
 	void activateExplosion()
 	{
 		Explode(blob, blob.getPosition(), 80, 6, "Bomb.ogg", 16 * 5, 1.0, true, Hitters::explosion, true);
-		blob.server_Hit(blob, blob.getPosition(), Vec2f_zero, 3.0, Hitters::explosion, true);
+		blob.server_Hit(blob, blob.getPosition(), Vec2f_zero,cheaterMode ? 0 : 3.0, Hitters::explosion, true);
 	}
 
 	void onDie() override
