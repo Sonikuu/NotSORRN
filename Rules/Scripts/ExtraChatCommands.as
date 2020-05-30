@@ -51,7 +51,7 @@ void onInit(CRules@ this)
     {
         array<ICommand@>@ commands;
         this.get("ChatCommands",@commands);
-        if(commands is null){error("COMMANDS WAS NULL ADMINPIXIE COMMAND NOT ADDED!!!"); return;}
+        if(commands is null){error("COMMANDS WAS NULL ADMINPIXIE COMMAND NOT ADDED!!! Try adjusting mod order"); return;}
         commands.push_back(AdminPixie());
     }
 }
