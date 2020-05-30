@@ -4,7 +4,6 @@ class AdminPixie : CommandBase
 {
     void Setup(string[]@ tokens) override
     {
-        print('yeet');
         if(names[0] == 0)
         {
             names[0] = "admin".getHash();
