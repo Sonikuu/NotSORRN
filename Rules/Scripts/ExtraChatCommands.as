@@ -11,7 +11,6 @@ class AdminPixie : CommandBase
             names[0] = "admin".getHash();
             names[1] = "adminpixie".getHash();
         }
-        permlevel = Moderator;
         blob_must_exist = false;
 
     }
