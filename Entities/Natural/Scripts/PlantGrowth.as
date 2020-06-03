@@ -13,7 +13,6 @@ void plantGrowthTick(CBlob@ this)
 		if (amount >= this.get_u8("growth max") && !this.hasTag(grown_tag))
 		{
 			this.Tag(grown_tag);
-			this.Sync(grown_tag, true);
 			this.server_SetHealth(this.getInitialHealth());
 		}
 		else if (canGrowAt(this, (pos + Vec2f(0.0f, 6.0f))))
@@ -30,6 +29,7 @@ void plantGrowthTick(CBlob@ this)
 			this.set_u8(grown_amount, 0); //TODO maybe remove, griefable
 		}
 	}
+	this.Sync(grown_tag, true);
 }
 
 void onInit(CBlob@ this)
@@ -55,5 +55,6 @@ void onTick(CBlob@ this)
 {
 	plantGrowthTick(this);
 	u8 time = this.get_u8(growth_time);
+	//time = 1;
 	this.getCurrentScript().tickFrequency = time;
 }

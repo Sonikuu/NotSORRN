@@ -88,6 +88,10 @@ void InitTrader(CBlob@ this)
 		ShopItem@ s = addShopItem(this, "Furnace Recipe", "$recipe$", "recipe-3", "Random furnace recipe", false);
 		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 100);
 	}
+	{
+		ShopItem@ s = addShopItem(this, "Common Seed", "$seed$", "seed", "Random common crop seed", false);
+		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 20);
+	}
 }
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params)

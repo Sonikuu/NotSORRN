@@ -47,6 +47,7 @@ array<int> fish_val = 				{0, 	25, 	0, 			0, 		0, 		0,		0,		0,		0,			50,		0,				
 array<int> heart_val = 				{0, 	25, 	0, 			0, 		0, 		0,		0,		0,		0,			0,		0,				0,			10};
 array<int> chicken_val = 			{0, 	25, 	10, 		0, 		25, 	0,		0,		0,		0,			0,		0,				0,			5};
 array<int> grain_val = 				{0, 	25, 	25, 		0, 		10};
+//array<int> grain_val = 				{0, 	25, 	25, 		0, 		10};
 
 array<CMeltableItem> meltlist = 
 {
@@ -218,6 +219,15 @@ void onRender(CSprite@ this)
 	
 }
 
+void onTick(CSprite@ this)
+{
+	CBlob@ b = this.getBlob();
+	if(b.hasTag("active"))
+		this.SetFrame(1);
+	else
+		this.SetFrame(0);
+}
+
 void onTick(CBlob@ this)
 {
 	CSprite@ sprite = this.getSprite();
@@ -249,9 +259,9 @@ void onTick(CBlob@ this)
 						}
 						this.SendCommand(this.getCommandID("meltitem"), params);
 					}
-					else if(sprite !is null)
+					else
 					{
-						sprite.SetFrame(1);
+						this.Tag("active");
 					}
 					/*
 					this.add_u16("burncooldown", getTotal(@values));
@@ -263,20 +273,24 @@ void onTick(CBlob@ this)
 					}*/
 				}
 			}
+			else
+				this.Untag("active");
 		}
 		else
 		{
 			if(this.get_f32("fuel") > 0 && this.get_u16("burncooldown") != 0)
 			{
-				if(sprite !is null)
-					sprite.SetFrame(1);
+				this.Tag("active");
+				//if(sprite !is null)
+				//	sprite.SetFrame(1);
 				this.add_f32("fuel", -1);
 				this.add_u16("burncooldown", -1);
 			}
 			else
 			{
-				if(sprite !is null)
-					sprite.SetFrame(0);
+				//if(sprite !is null)
+				//	sprite.SetFrame(0);
+				this.Untag("active");
 			}
 		}
 	}
