@@ -5,15 +5,18 @@
 //sprites to load by index
 const string[] seed_sprites =
 {
-	"Entities/Natural/Seed/Seed.png",       //normal seed
-	"Entities/Natural/Seed/Seed.png",       //grain seed
-	"Entities/Natural/Trees/Trees.png",     //pine
-	"Entities/Natural/Trees/Trees.png",     //bushy
-	"Entities/Natural/Farming/Grain.png",   //grains
-	"Entities/Natural/Seed/Seed.png",  //bush
-	"Entities/Natural/Seed/Seed.png",  //flowers
-	"Entities/Natural/LifeTree/LifeTrees.png",  //lifetree
-	"Entities/Natural/CorruptTree/CorruptTrees.png"
+	"Entities/Natural/Seed/Seed.png",       //normal seed 0
+	"Entities/Natural/Seed/Seed.png",       //grain seed 1
+	"Entities/Natural/Trees/Trees.png",     //pine 2
+	"Entities/Natural/Trees/Trees.png",     //bushy 3
+	"Entities/Natural/Farming/Grain.png",   //grains 4
+	"Entities/Natural/Seed/Seed.png",  //bush 5
+	"Entities/Natural/Seed/Seed.png",  //flowers 6
+	"Entities/Natural/LifeTree/LifeTrees.png",  //lifetree 7 
+	"Entities/Natural/CorruptTree/CorruptTrees.png",
+	"Entities/Natural/Farming/Lettuce/Lettuce.png",	//Lettuce 9
+	"Entities/Natural/Farming/Tomato/Tomato.png",	//Tomato 10
+	"Entities/Natural/Farming/Tomato/Cucumber.png"	//Tomato 11
 };
 
 // names of seeds
@@ -24,10 +27,13 @@ const string[] seed_names =
 	"Pine Seed",        //pine
 	"Oak Seed",     //bushy
 	"Grain",       //grains
-	"Bush seed",    //bush
-	"Flower seed",   //flowers
-	"Lifewood seed",   //flowers
-	"Corrupted seed"
+	"Bush Seed",    //bush
+	"Flower Seed",   //flowers
+	"Lifewood Seed",   //flowers
+	"Corrupted Seed",
+	"Lettuce Seed",
+	"Tomato Seed",
+	"Cucumber Seed"
 };
 
 const u32 OPT_TICK = 31;
@@ -97,18 +103,25 @@ void LoadSprite(CBlob@ this, string filename, u8 spriteIndex)
 
 	if (anim !is null)
 	{
-		switch (spriteIndex)
+		if(spriteIndex >= 9)
 		{
-			case 2: anim.AddFrame(20); anim.AddFrame(21); sprite.SetOffset(Vec2f(0, -2)); break;
+			anim.AddFrame(16); anim.AddFrame(17); sprite.SetOffset(Vec2f(0, 1));
+		}
+		else
+		{
+			switch (spriteIndex)
+			{
+				case 2: anim.AddFrame(20); anim.AddFrame(21); sprite.SetOffset(Vec2f(0, -2)); break;
 
-			case 3: anim.AddFrame(4); anim.AddFrame(5); sprite.SetOffset(Vec2f(0, -2)); break;
+				case 3: anim.AddFrame(4); anim.AddFrame(5); sprite.SetOffset(Vec2f(0, -2)); break;
 
-			case 7: anim.AddFrame(4); anim.AddFrame(5); sprite.SetOffset(Vec2f(0, -2)); break;
-			
-			case 8: anim.AddFrame(4); anim.AddFrame(5); sprite.SetOffset(Vec2f(0, -2)); break;
-			//case 4: anim.AddFrame(0); anim.AddFrame(1); sprite.SetOffset( Vec2f(0,2) ); break;
+				case 7: anim.AddFrame(4); anim.AddFrame(5); sprite.SetOffset(Vec2f(0, -2)); break;
+				
+				case 8: anim.AddFrame(4); anim.AddFrame(5); sprite.SetOffset(Vec2f(0, -2)); break;
+				//case 4: anim.AddFrame(0); anim.AddFrame(1); sprite.SetOffset( Vec2f(0,2) ); break;
 
-			default: anim.AddFrame(0); anim.AddFrame(1); break;
+				default: anim.AddFrame(0); anim.AddFrame(1); break;
+			}
 		}
 
 		sprite.SetAnimation(anim);

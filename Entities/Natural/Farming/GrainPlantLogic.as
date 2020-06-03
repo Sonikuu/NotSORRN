@@ -11,6 +11,8 @@ void onInit(CBlob@ this)
 
 	this.Tag("builder always hit");
 	this.Tag("nature");
+	this.set_u8("growth max", 20);
+	this.set_u8(growth_time, 75);
 	// this script gets removed so onTick won't be run on client on server join, just onInit
 	if (this.hasTag("instant_grow"))
 	{
