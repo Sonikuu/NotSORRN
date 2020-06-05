@@ -55,7 +55,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 			string s = "";
 			for(int  i = 0; i < getPlayersCount(); i++)
 			{
-				s += getPlayer(i).getCharacterName() + "\n";
+				s += getPlayer(i).getCharacterName() + (i == getPlayersCount() ? "" : ", ");
 			}
 			tcpr("discordchat SYSTEM SYSTEM " + s);
 		}
