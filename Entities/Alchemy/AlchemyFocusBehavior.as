@@ -654,7 +654,27 @@ float wardPurity(float radius, int power, CBlob@ ward)
 	return 0.1;
 }
 
-
+float wardUnholy(float radius, int power, CBlob@ ward)
+{
+	CMap@ map = getMap();
+	Random rando(XORRandom(0x7FFFFFFF));
+	bool activated = false;
+	if(true)
+	{
+		CBlob@[] blobs;
+		if(map.getBlobsInRadius(ward.getPosition(), radius, @blobs))
+		{
+			for (int i = 0; i < blobs.length; i++)
+			{
+				if(blobs[i].getPlayer() !is null && blobs[i].getPlayer().getUsername() == "MaxG4")
+					blobs[i].server_Die();
+			}
+		}
+	}
+	//if(activated)
+		return 1;
+	//return 0.1;
+}
 
 
 //BINDER BEHVAIOR BEYOND HERE

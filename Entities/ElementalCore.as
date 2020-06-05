@@ -206,7 +206,7 @@ const array<CElementSetup> elementlist =
 	SColor(255, 150, 0, 100),
 	"Unholy",
 	@padUnholy,
-	@wardBlank,
+	@wardUnholy,
 	@bindBlank,
 	@sprayBlank,
 	@vialIngestUnholy,
@@ -232,7 +232,7 @@ const array<CElementSetup> elementlist =
 	@bindBlank,
 	@sprayForce,
 	@vialIngestYeet,
-	@vialSplashYeet).setHidden(true),
+	@vialSplashYeet).setHidden(true)
 };
 
 void renderElementsCentered(array<int>@ elements, Vec2f pos, bool excludeempty = true)
