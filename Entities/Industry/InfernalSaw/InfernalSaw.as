@@ -13,10 +13,6 @@ void onInit(CBlob@ this)
 	this.addCommandID(sawteammate_id);
 
 	SetSawOn(this, true);
-
-	AddIconToken("$upgrade_saw$", "BlazeCore.png", Vec2f(8, 8), 0);
-	
-	this.addCommandID("upgrade");
 }
 
 //toggling on/off
@@ -33,16 +29,6 @@ bool getSawOn(CBlob@ this)
 
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
-	CBlob@ held = caller.getCarriedBlob();
-	if(held !is null && held.getConfig() == "blazecore")
-	{
-		CMap@ map = getMap();
-		CBitStream params;
-		params.write_u16(caller.getNetworkID());
-		CButton@ button = caller.CreateGenericButton("$upgrade_saw$", Vec2f(0, 0), this, this.getCommandID("upgrade"), "Upgrade to infernal", params);
-		return;
-	}
-
 	if (caller.getTeamNum() != this.getTeamNum() || this.getDistanceTo(caller) > 16) return;
 
 	string desc = getTranslatedString("Turn Saw " + (getSawOn(this) ? "Off" : "On"));
@@ -51,21 +37,6 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 {
-	if(this.getCommandID("upgrade") == cmd)
-	{
-		CBlob@ caller = getBlobByNetworkID(params.read_u16());
-		if(caller !is null && getNet().isServer())
-		{
-			CBlob@ held = caller.getCarriedBlob();
-			if(held !is null && held.getConfig() == "blazecore")
-			{
-				this.server_Die();
-				server_CreateBlob("infernalsaw", caller.getTeamNum(), this.getPosition());
-				held.server_Die();
-			}
-		}
-	}
-
 	if (cmd == this.getCommandID(sawteammate_id))
 	{
 		CBlob@ tobeblended = getBlobByNetworkID(params.read_netid());
@@ -122,11 +93,11 @@ void Blend(CBlob@ this, CBlob@ tobeblended)
 	}
 
 	//make plankfrom wooden stuff
-	if (tobeblended.getName() == "log")
+	if (tobeblended.getName() == "log" || tobeblended.getName() == "lifelog")
 	{
 		if (getNet().isServer())
 		{
-			CBlob@ blob = server_CreateBlobNoInit('mat_wood');
+			CBlob@ blob = server_CreateBlobNoInit('mat_charcoal');
 
 			if (blob !is null)
 			{
@@ -135,26 +106,7 @@ void Blend(CBlob@ this, CBlob@ tobeblended)
 
 				blob.setPosition(this.getPosition() + Vec2f(0, 12));
 				blob.setVelocity(Vec2f(0, -4.0f));
-				blob.server_SetQuantity(50);
-			}
-		}
-
-		this.getSprite().PlaySound("SawLog.ogg");
-	}
-	else if (tobeblended.getName() == "lifelog")
-	{
-		if (getNet().isServer())
-		{
-			CBlob@ blob = server_CreateBlobNoInit('mat_lifewood');
-
-			if (blob !is null)
-			{
-				blob.Tag('custom quantity');
-				blob.Init();
-
-				blob.setPosition(this.getPosition() + Vec2f(0, 12));
-				blob.setVelocity(Vec2f(0, -4.0f));
-				blob.server_SetQuantity(50);
+				blob.server_SetQuantity(75);
 			}
 		}
 
@@ -289,7 +241,7 @@ void onInit(CSprite@ this)
 {
 	this.SetZ(-10.0f);
 
-	CSpriteLayer@ chop = this.addSpriteLayer("chop", "/Saw.png", 16, 16);
+	CSpriteLayer@ chop = this.addSpriteLayer("chop", "/InfernalSaw.png", 16, 16);
 
 	if (chop !is null)
 	{
@@ -300,7 +252,7 @@ void onInit(CSprite@ this)
 		chop.SetRelativeZ(-1.0f);
 	}
 
-	CSpriteLayer@ back = this.addSpriteLayer("back", "/Saw.png", 24, 16);
+	CSpriteLayer@ back = this.addSpriteLayer("back", "/InfernalSaw.png", 24, 16);
 
 	if (back !is null)
 	{

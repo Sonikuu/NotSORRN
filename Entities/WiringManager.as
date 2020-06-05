@@ -1,4 +1,5 @@
 
+#include "WheelMenuCommon.as";
 
 void onInit(CBlob@ this)
 {
@@ -15,6 +16,62 @@ void onTick(CBlob@ this)
 	if(this.isKeyJustPressed(key_pickup))
 	{
 		this.set_u8("wiringmode", 0);
+	}
+
+	if(isClient() && this is getLocalPlayerBlob())
+	{
+		
+		WheelMenu@ menu = get_wheel_menu("wiring");
+		
+
+		if(getControls().isKeyJustPressed(KEY_LCONTROL))
+		{
+			menu.entries.clear();
+			menu.option_notice = "Select Wiring";
+			//CInventory@ inv = this.getInventory();
+			for (uint i = 0; i < 2; i++)
+			{
+				{
+					IconWheelMenuEntry entry("wiring" + i);
+					if(i == 0)
+						entry.visible_name = "Cancel Wiring";
+					else if(i == 1)
+						entry.visible_name = "Alchemic Wiring";
+					else if(i == 2)
+						entry.visible_name = "Item Wiring";
+					else
+						entry.visible_name = "Logic Wiring";
+					entry.frame = i;
+					entry.texture_name = "WiringIcons.png";
+					entry.frame_size = Vec2f(16, 16);
+					entry.scale = 1.0f;
+					entry.offset = Vec2f(0.0f, -3.0f);
+					menu.entries.push_back(@entry);
+				}
+			}
+			
+			set_active_wheel_menu(menu);
+		}
+		
+		if(menu is get_active_wheel_menu())
+		{
+			if(getControls().isKeyJustReleased(KEY_LCONTROL) || this.isKeyJustPressed(key_action1))
+			{
+				WheelMenuEntry@ entry = menu.get_selected();
+				
+				for(int i = 0; i < menu.entries.length; i++)
+				{
+					if(menu.entries[i] is entry)
+					{		
+						CBitStream params;
+						params.write_u8(i);
+						this.SendCommand(this.getCommandID("setwiringmode"), params);
+						break;
+					}
+				}
+				set_active_wheel_menu(null);
+			}
+		}
 	}
 }
 

@@ -2,6 +2,10 @@
 //Means effects added in this way wont be applied to entities without this
 //Also inits damage mods
 //TBH should just cave and have all effects handled here
+
+
+//Then I could have it be object oriented
+//And have it render a more reasonable way on screen
 #include "FxDamageReduce.as";
 #include "CHitters.as";
 #include "DamageModCommon.as";

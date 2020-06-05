@@ -59,6 +59,11 @@ void onTick(CMovement@ this)
 
 void onTick(CBlob@ this)
 {
+	if(this.getPlayer() !is null && this.getBrain() !is null)
+		this.getBrain().server_SetActive(false);
+	else if(this.getBrain() !is null)
+		this.getBrain().server_SetActive(true);
+
 	if(this.isKeyPressed(key_left))
 		this.SetFacingLeft(true);
 	else if(this.isKeyPressed(key_right))
