@@ -50,59 +50,68 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 				}
 			}
 		}
-		else if(tokens.length > 2 && tokens[2] == "!cache")
+		else if(tokens.length > 2 && tokens[2] == "!players")
 		{
-			tcpr("discordchat SYSTEM SYSTEM A cache has appeared!");
-			client_AddToChat("A cache has appeared!", SColor(255, 200, 0, 0));
-			if(isServer())
+			string s = "";
+			for(int  i = 0; i < getPlayersCount(); i++)
 			{
-				CMap@ map = getMap();
-				CBlob@ crate = server_MakeCrateOnParachute("", "", 5, -1, Vec2f(XORRandom(map.tilemapwidth * map.tilesize), 0));
-				if (crate !is null)
-				{
-					// make unpack button
-					crate.Tag("unpackall");
-					//crate.Tag("destroy on touch");
-					for (uint i = 0; i < 2; i++)
-					{
-						CBlob@ mat = server_CreateBlob("mat_wood");
-						if (mat !is null)
-						{
-							crate.server_PutInInventory(mat);
-						}
-					}
-					for (uint i = 0; i < 2; i++)
-					{
-						CBlob@ mat = server_CreateBlob("mat_stone");
-						if (mat !is null)
-						{
-							crate.server_PutInInventory(mat);
-						}
-					}
-					{
-						CBlob@ mat = server_CreateBlob("mat_metal");
-						if (mat !is null)
-						{
-							crate.server_PutInInventory(mat);
-						}
-					}
-				}
+				s += getPlayer(i).getCharacterName() + "\n";
 			}
+			tcpr("discordchat SYSTEM SYSTEM " + s);
 		}
-		else if(tokens.length > 2 && tokens[2] == "!corrupt")
-		{
-			tcpr("discordchat SYSTEM SYSTEM A corrupted squad has appeared!");
-			client_AddToChat("A corrupted squad has appeared!", SColor(255, 200, 0, 0));
-			if(isServer())
-			{
-				CMap@ map = getMap();
-				Vec2f startpos = Vec2f(XORRandom(map.tilemapwidth * map.tilesize), 0);
-				for (uint i = 0; i < 8; i++)
-				{
-					CBlob@ knok = server_CreateBlob("knokling", -1, startpos + (Vec2f(XORRandom(200) - 100, 0)));
-				}
-			}
-		}
+		// else if(tokens.length > 2 && tokens[2] == "!cache")
+		// {
+		// 	tcpr("discordchat SYSTEM SYSTEM A cache has appeared!");
+		// 	client_AddToChat("A cache has appeared!", SColor(255, 200, 0, 0));
+		// 	if(isServer())
+		// 	{
+		// 		CMap@ map = getMap();
+		// 		CBlob@ crate = server_MakeCrateOnParachute("", "", 5, -1, Vec2f(XORRandom(map.tilemapwidth * map.tilesize), 0));
+		// 		if (crate !is null)
+		// 		{
+		// 			// make unpack button
+		// 			crate.Tag("unpackall");
+		// 			//crate.Tag("destroy on touch");
+		// 			for (uint i = 0; i < 2; i++)
+		// 			{
+		// 				CBlob@ mat = server_CreateBlob("mat_wood");
+		// 				if (mat !is null)
+		// 				{
+		// 					crate.server_PutInInventory(mat);
+		// 				}
+		// 			}
+		// 			for (uint i = 0; i < 2; i++)
+		// 			{
+		// 				CBlob@ mat = server_CreateBlob("mat_stone");
+		// 				if (mat !is null)
+		// 				{
+		// 					crate.server_PutInInventory(mat);
+		// 				}
+		// 			}
+		// 			{
+		// 				CBlob@ mat = server_CreateBlob("mat_metal");
+		// 				if (mat !is null)
+		// 				{
+		// 					crate.server_PutInInventory(mat);
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
+		// else if(tokens.length > 2 && tokens[2] == "!corrupt")
+		// {
+		// 	tcpr("discordchat SYSTEM SYSTEM A corrupted squad has appeared!");
+		// 	client_AddToChat("A corrupted squad has appeared!", SColor(255, 200, 0, 0));
+		// 	if(isServer())
+		// 	{
+		// 		CMap@ map = getMap();
+		// 		Vec2f startpos = Vec2f(XORRandom(map.tilemapwidth * map.tilesize), 0);
+		// 		for (uint i = 0; i < 8; i++)
+		// 		{
+		// 			CBlob@ knok = server_CreateBlob("knokling", -1, startpos + (Vec2f(XORRandom(200) - 100, 0)));
+		// 		}
+		// 	}
+		// }
 		else if(tokens.length > 2)
 		{
 			input = tokens[0];
