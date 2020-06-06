@@ -1,5 +1,5 @@
 #include "FuelCommon.as";
-
+#include "CustomFoodCommon.as";
 
 //Alright, ideas time
 //I want food to have status effects, how to do?
@@ -27,94 +27,7 @@
 //Note: just base data, modifiers probs
 
 //Oh right, need stuff like healing power, since it is food, and also ingredient category (Grain, veg, fruit, meat)
-namespace Categories
-{
-	enum Types
-	{
-		Grain = 	0b00000001,
-		Meat = 		0b00000010,
-		Vegetable = 0b00000100,
-		Fruit = 	0b00001000,
-		Cheese = 	0b00010000,
-		Fish =	 	0b00100000
-	}
-}
 
-class CIngredientData
-{
-	string ingredient;
-	int flavor;
-	int effect;
-	float healing;
-	int basepower;
-	int baseduration;
-	float powermod;
-	float durationmod;
-	u8 typedata;
-	CIngredientData(string ingredient, int flavor, int effect, float healing, int basepower, int baseduration, float powermod, float durationmod, u8 typedata)
-	{
-		this.ingredient = ingredient;
-		this.flavor = flavor;
-		this.effect = effect;
-		this.healing = healing;
-		this.basepower = basepower;
-		this.baseduration = baseduration;
-		this.powermod = powermod;
-		this.durationmod = durationmod;
-		this.typedata = typedata;
-	}
-}
-
-array<CIngredientData@> ingredientdata =
-{
-	@CIngredientData("lettuce", 	2, 0, 0.25, 1, 1, 1, 1, 	Categories::Vegetable),
-	@CIngredientData("grain", 		3, 0, 0.5, 	1, 1, 1.2, 1.2, Categories::Grain),		//technially some generic grain, we'll treat it like wheat tho lel
-	@CIngredientData("tomato", 		2, 0, 0.25, 1, 1, 1, 1, 	Categories::Vegetable | Categories::Fruit), //its not both, of course, but eh
-	@CIngredientData("cucumber", 	3, 0, 0.25, 1, 1, 1.1, 1.1, Categories::Vegetable),	//we need stuff with more flavor lel
-	@CIngredientData("steak",	 	4, 0, 0.5, 	1, 1, 1.3, 1.3, Categories::Meat),
-	@CIngredientData("fishy",	 	2, 0, 0.5, 	1, 1, 1, 1.5, Categories::Meat | Categories::Fish)		//Change to a cooked fish or whatever eventually, maybe
-};
-
-CIngredientData@ getIngredientData(string input)
-{
-	for (int i = 0; i < ingredientdata.length; i++)
-	{
-		if(input == ingredientdata[i].ingredient)
-		
-			return @ingredientdata[i];
-	}
-	return null;
-}
-
-class CRecipeData
-{
-	string recipename;
-	array<u8> ingredientlist;
-	array<string> ingredientspecific;
-	CRecipeData(string recipename)
-	{
-		this.recipename = recipename;
-	}
-
-	CRecipeData@ addIngredient(u8 ingredient)
-	{
-		ingredientlist.push_back(ingredient);
-		return @this;
-	}
-
-	CRecipeData@ addSpecific(string ingredient)
-	{
-		ingredientspecific.push_back(ingredient);
-		return @this;
-	}
-}
-
-array<CRecipeData@> recipelist = 
-{
-	@CRecipeData("Burger").addIngredient(Categories::Grain).addIngredient(Categories::Meat).addIngredient(Categories::Vegetable),
-	@CRecipeData("Salad").addIngredient(Categories::Vegetable).addIngredient(Categories::Vegetable).addIngredient(Categories::Vegetable),
-	@CRecipeData("Pizza").addIngredient(Categories::Grain).addIngredient(Categories::Cheese).addSpecific("tomato")
-};
 
 void onRender(CSprite@ this)
 {
@@ -214,6 +127,101 @@ void onTick(CBlob@ this)
 		}
 		this.set_bool("active", false);
 	}*/
+
+	//Alright, first ill just write the actual food making thingy, then ill make it work with fuel and stuff
+	//All the usual checks, of course
+	
+
+	u8 currentrecipe = this.get_u8("currrecipe");
+	if(currentrecipe < recipelist.size())
+	{
+		CRecipeData@ recipedata = @recipelist[currentrecipe];
+		CInventory@ inv = this.getInventory();
+		//Now, lets get all valid recipe items from storage
+		//And cache names in the array
+		array<string> storedingredients;
+		for(int i = 0; i < inv.getItemsCount(); i++)
+		{
+			CBlob@ item = inv.getItem(i);
+			if(item !is null && getIngredientData(item.getName()) !is null && storedingredients.find(item.getName()) < 0)
+			{
+				storedingredients.push_back(item.getName());
+			}
+		}
+
+		//So, lets get every required item and their count
+		array<string> reqname;
+		array<int> reqcount;
+		bool canmake = true;
+		for(int i = 0; i < recipedata.ingredientlist.size(); i++)
+		{
+			string thisreq = this.get_string("selingredient" + i);
+			if(getIngredientData(thisreq) is null || getIngredientData(thisreq).typedata & recipedata.ingredientlist[i] == 0)
+				canmake = false;
+			int reqpos = reqname.find(thisreq);
+			if(reqpos >= 0)
+			{
+				reqcount[reqpos]++;
+			}
+			else
+			{
+				reqname.push_back(thisreq);
+				reqcount.push_back(1);
+			}
+		} 
+
+		//For our hardcoded ingredients
+		for(int i = 0; i < recipedata.ingredientspecific.size(); i++)
+		{
+			string thisreq = recipedata.ingredientspecific[i];
+			int reqpos = reqname.find(thisreq);
+			if(reqpos >= 0)
+			{
+				reqcount[reqpos]++;
+			}
+			else
+			{
+				reqname.push_back(thisreq);
+				reqcount.push_back(1);
+			}
+		} 
+		//Now check we got everything we need
+
+		for(int i = 0; i < reqname.size(); i++)
+		{
+			if(inv.getCount(reqname[i]) < reqcount[i])
+				canmake = false;
+		}
+
+		if(canmake)
+		{
+			for(int i = 0; i < reqname.size(); i++)
+			{
+				int index = 0;
+				while(reqcount[i] > 0)
+				{
+					CBlob@ invitem = inv.getItem(index);
+					if(invitem !is null && invitem.getName() == reqname[i])
+					{
+						invitem.server_Die();
+						reqcount[i]--;
+					}
+					index++;
+					if(index > inv.getItemsCount())
+						break;
+				}
+			}
+			//print("THE PART WHERE WE MAKE FOOD");
+			//Cool, now that custom food is now an item, we can make it
+			CBlob@ food = server_CreateBlobNoInit("customfood");
+			food.setPosition(this.getPosition());
+			food.set_u8("recipe", currentrecipe);
+			for(int i = 0; i < recipedata.ingredientlist.size(); i++)
+			{
+				food.set_string("ingredient" + i, this.get_string("selingredient" + i));
+			}
+		}
+	}
 }
 
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
@@ -288,6 +296,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 	//ASDHGASDHGASHDGASDHY
 	//okay
 	//les go
+	caller.ClearGridMenus();
 	Vec2f screenmid(getScreenWidth() / 2, getScreenHeight() / 2);
 	u8 currentrecipe = this.get_u8("currrecipe");
 	//First, we make a list of all available recipes
@@ -319,7 +328,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 			if(item !is null && getIngredientData(item.getName()) !is null && storedingredients.find(item.getName()) < 0)
 			{
 				storedingredients.push_back(item.getName());
-				print(item.getName());	//Havent tested yet, i have a feeling ill need this
+				//print(item.getName());	//Havent tested yet, i have a feeling ill need this
 			}
 		}
 
@@ -340,7 +349,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 
 			//Now we make menu
 			//And then add each ingredient to list
-			CGridMenu@ seling = CreateGridMenu(screenmid + Vec2f(0, (i + 0.5 - float(recipedata.ingredientlist.size()) / 2.0) * 80), this, Vec2f(valids.size(), 1), "Select Ingredient");
+			CGridMenu@ seling = CreateGridMenu(screenmid + Vec2f(0, (i + 0.5 - float(recipedata.ingredientlist.size()) / 2.0) * 80), this, Vec2f(Maths::Max(valids.size(), 1), 1), "Select Ingredient");
 			for(int j = 0; j < valids.size(); j++)
 			{
 				CBlob@ datblob = inv.getItem(valids[j]);

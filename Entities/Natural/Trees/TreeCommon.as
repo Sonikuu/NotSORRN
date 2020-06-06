@@ -1,5 +1,4 @@
 #include "Hitters.as"
-#include "Knocked.as"
 
 funcdef void growthTick(CBlob@ this);
 

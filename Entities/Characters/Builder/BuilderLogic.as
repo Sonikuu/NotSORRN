@@ -1,7 +1,7 @@
 // Builder logic
 
 #include "Hitters.as";
-#include "Knocked.as";
+#include "KnockedCommon.as";
 #include "BuilderCommon.as";
 #include "ThrowCommon.as";
 #include "RunnerCommon.as";

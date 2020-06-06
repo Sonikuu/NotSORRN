@@ -15,7 +15,7 @@ void onRender(CSprite@ this)
 {
 	CBlob@ blob = this.getBlob();
 	CControls@ con = getControls();
-	if(blob !is null && con !is null)
+	if(blob !is null && con !is null && blob is getLocalPlayerBlob())
 	{
 		u8 wm = blob.get_u8("wiringmode");
 		if(wm != 0)
