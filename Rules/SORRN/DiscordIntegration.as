@@ -57,7 +57,14 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 			{
 				s += getPlayer(i).getCharacterName() + (i == getPlayersCount() -1 ? "" : ", ");
 			}
-			tcpr("discordchat SYSTEM SYSTEM " + s);
+			if(s == "")
+			{
+				tcpr("discordchat SYSTEM No players :(");
+			}
+			else
+			{
+				tcpr("discordchat SYSTEM SYSTEM " + s);
+			}
 		}
 		// else if(tokens.length > 2 && tokens[2] == "!cache")
 		// {
