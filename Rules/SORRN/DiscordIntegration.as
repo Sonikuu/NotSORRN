@@ -59,7 +59,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 			}
 			if(s == "")
 			{
-				tcpr("discordchat SYSTEM No players :(");
+				tcpr("discordchat SYSTEM SYSTEM no players :(");
 			}
 			else
 			{
