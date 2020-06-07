@@ -1351,7 +1351,7 @@ bool vialIngestEcto(CBlob@ drinker, CBlob@ vial, f32 power)
 }
 bool vialIngestLife(CBlob@ drinker, CBlob@ vial, f32 power)
 {
-	drinker.server_Heal(drinker.getInitialHealth() * power);
+	drinker.server_SetHealth(Maths::Min(drinker.getHealth() + float(power) * 0.2, drinker.getInitialHealth() * 2));
 	return true;
 }
 bool vialIngestNatura(CBlob@ drinker, CBlob@ vial, f32 power)
@@ -1445,7 +1445,7 @@ bool vialSplashLife(CBlob@ vial, f32 power)
 	{
 		CBlob@ blob = blobs[i];
 		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
-		blob.server_Heal(blob.getInitialHealth() * power);
+		blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.2, blob.getInitialHealth() * 2));
 	}
 	return true;
 }
