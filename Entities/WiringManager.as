@@ -11,6 +11,20 @@ void onInit(CBlob@ this)
 	AddIconToken("$logic_wire$", "WiringIcons.png", Vec2f(16, 16), 3);
 }
 
+void onRender(CSprite@ this)
+{
+	CBlob@ blob = this.getBlob();
+	CControls@ con = getControls();
+	if(blob !is null && con !is null && blob is getLocalPlayerBlob())
+	{
+		u8 wm = blob.get_u8("wiringmode");
+		if(wm != 0)
+		{
+			GUI::DrawIcon("WiringIcons.png", wm, Vec2f(16, 16), con.getInterpMouseScreenPos() + Vec2f(32, -8));
+		}
+	}
+}
+
 void onTick(CBlob@ this)
 {
 	if(this.isKeyJustPressed(key_pickup))
@@ -81,7 +95,7 @@ void onCreateInventoryMenu(CBlob@ this, CBlob@ forBlob, CGridMenu @gridmenu)
     Vec2f lr = gridmenu.getLowerRightPosition();
 
     Vec2f pos = Vec2f(ul.x, (ul.y + lr.y) / 2) + Vec2f(-84, -216);
-    CGridMenu@ menu = CreateGridMenu(pos, this, Vec2f(1, 4), "Wiring Mode");
+    CGridMenu@ menu = CreateGridMenu(pos, this, Vec2f(1, 4), "Wiring Mode\nTry ctrl to quick change!");
     
     if (menu !is null)
     {
