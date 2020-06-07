@@ -173,7 +173,19 @@ void InitWorkshop(CBlob@ this)
 		
 		AddIconToken("$raildrill$", "RailDrill.png", Vec2f(32, 16), 0);
 	}
-		{
+	{
+		ShopItem@ s = addShopItem(this,  "Mechanical Components", "$mat_component0$", "mat_component-1", "A crude component made from stone", false);
+		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 25);
+		
+		AddIconToken("$mat_component0$", "MaterialComponents.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Mechanical Components", "$mat_component1$", "mat_component-4", "Metallic components for machinery", false);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 1);
+		
+		AddIconToken("$mat_component1$", "MaterialComponents.png", Vec2f(16, 16), 1);
+	}
+	{
 		ShopItem@ s = addShopItem(this,  "Element Vial", "$vial$", "vial", "An element holding vial, looks fragile but sturdy enough to drink from ", false);
 		AddRequirement(s.requirements, "blob", "mat_glass", "Glass", 30);
 		

@@ -25,6 +25,13 @@
 //Note: just base data, modifiers probs
 
 //Oh right, need stuff like healing power, since it is food, and also ingredient category (Grain, veg, fruit, meat)
+
+//Ooh, here's idea
+//Different recipe types have different status affinities?
+//Ex burger good for strength buff
+//Salad good for speed boost
+//Something like that
+//Or just modifiers on power and duration
 namespace Categories
 {
 	enum Types
@@ -43,6 +50,7 @@ class CIngredientData
 {
 	int id;
 	string ingredient;
+	string friendlyname;
 	int flavor;
 	int effect;
 	float healing;
@@ -52,12 +60,13 @@ class CIngredientData
 	float durationmod;
 	SColor color;
 	u8 typedata;
-	CIngredientData(string ingredient, int flavor, int effect, float healing, int basepower, int baseduration, float powermod, float durationmod, SColor color, u8 typedata)
+	CIngredientData(string ingredient, string friendlyname, int flavor, int effect, float healing, int basepower, int baseduration, float powermod, float durationmod, SColor color, u8 typedata)
 	{
 		id = ingidcounter;
 		ingidcounter++;
 
 		this.ingredient = ingredient;
+		this.friendlyname = friendlyname;
 		this.flavor = flavor;
 		this.effect = effect;
 		this.healing = healing;
@@ -72,14 +81,14 @@ class CIngredientData
 
 array<CIngredientData@> ingredientdata =
 {
-	@CIngredientData("lettuce", 	2, 0, 0.25, 1, 1, 1, 1, 	SColor(255, 100, 155, 13),	Categories::Vegetable),
-	@CIngredientData("grain", 		3, 0, 0.5, 	1, 1, 1.2, 1.2,	SColor(255, 196, 135, 58),	Categories::Grain),		//technially some generic grain, we'll treat it like wheat tho lel
-	@CIngredientData("tomato", 		2, 0, 0.25, 1, 1, 1, 1, 	SColor(255, 213, 84, 63),	Categories::Vegetable | Categories::Fruit), //its not both, of course, but eh
-	@CIngredientData("cucumber", 	3, 0, 0.25, 1, 1, 1.1, 1.1, SColor(255, 150, 200, 65),	Categories::Vegetable),	//we need stuff with more flavor lel
-	@CIngredientData("steak",	 	4, 0, 0.5, 	1, 1, 1.3, 1.3, SColor(255, 213, 84, 63),	Categories::Meat),
-	@CIngredientData("fishy",	 	2, 0, 0.5, 	1, 1, 1, 1.5, 	SColor(255, 44, 175, 222),	Categories::Meat | Categories::Fish),		//Change to a cooked fish or whatever eventually, maybe
-	@CIngredientData("carrot",	 	3, 0, 0.25, 1, 1, 1.4, 1, 	SColor(255, 230, 110, 0),	Categories::Vegetable),
-	@CIngredientData("lantern",	 	0, 0, 0, 	1, 1, 1, 1, 	SColor(255, 240, 230, 30),	Categories::Cheese)	//Temporary cheese substitute
+	@CIngredientData("lettuce", 	"Lettuce",	2, 0, 0.25, 1, 1, 1, 1, 	SColor(255, 100, 155, 13),	Categories::Vegetable),
+	@CIngredientData("grain", 		"Wheat",	3, 0, 0.5, 	1, 1, 1.2, 1.2,	SColor(255, 196, 135, 58),	Categories::Grain),		//technially some generic grain, we'll treat it like wheat tho lel
+	@CIngredientData("tomato", 		"Tomato",	2, 0, 0.25, 1, 1, 1, 1, 	SColor(255, 213, 84, 63),	Categories::Vegetable | Categories::Fruit), //its not both, of course, but eh
+	@CIngredientData("cucumber", 	"Cucumber",	3, 0, 0.25, 1, 1, 1.1, 1.1, SColor(255, 150, 200, 65),	Categories::Vegetable),	//we need stuff with more flavor lel
+	@CIngredientData("steak",	 	"Beef",		4, 0, 0.5, 	1, 1, 1.3, 1.3, SColor(255, 213, 84, 63),	Categories::Meat),
+	@CIngredientData("fishy",	 	"Fish",		2, 0, 0.5, 	1, 1, 1, 1.5, 	SColor(255, 44, 175, 222),	Categories::Meat | Categories::Fish),		//Change to a cooked fish or whatever eventually, maybe
+	@CIngredientData("carrot",	 	"Carrot",	3, 0, 0.25, 1, 1, 1.4, 1, 	SColor(255, 230, 110, 0),	Categories::Vegetable),
+	@CIngredientData("lantern",	 	"Lantern?",	0, 0, 0, 	1, 1, 1, 1, 	SColor(255, 240, 230, 30),	Categories::Cheese)	//Temporary cheese substitute
 };
 
 CIngredientData@ getIngredientData(string input)
@@ -148,7 +157,7 @@ void makeFoodImage(CBlob@ this)
 		}
 
 		Vec2f spritesize(16, 16);
-		if(Texture::exists(texname))
+		if(Texture::exists(texname) && false)
 		{
 			sprite.SetTexture(texname, 16, 16);
 			sprite.SetFrame(0);
@@ -195,21 +204,28 @@ void makeFoodImage(CBlob@ this)
 			Texture::createFromData(texname, newimage);
 			sprite.SetTexture(texname, 16, 16);
 			sprite.SetFrame(0);
-			//FML everytime i use imagedata i want to die
-			//ill get used to it eventually
+			this.SetInventoryIcon("RecipeIcons.png", recipe, Vec2f(16, 16));
+			//Code partially stolen from custom gun stuff woo
 		}
 	}
 }
 
 void mergeOntoColored(ImageData@ onto, ImageData@ fromimage, Vec2f offset, Vec2f startpos, Vec2f endpos, SColor color)
 {
+	//Resaturation?
+	//Dunno lel
+	float invratio = Maths::Max(Maths::Max(color.getRed(), color.getGreen()), color.getBlue());
+	invratio /= 255.0;
+	invratio = 1.0 - invratio;
+	invratio += 1.0;
+	color.set(255, color.getRed() * invratio,  color.getGreen() * invratio,  color.getBlue() * invratio);
 	for(int x = startpos.x; x < endpos.x; x++)
 	{
 		for(int y = startpos.y; y < endpos.y; y++)
 		{
 			SColor pixcol = fromimage.get(x, y);
 			float colratio = pixcol.getRed() / 255.0;
-			colratio = Maths::Min(1.0, colratio * 2.0);
+			//colratio = Maths::Min(1.0, colratio * 2.0);
 			pixcol.set(pixcol.getAlpha(), color.getRed() * colratio, color.getGreen() * colratio, color.getBlue() * colratio);
 			Vec2f thispos = (Vec2f(x, y) - startpos) + offset;
 			if(pixcol.getAlpha() > 0)

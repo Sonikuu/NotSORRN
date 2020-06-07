@@ -2,7 +2,7 @@
 void onInit(CBlob@ this)
 {
 	this.getShape().SetRotationsAllowed(false);
-	this.set_f32("railmult", 2);
+	this.set_f32("railmult", 3);
 }
 
 void onTick(CBlob@ this)
@@ -10,17 +10,21 @@ void onTick(CBlob@ this)
 	if(this.get_bool("riding"))
 	{
 		this.getShape().getConsts().mapCollisions = false;
-		/*Vec2f diff = this.getPosition() - this.get_Vec2f("lastvec");
+		Vec2f diff = this.getPosition() - this.get_Vec2f("lastvec");
 		for(int i = 0; i < this.getTouchingCount(); i++)
 		{
 			CBlob@ blob = this.getTouchingByIndex(i);
-			if(blob !is null && !blob.isKeyPressed(key_up) && this.doesCollideWithBlob(blob) && (blob.get_u32("lastplatmove") < getGameTime() - 3 || blob.get_u16("lastplatid") == this.getNetworkID()))
+			/*if(blob !is null && !blob.isKeyPressed(key_up) && this.doesCollideWithBlob(blob) && (blob.get_u32("lastplatmove") < getGameTime() - 3 || blob.get_u16("lastplatid") == this.getNetworkID()))
 			{
 				blob.set_u32("lastplatmove", getGameTime());
 				blob.set_u16("lastplatid", this.getNetworkID());
 				blob.setPosition(blob.getPosition() + diff);
+			}*/
+			if(blob !is null && !blob.isKeyPressed(key_up) && this.doesCollideWithBlob(blob))
+			{
+				blob.setVelocity(blob.getVelocity() + Vec2f(0, 2));
 			}
-		}*/
+		}
 	}
 	else
 		this.getShape().getConsts().mapCollisions = true;

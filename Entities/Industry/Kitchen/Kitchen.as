@@ -1,33 +1,6 @@
 #include "FuelCommon.as";
 #include "CustomFoodCommon.as";
 
-//Alright, ideas time
-//I want food to have status effects, how to do?
-//1. Food will consist of several different ingredients, one of which will determine main effects
-//2. All other ingredients will modify stats on effect, ex. power, duration, possible auxilliary effects
-//3. I want any ingredient to be able to determine main effect and base stats
-
-//Lets give each ingredient some basic stats:
-//Duration and power for if main ingredient
-//Duration and power multipliers otherwise
-//Option for secondary ingredient effect?
-
-//One way to determine which ingredient is the main is assigning a "flavor" value
-//Whichever one has the highest will determine effect
-//Maybe, if two ingredients match, the food will get both effects, at the cost of missing out on a multiplier
-//Or they could get a minor duration reduction or something
-//Duration between all effects applied should be the same tho
-
-//More ideas:
-//Way to increase or decrease the flavor on an ingredient
-//So you could force it to match flavor of another, at a certain cost?
-//Maybe this can be implemented through condiments: salt, pepper, ketchup, ranch, mustard, honey, or even boiling an ingredient
-//Mmm boiled asparagus lel
-
-//Note: just base data, modifiers probs
-
-//Oh right, need stuff like healing power, since it is food, and also ingredient category (Grain, veg, fruit, meat)
-
 
 void onRender(CSprite@ this)
 {
@@ -133,7 +106,7 @@ void onTick(CBlob@ this)
 	
 
 	u8 currentrecipe = this.get_u8("currrecipe");
-	if(currentrecipe < recipelist.size())
+	if(currentrecipe < recipelist.size() && isServer())
 	{
 		CRecipeData@ recipedata = @recipelist[currentrecipe];
 		CInventory@ inv = this.getInventory();
@@ -335,7 +308,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 		//Okay, now that thats done
 		//Lets make the gui for each ingredient selector
 		//ugh
-
+		int totalsize = recipedata.ingredientlist.size() + recipedata.ingredientspecific.size();
 		for(int i = 0; i < recipedata.ingredientlist.size(); i++)
 		{
 			//First, we get the valid ingredients for this ingredient space in particular
@@ -349,7 +322,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 
 			//Now we make menu
 			//And then add each ingredient to list
-			CGridMenu@ seling = CreateGridMenu(screenmid + Vec2f(0, (i + 0.5 - float(recipedata.ingredientlist.size()) / 2.0) * 80), this, Vec2f(Maths::Max(valids.size(), 1), 1), "Select Ingredient");
+			CGridMenu@ seling = CreateGridMenu(screenmid + Vec2f(0, (i + 0.5 - float(totalsize) / 2.0) * 80), this, Vec2f(Maths::Max(valids.size(), 1), 1), "Select Ingredient");
 			for(int j = 0; j < valids.size(); j++)
 			{
 				CBlob@ datblob = inv.getItem(valids[j]);
@@ -367,5 +340,18 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 				}
 			}
 		} 
+
+		for(int i = 0; i < recipedata.ingredientspecific.size(); i++)
+		{
+			CGridMenu@ seling = CreateGridMenu(screenmid + Vec2f(0, ((i + recipedata.ingredientlist.size()) + 0.5 - float(totalsize) / 2.0) * 80), this, Vec2f(1, 1), "Required Ingredient");
+			CIngredientData@ specdata = getIngredientData(recipedata.ingredientspecific[i]);
+			CBitStream params;
+			CGridButton@ butt = seling.AddButton(specdata.friendlyname + ".png", 0, Vec2f(8, 8), specdata.friendlyname, this.getCommandID("selingredient"), Vec2f(1, 1), params);
+			//if(this.get_string("selingredient" + i) == valids[j])
+			{
+				butt.SetSelected(1);
+				butt.clickable = false;
+			}
+		}
 	}
 }

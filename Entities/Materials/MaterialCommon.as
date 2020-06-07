@@ -274,7 +274,7 @@ namespace Material
 		}
 		else if(type >= 446 && type <= 451)//Track Tiles
 		{
-			createFor(this, 'mat_metal', 1);
+			createFor(this, 'mat_component', 1);
 		}
 		else if(type >= 452 && type <= 461)//Gold Tiles
 		{
