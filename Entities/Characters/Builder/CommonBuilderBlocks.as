@@ -334,7 +334,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 		}
 		{
 			BuildBlock b(446, "track_block", "$track_block$", "Track\nTrack riding objects use these");
-			AddRequirement(b.reqs, "blob", "mat_component", "Components", 1);
+			AddRequirement(b.reqs, "blob", "mat_component", "Mechanical Components", 1);
 			blocks[0].push_back(b);
 			AddIconToken("$track_block$", "world.png", Vec2f(8, 8), 446);
 		}
