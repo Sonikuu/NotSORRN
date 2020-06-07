@@ -56,7 +56,12 @@ void onCollision( CBlob@ this, CBlob@ blob, bool solid )
 {
     if(solid)
     {
-        if(this.getVelocity().Length() > 2)
+		Vec2f absVel = Vec2f(Maths::Abs(this.getVelocity().x),Maths::Abs(this.getVelocity().y));
+		if(blob !is null)
+		{
+			absVel += Vec2f(Maths::Abs(blob.getVelocity().x), Maths::Abs(blob.getVelocity().y));
+		}
+        if(absVel.Length() > 2)
         {
             this.server_Die();
         }
