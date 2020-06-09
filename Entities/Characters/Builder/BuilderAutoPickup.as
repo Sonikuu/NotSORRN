@@ -22,6 +22,30 @@ void Take(CBlob@ this, CBlob@ blob)
 	}
 }
 
+const string[] whitelist = {
+	"mat_gold",
+	"mat_stone",
+	"mat_wood",
+	"mat_sand",
+	"mat_glass",
+	"mat_charcoal",
+	"grain",
+	"mat_gunpowder",
+	"mat_metal",
+	"mat_marble",
+	"mat_basalt",
+	"log"
+};
+
+bool stringContains(string[] list, string item)
+{
+	for(int i = 0; i < list.size(); i++)
+	{
+		if(list[i] == item){return true;}
+	}
+	return false;
+}
+
 bool isMatch(CBlob@ this, CBlob@ blob)
 {
 	const string blobName = blob.getName();
@@ -33,7 +57,7 @@ bool isMatch(CBlob@ this, CBlob@ blob)
 		{
 			if(inv.getItem(i).getConfig() == blob.getConfig())
 			{
-				return true;
+				return stringContains(whitelist, blob.getConfig());
 			}
 		}
 		return false;
