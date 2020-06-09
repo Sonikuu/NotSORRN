@@ -23,6 +23,7 @@ void onInit(CRules@ this)
 	
 	this.SetCurrentState(GAME);
 	//this.server_setShowHoverNames(false);
+	this.set_s32("restart_rules_after_game_time", 30 * 15);
 }
 
 void onTick(CRules@ this)

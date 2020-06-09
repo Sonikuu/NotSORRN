@@ -22,7 +22,9 @@ void InitTrader(CBlob@ this)
 	InitCosts(); //read from cfg
 
 	this.set_Vec2f("shop offset", Vec2f_zero);
-	this.set_Vec2f("shop menu size", Vec2f(6, 6));
+	this.set_Vec2f("shop menu size", Vec2f(3, 4));
+	this.set_string("shop description", "Trading Post");
+	this.set_u8("shop icon", 25);
 
 	/*{
 		ShopItem@ s = addShopItem(this, "Lantern", "$lantern$", "lantern", Descriptions::lantern, false);
