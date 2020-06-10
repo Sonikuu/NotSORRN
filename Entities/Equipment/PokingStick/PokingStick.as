@@ -5,7 +5,7 @@
 void onInit(CBlob@ this)
 {
 	//					Damage, Range, ChargeTime, Knockback, Jab only, Jab cooldown, Slash cooldown, Lunge speed
-	CSwordEquipment part(1.0, 	28, 	20, 		3, 		true, 	25, 				8, 				0);
+	CSwordEquipment part(0.75, 	28 * 1.5, 	20, 		3, 		true, 	20, 				8, 				0);
 	//Should be able to do everything you wany by just modifying the values above
 	
 	part.spriteoffset = Vec2f(6, 0);

@@ -6,6 +6,7 @@ bool canBePickedUp(CBlob@ this, CBlob@ byBlob)
 void onInit(CBlob@ this)
 {
     this.Tag("place norotate");
+    this.Tag("building");
 }
 
 void onTick(CSprite@ this)

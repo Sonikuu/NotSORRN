@@ -21,7 +21,7 @@ void onRender(CSprite@ this)
 
 void onInit(CBlob@ this)
 {	
-	addTank(this, "output", false, Vec2f(0, -12));
+	addTank(this, "Output", false, Vec2f(0, -12));
 	this.addCommandID("addfuel");
 	//this.addCommandID("meltitem");
 	

@@ -5,7 +5,7 @@
 void onInit(CBlob@ this)
 {
 	//					Damage, Range, ChargeTime, Knockback, Jab only, Jab cooldown, Slash cooldown, Lunge speed
-	CSwordEquipment part(1.0, 	18, 	25, 		2, 		false, 	5, 				8, 				2);
+	CSwordEquipment part(1.5, 	18 * 1.5, 	20, 		2, 		false, 	8, 				8, 				2);
 	//Should be able to do everything you wany by just modifying the values above
 	setEquipment(this, @part);
 	this.addCommandID("partcmd");

@@ -22,7 +22,8 @@ void onInit(CRules@ this)
 	this.set("spawnqueue", @spawnqueue);
 	
 	this.SetCurrentState(GAME);
-	this.server_setShowHoverNames(false);
+	//this.server_setShowHoverNames(false);
+	this.set_s32("restart_rules_after_game_time", 30 * 15);
 }
 
 void onTick(CRules@ this)
@@ -56,8 +57,31 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
 	if(!getNet().isServer())
 		return;
-	player.server_setTeamNum(50);
-	spawnPlayer(this, player);
+
+	CBlob@[] blobs;
+	getBlobsByTag(player.getUsername() + "'s soulless",@blobs);
+	if(blobs.size() > 0)
+	{
+		if(!blobs[0].hasTag("dead"))
+		{
+			blobs[0].server_SetPlayer(player);
+			player.server_setTeamNum(blobs[0].getTeamNum());
+		}
+		else
+		{
+			player.server_setTeamNum(50);
+			spawnPlayer(this, player);
+		}
+		blobs[0].set_bool("soulless",false);
+		blobs[0].Untag(player.getUsername() + "'s soulless");
+		blobs[0].Sync("soulless", true);
+		blobs[0].SendCommand(blobs[0].getCommandID("Server_Menu_Sync"));
+	}
+	else
+	{
+		player.server_setTeamNum(50);
+		spawnPlayer(this, player);
+	}
 }
 
 //If we dont do this nobody spawns on nextmap lel
@@ -192,5 +216,16 @@ void addRespawnQueue(CRules@ this, CPlayer@ player)
 	{
 		//Maybe could add different respawn times if we want
 		spawnqueue.push_back(@CRespawnData(getGameTime() + default_respawn, player.getUsername()));
+	}
+}
+
+void onPlayerLeave( CRules@ this, CPlayer@ player )
+{
+	CBlob@ blob = player.getBlob();
+	if(blob !is null)
+	{
+		blob.Tag(player.getUsername() + "'s soulless");
+		blob.set_bool("soulless",true);
+		blob.server_SetPlayer(null);
 	}
 }

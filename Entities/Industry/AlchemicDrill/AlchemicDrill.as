@@ -5,6 +5,7 @@
 #include "ParticleSparks.as";
 #include "MaterialCommon.as";
 #include "AlchemyCommon.as";
+#include "KnockedCommon.as";
 
 const f32 speed_thresh = 2.4f;
 const f32 speed_hard_thresh = 2.6f;
@@ -61,21 +62,22 @@ void onInit(CBlob@ this)
 	}*/
 
 	this.set_u32("hittime", 0);
-	this.Tag("place45");
-	this.set_s8("place45 distance", 1);
-	this.Tag("place45 perp");
+	this.Tag("place norotate"); // required to prevent drill from locking in place (blame builder code :kag_angry:)
+	
+	//this.Tag("place45"); // old 45 degree angle lock
+	//this.set_s8("place45 distance", 1);
+	//this.Tag("place45 perp");
+
 	this.set_u8(heat_prop, 0);
 	this.set_u16("showHeatTo", 0);
 	this.set_u16("harvestWoodDoorCap", 4);
 	this.set_u16("harvestStoneDoorCap",4);
 	this.set_u16("harvestPlatformCap", 2);
-	
-	this.set_f32("consumetimea", 0);
-	this.set_f32("consumetimet", 0);
-	this.set_f32("consumetimef", 0);
 
 	AddIconToken("$opaque_heatbar$", "Entities/Industry/Drill/HeatBar.png", Vec2f(24, 6), 0);
 	AddIconToken("$transparent_heatbar$", "Entities/Industry/Drill/HeatBar.png", Vec2f(24, 6), 1);
+
+	this.set_u32(last_drill_prop, 0);
 	
 	CAlchemyTank@ tank = addTank(this, "input", true, Vec2f(0, 0));
 	//tank.singleelement = true;
@@ -83,8 +85,6 @@ void onInit(CBlob@ this)
 	tank.unmixedstorage = true;
 	
 	this.getShape().getConsts().mapCollisions = true;
-
-	this.set_u32(last_drill_prop, 0);
 }
 
 bool canBePutInInventory( CBlob@ this, CBlob@ inventoryBlob )
@@ -190,7 +190,7 @@ void onTick(CBlob@ this)
 	{
 		if(hasaqua)
 			this.add_f32("consumetimea", consume_amount);
-		if (gametime % heat_cooldown_time == 0)
+		if (gametime % int(heat_cooldown_time * (1.0 - rainCoolingAmt(this) / 2.0)) == 0)
 		{
 			heat -= Maths::Min(hasaqua ? 2 : 1, heat);
 		}
@@ -219,6 +219,8 @@ void onTick(CBlob@ this)
 
 		if (holder is null) return;
 
+		AimAtMouse(this, holder);
+
 		// cool faster if holder is moving
 		if (heat > 0 && holder.getShape().vellen > 0.01f && getGameTime() % heat_cooldown_time == 0)
 		{
@@ -237,7 +239,7 @@ void onTick(CBlob@ this)
 
 		if (holder.getName() == required_class || sv_gamemode == "TDM")
 		{
-			if (!holder.isKeyPressed(key_action1) || holder.get_u8("knocked") > 0)
+			if (!holder.isKeyPressed(key_action1) || isKnocked(holder))
 			{
 				this.set_bool(buzz_prop, false);
 				return;
@@ -555,4 +557,30 @@ void makeSteamPuff(CBlob@ this, const f32 velocity = 1.0f, const int smallpartic
 		Vec2f vel = getRandomVelocity(-90, velocity * randomness, 360.0f);
 		makeSteamParticle(this, vel);
 	}
+}
+
+void AimAtMouse(CBlob@ this, CBlob@ holder)
+{
+	// code used from BlobPlacement.as, just edited to use mouse pos instead of 45 degree angle
+	Vec2f aimpos = holder.getAimPos();
+	Vec2f pos = this.getPosition();
+	Vec2f aim_vec = (pos - aimpos);
+	aim_vec.Normalize();
+
+	f32 mouseAngle = aim_vec.getAngleDegrees();
+
+	if (!this.isFacingLeft()) mouseAngle += 180;
+
+	this.setAngleDegrees(-mouseAngle); // set aim pos
+}
+
+float rainCoolingAmt(CBlob@ this)
+{
+	CMap@ map = getMap();
+	array<int>@ heightdata;
+	map.get("heightdata", @heightdata);
+	Vec2f position = this.getPosition();
+	if((heightdata is null || (position.x < 0 || position.x / 8 > heightdata.size() - 1 || (position.y) / 8 > heightdata[position.x / 8])))
+		return 0;
+	return getRules().get_f32("rainratio");
 }

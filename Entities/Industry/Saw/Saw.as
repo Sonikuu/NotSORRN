@@ -13,6 +13,10 @@ void onInit(CBlob@ this)
 	this.addCommandID(sawteammate_id);
 
 	SetSawOn(this, true);
+
+	AddIconToken("$upgrade_saw$", "BlazeCore.png", Vec2f(8, 8), 0);
+	
+	this.addCommandID("upgrade");
 }
 
 //toggling on/off
@@ -29,6 +33,16 @@ bool getSawOn(CBlob@ this)
 
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
+	CBlob@ held = caller.getCarriedBlob();
+	if(held !is null && held.getConfig() == "blazecore")
+	{
+		CMap@ map = getMap();
+		CBitStream params;
+		params.write_u16(caller.getNetworkID());
+		CButton@ button = caller.CreateGenericButton("$upgrade_saw$", Vec2f(0, 0), this, this.getCommandID("upgrade"), "Upgrade to infernal", params);
+		return;
+	}
+
 	if (caller.getTeamNum() != this.getTeamNum() || this.getDistanceTo(caller) > 16) return;
 
 	string desc = getTranslatedString("Turn Saw " + (getSawOn(this) ? "Off" : "On"));
@@ -37,6 +51,21 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 {
+	if(this.getCommandID("upgrade") == cmd)
+	{
+		CBlob@ caller = getBlobByNetworkID(params.read_u16());
+		if(caller !is null && getNet().isServer())
+		{
+			CBlob@ held = caller.getCarriedBlob();
+			if(held !is null && held.getConfig() == "blazecore")
+			{
+				this.server_Die();
+				server_CreateBlob("infernalsaw", caller.getTeamNum(), this.getPosition());
+				held.server_Die();
+			}
+		}
+	}
+
 	if (cmd == this.getCommandID(sawteammate_id))
 	{
 		CBlob@ tobeblended = getBlobByNetworkID(params.read_netid());
@@ -176,8 +205,11 @@ bool canSaw(CBlob@ this, CBlob@ blob)
 	    name == "migrant" ||
 	    name == "wooden_door" ||
 	    name == "mat_wood" ||
-	    name == "tree_bushy" ||
-	    name == "tree_pine")
+	    name.find("tree_") >= 0 ||
+	  //  name == "tree_pine" ||
+		//name == "tree_life" ||
+		//name == "tree_corrupt" ||
+		name == "seed")
 	{
 		return false;
 	}
@@ -247,7 +279,7 @@ void onCollision(CBlob@ this, CBlob@ blob, bool solid)
 //only pickable by enemies if they are _under_ this
 bool canBePickedUp(CBlob@ this, CBlob@ byBlob)
 {
-	return (byBlob.getTeamNum() == this.getTeamNum() ||
+	return (byBlob.getTeamNum() == this.getTeamNum() || this.getTeamNum() > 6 ||
 	        byBlob.getPosition().y > this.getPosition().y + 4);
 }
 

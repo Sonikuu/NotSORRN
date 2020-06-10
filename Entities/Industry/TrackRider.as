@@ -64,8 +64,9 @@ void onTick(CBlob@ this)
 		}
 		else
 		{
-			if((this.getPosition() - this.get_Vec2f("nextpos")).Length() < railspeed * 1.5)//If close to center
+			if((this.getPosition() - this.get_Vec2f("nextpos")).Length() < railspeed * 1.1)//If close to center
 			{
+				//this.setPosition(this.get_Vec2f("nextpos"));
 				u8 nextdir = getNextDir(tile, this.get_u8("nextdir"));
 				this.set_u8("nextdir", nextdir);
 				Vec2f goodpos = blockCenterPos(this.getPosition(), map);

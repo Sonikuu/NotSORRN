@@ -41,12 +41,13 @@ array<int> mat_corrpulp_val = 		{0, 	0,		0,			0,		0,		0,		0,		0,		0,			0,		1};
 array<int> blazecore_val = 			{0, 	0, 		0, 			0, 		0, 		500};
 array<int> mat_marble_val = 		{0, 	0, 		0, 			0, 		0, 		0,		1,		1,		0,			0,		0,				1};
 array<int> mat_basalt_val = 		{0, 	0, 		0, 			0, 		0, 		0,		1,		0,		1,			0,		1};
-array<int> mat_metal_val = 			{0, 	0, 		0, 			0, 		0, 		0,		50,		50};
+array<int> mat_metal_val = 			{0, 	0, 		0, 			0, 		0, 		0,		25,		25};
 array<int> builder_val = 			{50, 	50, 	0, 			0, 		0, 		0,		0,		0,		0,			0,		0,				0,			10};//Corpse, essentially
 array<int> fish_val = 				{0, 	25, 	0, 			0, 		0, 		0,		0,		0,		0,			50,		0,				0,			5};
 array<int> heart_val = 				{0, 	25, 	0, 			0, 		0, 		0,		0,		0,		0,			0,		0,				0,			10};
 array<int> chicken_val = 			{0, 	25, 	10, 		0, 		25, 	0,		0,		0,		0,			0,		0,				0,			5};
 array<int> grain_val = 				{0, 	25, 	25, 		0, 		10};
+//array<int> grain_val = 				{0, 	25, 	25, 		0, 		10};
 
 array<CMeltableItem> meltlist = 
 {
@@ -190,7 +191,7 @@ void onInit(CBlob@ this)
 	this.set_u16("burncooldown", 0);
 	
 	//Setup tanks
-	addTank(this, "output", false, Vec2f(0, -12));
+	addTank(this, "Output", false, Vec2f(0, -12));
 	
 	AddIconToken("$add_fuel$", "FireFlash.png", Vec2f(32, 32), 0);
 	
@@ -218,6 +219,15 @@ void onRender(CSprite@ this)
 	
 }
 
+void onTick(CSprite@ this)
+{
+	CBlob@ b = this.getBlob();
+	if(b.hasTag("active"))
+		this.SetFrame(1);
+	else
+		this.SetFrame(0);
+}
+
 void onTick(CBlob@ this)
 {
 	CSprite@ sprite = this.getSprite();
@@ -232,7 +242,7 @@ void onTick(CBlob@ this)
 				
 				int id = -1;
 				array<int>@ values = getElementalValue(invitem.getConfig(), id);
-				CAlchemyTank@ tank = getTank(this, "output");
+				CAlchemyTank@ tank = getTank(this, 0);
 				if(values !is null)
 				{
 					if(getNet().isServer())
@@ -249,9 +259,9 @@ void onTick(CBlob@ this)
 						}
 						this.SendCommand(this.getCommandID("meltitem"), params);
 					}
-					else if(sprite !is null)
+					else
 					{
-						sprite.SetFrame(1);
+						this.Tag("active");
 					}
 					/*
 					this.add_u16("burncooldown", getTotal(@values));
@@ -263,20 +273,24 @@ void onTick(CBlob@ this)
 					}*/
 				}
 			}
+			else
+				this.Untag("active");
 		}
 		else
 		{
 			if(this.get_f32("fuel") > 0 && this.get_u16("burncooldown") != 0)
 			{
-				if(sprite !is null)
-					sprite.SetFrame(1);
+				this.Tag("active");
+				//if(sprite !is null)
+				//	sprite.SetFrame(1);
 				this.add_f32("fuel", -1);
 				this.add_u16("burncooldown", -1);
 			}
 			else
 			{
-				if(sprite !is null)
-					sprite.SetFrame(0);
+				//if(sprite !is null)
+				//	sprite.SetFrame(0);
+				this.Untag("active");
 			}
 		}
 	}
@@ -323,8 +337,9 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 		u8 count = params.read_u8();
 		if(melted !is null)
 		{
-			array<int>@ values = getElementalValue(melted.getConfig());
-			CAlchemyTank@ tank = getTank(this, "output");
+			int id = -1;
+			array<int>@ values = getElementalValue(melted.getConfig(), id);
+			CAlchemyTank@ tank = getTank(this, 0);
 			if(values !is null && tank !is null)
 			{
 				array<int> valcopy;
@@ -351,7 +366,7 @@ bool isInventoryAccessible(CBlob@ this, CBlob@ forBlob)
 	return true;
 }
 
-array<int>@ getElementalValue(string name, int &out id = -1)
+array<int>@ getElementalValue(string name, int &out id)
 {
 	for (uint i = 0; i < meltlist.length; i++)
 	{
@@ -363,9 +378,3 @@ array<int>@ getElementalValue(string name, int &out id = -1)
 	}
 	return null;
 }
-
-
-
-
-
-

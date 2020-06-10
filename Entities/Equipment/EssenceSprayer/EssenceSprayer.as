@@ -8,7 +8,7 @@ void onInit(CBlob@ this)
 	
 	part.spriteoffset = Vec2f(0, 1.25);
 	
-	CAlchemyTank@ tank = addTank(this, "input", true, Vec2f(0, 0));
+	CAlchemyTank@ tank = addTank(this, "Input", true, Vec2f(0, 0));
 	tank.maxelements = 100;
 	tank.singleelement = true;
 	tank.dynamictank = true;
@@ -18,6 +18,8 @@ void onInit(CBlob@ this)
 	this.set_bool("equipped", false);
 	
 	this.getShape().getConsts().mapCollisions = true;
+
+	this.set_f32("leftovers", 0);
 }
 
 void onTick(CBlob@ this)

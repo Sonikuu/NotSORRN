@@ -45,6 +45,7 @@ void onRender(CSprite@ this)
 {
 	//Change to look gud when possible
 	CBlob@ blob = this.getBlob();
+	connectSysRender(blob);
 	CControls@ controls = getControls();
 	CCamera@ camera = getCamera();
 	if(controls is null || blob is null)
@@ -138,6 +139,7 @@ void onTick(CSprite@ this)
 
 void onTick(CBlob@ this)
 {
+	manageConnectSys(this);
 	CAlchemyTankController@ controller = getTankController(this);
 	
 	if(controller is null)
@@ -156,7 +158,14 @@ void onTick(CBlob@ this)
 				CBlob@ b = p.getBlob();
 				if(b !is null)
 				{
-					float dist = (b.getPosition() - this.getPosition()).Length();
+					Vec2f topos = this.getPosition();
+					if(this.get_bool("equipped"))
+					{
+						CBlob@ equipper = getBlobByNetworkID(this.get_u16("equipper"));
+						if(equipper !is null)
+							topos = equipper.getPosition();
+					}
+					float dist = (b.getPosition() - topos).Length();
 					int modmult = dist < 128 ? 1 : dist < 256 ? 3 : 30;
 					int mod = 30 * modmult;
 					if((this.getNetworkID() * modmult + getGameTime()) % mod == 0)
@@ -213,6 +222,8 @@ void onTick(CBlob@ this)
 				{
 					if(controller.tanks[i].connection.singleelement)
 						transferOnly(controller.tanks[i], controller.tanks[i].connection, this.get_u16("transferrate"), firstId(controller.tanks[i].connection));
+					else if(controller.tanks[i].connection.onlyele < elementlist.length)
+						transferOnly(controller.tanks[i], controller.tanks[i].connection, this.get_u16("transferrate"), controller.tanks[i].connection.onlyele);
 					else
 						transferSimple(controller.tanks[i], controller.tanks[i].connection, this.get_u16("transferrate"));
 				}
@@ -223,6 +234,8 @@ void onTick(CBlob@ this)
 
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
+	if((this.hasTag("building") && this.isAttached()) || (this.getTeamNum() != caller.getTeamNum() && !(this.getTeamNum() > 7 && caller.getTeamNum() > 7)))
+		return;
 	CAlchemyTankController@ controller = getTankController(this);
 	
 	if(controller is null)
@@ -267,7 +280,7 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 			}
 		}
 		//Disconnect
-		else if(controller.tanks[i].connection !is null)
+		/*else if(controller.tanks[i].connection !is null)
 		{
 			CBitStream params;
 			params.write_u8(i);
@@ -284,7 +297,7 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 			caller.CreateGenericButton("$cancel_alc$", buttonpos, this, this.getCommandID("cancel"), "Cancel Connection", params);
 		}
 		//Finishing connection
-		else if(caller.get_bool("connectingalchemy") && controller.tanks[i].input/* && caller.get_u16("connectingblob") != this.getNetworkID()*/)
+		else if(caller.get_bool("connectingalchemy") && controller.tanks[i].input/* && caller.get_u16("connectingblob") != this.getNetworkID()*//*)
 		{
 			//If you think this is too many params to write:
 			//It's to make sure that players joining while in the process of connecting dont get desynced
@@ -321,7 +334,7 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 			//params.write_u16(caller.get_u16("connectingblob"));
 			//params.write_u8(caller.get_u8("tankid"));
 			caller.CreateGenericButton("$connect_alc$", buttonpos, this, this.getCommandID("startconnect"), "Connect From", params);
-		}
+		}*/
 	}
 }
 
@@ -601,6 +614,159 @@ Vec2f getWorldTankPos(CBlob@ blob, CAlchemyTank@ tank)
 	return topos;
 }
 
+u16 fromtanknet = 0;
+u8 fromtankid = 0;
+
+u16 hoveredtanknet = 0;
+u8 hoveredtankid = 0;
+
+void manageConnectSys(CBlob@ this)
+{
+	CBlob@ local = getLocalPlayerBlob();
+	CControls@ con = getControls();
+	if(local !is null && con !is null && this.isPointInside(con.getMouseWorldPos()) && local.get_u8("wiringmode") == 1)
+	{
+		Vec2f mousepos = con.getMouseWorldPos();
+		u8 nearesttank = 0;
+		float nearestdist = 999;
+		CAlchemyTankController@ controller = getTankController(this);
+
+	//	print("infdunc");
+	
+		if(controller is null)
+			return;
+			
+		for (uint i = 0; i < controller.tanks.size(); i++)
+		{
+			Vec2f thistankpos = getWorldTankPos(this, controller.tanks[i]);
+			if((thistankpos - mousepos).Length() < nearestdist)
+			{
+				nearesttank = i;
+				nearestdist = (thistankpos - mousepos).Length();
+			}
+		}
+		hoveredtanknet = this.getNetworkID();
+		hoveredtankid = nearesttank;
+		CAlchemyTank@ seltank = @controller.tanks[nearesttank];
+		if(local.isKeyJustPressed(key_action1) && !seltank.input)
+		{
+			
+			fromtankid = nearesttank;
+			fromtanknet = this.getNetworkID();
+		}
+		//print("masdasd");
+		if(local.isKeyJustPressed(key_action2))
+		{
+			CBitStream params;
+			params.write_u8(hoveredtankid);
+			this.SendCommand(this.getCommandID("disconnect"), params);
+		}
+
+		if(local.isKeyJustReleased(key_action1))
+		{
+			CBlob@ fromblob = getBlobByNetworkID(fromtanknet);
+			if(fromblob !is null)
+			{
+				CAlchemyTankController@ fromcon = getTankController(fromblob);
+				if(fromcon !is null && fromcon.tanks.size() > fromtankid)
+				{
+					CAlchemyTank@ fromtank = @fromcon.tanks[fromtankid];
+					if(canAttachTank(fromtank, fromblob, seltank, this))
+					{
+						CBitStream params;
+						params.write_u16(hoveredtanknet);
+						params.write_u8(hoveredtankid);
+						params.write_u16(fromtanknet);
+						params.write_u8(fromtankid);
+						this.SendCommand(this.getCommandID("connect"), params);
+					}
+				}
+			}
+		}
+	}
+	if(local !is null && local.isKeyJustReleased(key_action1) && this.getNetworkID() == hoveredtanknet)
+	{
+		fromtanknet = 0;
+		fromtankid = 0;
+	}
+}
+
+void connectSysRender(CBlob@ this)
+{
+	CBlob@ local = getLocalPlayerBlob();
+	CControls@ cont = getControls();
+	if(this.getNetworkID() == fromtanknet && local !is null && local.isKeyPressed(key_action1) && local.get_u8("wiringmode") == 1)
+	{
+		Vec2f mousepos = local.getAimPos();
+		//CBlob@ netblob = getBlobByNetworkID(fromtanknet);
+	//	if(netblob !is null)
+		{
+			CAlchemyTankController@ fromcontroller = getTankController(this);
+
+			if(fromcontroller !is null && fromcontroller.tanks.size() > fromtankid)
+			{
+				array<Vertex> vertlist;
+
+				CAlchemyTank@ fromtank = fromcontroller.tanks[fromtankid];
+
+				CBlob@ hovertank = getBlobByNetworkID(hoveredtanknet);
+				bool valid = false;
+				if(hovertank !is null && hovertank.isPointInside(mousepos))
+				{
+					CAlchemyTankController@ hovercon = getTankController(hovertank);
+					if(hovercon !is null && hoveredtankid < hovercon.tanks.size())
+					{
+						if(canAttachTank(fromtank, this, hovercon.tanks[hoveredtankid], hovertank))
+						{
+							valid = true;
+							mousepos = getWorldTankPos(hovertank, hovercon.tanks[hoveredtankid]);
+						}
+					}
+				}
+
+				Vec2f startpos = getWorldTankPos(this, fromtank);
+				Vec2f endvec = mousepos;
+				if((startpos - endvec).Length() > maxrange)
+				{
+					endvec = Vec2f_lengthdir(maxrange, (endvec - startpos).Angle() * -1) + startpos;
+				}
+				float perp = ((((endvec - startpos).Angle() * -1) / 180.0) * Maths::Pi) + Maths::Pi / 2;
+				Vec2f perpoffs(Maths::Cos(perp) * 4, Maths::Sin(perp) * 4);
+			
+				
+				SColor linecol = SColor(255, 200, 255, 200);
+				if(!valid)
+					 linecol = SColor(255, 255, 0, 0);
+				vertlist.push_back(Vertex(startpos.x - perpoffs.x, startpos.y - perpoffs.y, 0, 0.3333, 0, linecol));
+				vertlist.push_back(Vertex(endvec.x - perpoffs.x, endvec.y - perpoffs.y, 0, 0.6666, 0, linecol));
+				vertlist.push_back(Vertex(endvec.x + perpoffs.x, endvec.y + perpoffs.y, 0, 0.6666, 1, linecol));
+				vertlist.push_back(Vertex(startpos.x + perpoffs.x, startpos.y + perpoffs.y, 0, 0.3333, 1, linecol));
+
+				addVertsToExistingRender(@vertlist, "Entities/Alchemy/AlchemyPipe.png", "RLrender");
+			}
+		}
+	}
+
+	//Drawing circle and node name
+	if(this.getNetworkID() == hoveredtanknet && local !is null && this.isPointInside(local.getAimPos()) && local.get_u8("wiringmode") == 1)
+	{
+		CCamera@ cam = getCamera();
+		CAlchemyTankController@ fromcontroller = getTankController(this);
+		if(fromcontroller !is null && fromcontroller.tanks.size() > hoveredtankid && cam !is null)
+		{
+			CAlchemyTank@ fromtank = fromcontroller.tanks[hoveredtankid];
+			Vec2f drawpos = (getWorldTankPos(this, fromtank) - this.getPosition()) / 0.5 * cam.targetDistance + this.getInterpolatedScreenPos();
+			GUI::DrawCircle(drawpos, 8, SColor(255, 255, 255, 255));
+			GUI::SetFont("menu");
+			GUI::DrawTextCentered(fromtank.name, drawpos - Vec2f(0, 32), SColor(255, 255, 255, 255));
+		}
+	}
+}
+
+bool canAttachTank(CAlchemyTank@ input, CBlob@ inputblob, CAlchemyTank@ output, CBlob@ outputblob)
+{
+	return (input !is output && !input.input && output.input && inputblob !is outputblob && (getWorldTankPos(inputblob, input) - getWorldTankPos(outputblob, output)).Length() < maxrange);
+}
 
 
 

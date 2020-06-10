@@ -22,7 +22,7 @@ void InitWorkshop(CBlob@ this)
 	InitCosts(); //read from cfg
 
 	this.set_Vec2f("shop offset", Vec2f_zero);
-	this.set_Vec2f("shop menu size", Vec2f(6, 6));
+	this.set_Vec2f("shop menu size", Vec2f(6, 7));
 
 	{
 		ShopItem@ s = addShopItem(this, "Lantern", "$lantern$", "lantern", Descriptions::lantern, false);
@@ -125,6 +125,33 @@ void InitWorkshop(CBlob@ this)
 		AddIconToken("$mat_explosiveammo$", "MaterialExplosiveAmmo.png", Vec2f(16, 16), 3);
 		AddIconToken("$blazecore$", "BlazeCore.png", Vec2f(8, 8), 0);
 	}
+	{
+		ShopItem@ s = addShopItem(this,  "Wooden Sword", "$woodsword$", "woodsword", "Basic Wooden Sword", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 80);
+		
+		AddIconToken("$woodsword$", "WoodSword.png", Vec2f(24, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Dagger", "$dagger$", "dagger", "Dagger, for Stabbing", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 20);
+		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 40);
+		
+		AddIconToken("$dagger$", "Dagger.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Spear", "$spear$", "spear", "Poke people with murderous intent", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 80);
+		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 40);
+		
+		AddIconToken("$spear$", "PokingStick.png", Vec2f(32, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Cleaver", "$cleaver$", "cleaver", "Heavy melee weapon, sacrifices speed for damage", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 50);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 4);
+		
+		AddIconToken("$cleaver$", "Cleaver.png", Vec2f(32, 16), 0);
+	}
 	/*{
 		ShopItem@ s = addShopItem(this, "Soul Dust", "$souldust$", "souldust-3", "Smash a soul shard into dust", false);
 		AddRequirement(s.requirements, "blob", "soul_chunk", "Soul Chunk", 1);
@@ -146,6 +173,31 @@ void InitWorkshop(CBlob@ this)
 		
 		AddIconToken("$raildrill$", "RailDrill.png", Vec2f(32, 16), 0);
 	}
+	{
+		ShopItem@ s = addShopItem(this,  "Mechanical Components", "$mat_component0$", "mat_component-1", "A crude component made from stone", false);
+		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 25);
+		
+		AddIconToken("$mat_component0$", "MaterialComponents.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Mechanical Components", "$mat_component1$", "mat_component-4", "Metallic components for machinery", false);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 1);
+		
+		AddIconToken("$mat_component1$", "MaterialComponents.png", Vec2f(16, 16), 1);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Element Vial", "$vial$", "vial", "An element holding vial, looks fragile but sturdy enough to drink from ", false);
+		AddRequirement(s.requirements, "blob", "mat_glass", "Glass", 30);
+		
+		AddIconToken("$vial$", "vial.png", Vec2f(8, 8), 0);
+	}
+	// {
+	// 	ShopItem@ s = addShopItem(this,  "Golemite Dust", "$golemitedust$", "GolemiteDust", "A mysterious substance that wiggles when you touch it", false);
+	// 	AddRequirement(s.requirements, "blob", "mat_purifiedgold", "Purified Gold", 1);
+	// 	AddRequirement(s.requirements, "blob", "mat_sand", "Sand", 250);
+		
+	// 	AddIconToken("$golemitedust$", "GolemiteDust.png", Vec2f(16, 16), 0);
+	// }
 }
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params)

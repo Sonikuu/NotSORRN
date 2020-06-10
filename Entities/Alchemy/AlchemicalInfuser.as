@@ -36,6 +36,15 @@ array<CAlchemyInfuse@> infuserecipes =
 	1,//output amount
 	900//processing time
 	),
+	@CAlchemyInfuse(
+	"aer",//input element
+	"lantern",//input item
+	"lum",//output item
+	100,//element amount
+	1,//item amount
+	1,//output amount
+	45//processing time
+	),
 	
 	@CAlchemyInfuse(
 	"purity",//input element
@@ -46,6 +55,16 @@ array<CAlchemyInfuse@> infuserecipes =
 	25,//output amount
 	25//processing time
 	),
+
+	@CAlchemyInfuse(
+	"purity",//input element
+	"mat_gold",//input item
+	"mat_purifiedgold",//output item
+	400,//element amount
+	250,//item amount
+	1,//output amount
+	1800//processing time
+	),
 	
 	@CAlchemyInfuse(
 	"corruption",//input element
@@ -55,6 +74,16 @@ array<CAlchemyInfuse@> infuserecipes =
 	25,//item amount
 	25,//output amount
 	25//processing time
+	),
+
+	@CAlchemyInfuse(
+	"aer",//input element
+	"mat_gold",//input item
+	"skyanchor",//output item
+	50,//element amount
+	125,//item amount
+	1,//output amount
+	150//processing time
 	),
 	
 	//Can duplicate items sometimes...?
@@ -98,6 +127,26 @@ array<CAlchemyInfuse@> infuserecipes =
 	10,//output amount
 	90//processing time
 	),
+
+	@CAlchemyInfuse(
+	"life",//input element
+	"log",//input item
+	"tree_pine",//output item
+	25,//element amount
+	1,//item amount
+	1,//output amount
+	30//processing time
+	),
+
+	@CAlchemyInfuse(
+	"life",//input element
+	"heart",//input item
+	"chicken",//output item
+	25,//element amount
+	1,//item amount
+	1,//output amount
+	30//processing time
+	),
 	
 	@CAlchemyInfuse(
 	"yeet",//input element
@@ -113,7 +162,7 @@ array<CAlchemyInfuse@> infuserecipes =
 void onInit(CBlob@ this)
 {	
 	//Setup tanks
-	CAlchemyTank@ input = addTank(this, "input", true, Vec2f(0, -8));
+	CAlchemyTank@ input = addTank(this, "Input", true, Vec2f(0, -8));
 	input.singleelement = true;
 	input.maxelements = 1000;
 	//addTank(this, "inputr", true, Vec2f(4, -4));
@@ -189,7 +238,7 @@ void onTick(CSprite@ this)
 
 void onTick(CBlob@ this)
 {
-	CAlchemyTank@ input = getTank(this, "input");
+	CAlchemyTank@ input = getTank(this, 0);
 	//CAlchemyTank@ inputr = getTank(this, "inputr");
 	//CAlchemyTank@ output = getTank(this, "output");
 	

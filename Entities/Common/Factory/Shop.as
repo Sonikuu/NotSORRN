@@ -7,6 +7,7 @@
 #include "Requirements_Tech.as"
 #include "MakeCrate.as"
 #include "CheckSpam.as"
+#include "PlantGrowthData.as"
 
 void onInit(CBlob@ this)
 {
@@ -216,6 +217,15 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 									total = parseInt(tokens[1]);
 
 								firstrun = true;
+
+								if(tokens[0] == "seed")
+								{
+									CPlantGrowthData@ gd = @growthdatas[XORRandom(growthdatas.size())];
+									blob.set_string("seed_grow_blobname", gd.blobname);
+									blob.set_u16("seed_grow_time", gd.growthtime);
+									blob.set_u8("sprite index", gd.index);
+									blob.set_u8("created_blob_radius", gd.radius);
+								}
 							
 								if(tokens[0] == "recipe" && tokens.length > 1)
 								{
@@ -229,6 +239,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 									blob.server_SetQuantity(Maths::Min(blob.maxQuantity, total));
 									total -= blob.maxQuantity;
 								}
+								
 								
 								
 								bool pickable = blob.getAttachments() !is null && blob.getAttachments().getAttachmentPointByName("PICKUP") !is null;

@@ -112,6 +112,8 @@ void onInit(CBlob@ this)
 	AddIconToken("$add_fuel$", "FireFlash.png", Vec2f(32, 32), 0);
 	
 	this.set_TileType("background tile", CMap::tile_castle_back);
+
+	this.Tag("builder always hit");
 }
 
 void onInit(CSprite@ this)

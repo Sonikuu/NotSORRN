@@ -6,9 +6,11 @@ void corruptTile(Vec2f tilepos, CMap@ map)
 {
 	if(isServer())
 	{
+		if(tilepos.x > map.tilemapwidth || tilepos.y > map.tilemapheight || tilepos.x < 0 || tilepos.y < 0)
+			return;
 		Tile tile = map.getTileFromTileSpace(tilepos);
 		//Doesnt corrupt itself or purified dust
-		if(map.isTileSolid(tile) && (tile.type < 400 || tile.type > 408) && !(tile.type >= 106 && tile.type <= 111))
+		if(map.isTileSolid(tile) && (tile.type < 400 || tile.type > 408) && !(tile.type >= 106 && tile.type <= 111) && map.getSectorAtPosition(tilepos * 8, "no build") is null)
 		{
 			map.server_SetTile(tilepos * map.tilesize, 400 + XORRandom(3));
 			Tile gtile = map.getTileFromTileSpace(tilepos - Vec2f(0, 1));
@@ -86,18 +88,39 @@ void corruptTick(Vec2f tilepos, CMap@ map)
 					server_CreateBlob("knokling", -1, (tilepos + Vec2f(0, -1)) * map.tilesize);
 			}
 		}
+		if(XORRandom(300) == 0)
+		{
+			if(!map.isTileSolid(map.getTileFromTileSpace(tilepos + Vec2f(0, -1))) && map.isTileSolid(map.getTileFromTileSpace(tilepos)))
+			{
+				CBlob@[] blobs;
+				map.getBlobsInRadius(tilepos * map.tilesize, 480, @blobs);
+				bool dospawn = true;
+				for(int i = 0; i < blobs.length(); i++)
+				{
+					if(blobs[i].getConfig() == "zest")
+					{
+						dospawn = false;
+						break;
+					}
+				}
+				if(dospawn)
+					server_CreateBlob("zest", -1, (tilepos - Vec2f(0, 1)) * map.tilesize);
+			}
+		}
 	}
 }
 
-void purifyTile(Vec2f tilepos, CMap@ map)
+bool purifyTile(Vec2f tilepos, CMap@ map)
 {
-	if(isServer())
+	//if(isServer())
 	{
 		Tile tile = map.getTileFromTileSpace(tilepos);
 		if(map.isTileSolid(tile) && (tile.type >= 400 && tile.type <= 405))
 		{
 			map.server_SetTile(tilepos * map.tilesize, 406 + XORRandom(3));
+			return true;
 		}
 	}
+	return false;
 }
 

@@ -5,13 +5,13 @@
 void onInit(CBlob@ this)
 {	
 	//Setup tanks
-	addTank(this, "input", true, Vec2f(0, -4));
+	addTank(this, "Input", true, Vec2f(0, -4));
 	this.set_u16("dumptotal", 0);
 }
 
 void onTick(CBlob@ this)
 {
-	CAlchemyTank@ input = getTank(this, "input");
+	CAlchemyTank@ input = getTank(this, "Input");
 	
 	if(input !is null)
 	{

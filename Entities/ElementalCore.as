@@ -18,8 +18,11 @@ class CElementSetup
 	wardProto@ wardbehavior;
 	bindProto@ bindbehavior;
 	sprayProto@ spraybehavior;
+	vialIngestProto@ vialIngestbehavior;
+	vialSplashProto@ vialSplashbehavior;
+
 	bool hidden;
-	CElementSetup(string name, SColor color, string visiblename, padProto@ padbehavior, wardProto@ wardbehavior, bindProto@ bindbehavior, sprayProto@ spraybehavior)
+	CElementSetup(string name, SColor color, string visiblename, padProto@ padbehavior, wardProto@ wardbehavior, bindProto@ bindbehavior, sprayProto@ spraybehavior, vialIngestProto@ vialIngestbehavior, vialSplashProto@ vialSplashbehavior)
 	{
 		this.name = name;
 		this.color = color;
@@ -28,6 +31,9 @@ class CElementSetup
 		@this.wardbehavior = wardbehavior;
 		@this.bindbehavior = bindbehavior;
 		@this.spraybehavior = spraybehavior;
+		@this.vialIngestbehavior = vialIngestbehavior;
+		@this.vialSplashbehavior = vialSplashbehavior;
+
 		hidden = false;
 	}
 	CElementSetup setHidden(bool hidden)
@@ -41,6 +47,25 @@ class CElementSetup
 //Element list, all other parts should be able to work off of only this
 //When getting data about elements, use the element list
 
+enum EElement
+{
+	ecto = 0,
+	life = 1,
+	natura = 2,
+	force = 3,
+	aer = 4,
+	ignis = 5,
+	terra = 6,
+	order = 7,
+	entropy = 8,
+	aqua = 9,
+	corruption = 10,
+	purity = 11,
+	unholy = 12,
+	holy = 13,
+	yeet = 14
+}
+
 const array<CElementSetup> elementlist = 
 {
 	CElementSetup//0
@@ -50,7 +75,9 @@ const array<CElementSetup> elementlist =
 	@padEcto,
 	@wardEcto,
 	@bindBlank,
-	@sprayEcto),	//Replace the blanks with special behavior when added
+	@sprayEcto,
+	@vialIngestEcto,
+	@vialSplashEcto),	//Replace the blanks with special behavior when added
 				//We can add icon names when we need to (or can, more like)
 	
 	CElementSetup//1
@@ -60,7 +87,9 @@ const array<CElementSetup> elementlist =
 	@padLife,
 	@wardLife,
 	@bindLife,
-	@sprayLife),
+	@sprayLife,
+	@vialIngestLife,
+	@vialSplashLife),
 	
 	CElementSetup//2
 	("natura",
@@ -69,7 +98,9 @@ const array<CElementSetup> elementlist =
 	@padNatura,
 	@wardNatura,
 	@bindBlank,
-	@sprayNatura),
+	@sprayNatura,
+	@vialIngestNatura,
+	@vialSplashNatura),
 	
 	CElementSetup//3
 	("force",
@@ -78,7 +109,9 @@ const array<CElementSetup> elementlist =
 	@padForce,
 	@wardForce,
 	@bindBlank,
-	@sprayForce),
+	@sprayForce,
+	@vialIngestForce,
+	@vialSplashForce),
 	
 	CElementSetup//4
 	("aer",
@@ -87,7 +120,9 @@ const array<CElementSetup> elementlist =
 	@padAer,
 	@wardAer,
 	@bindBlank,
-	@sprayAer),
+	@sprayAer,
+	@vialIngestAer,
+	@vialSplashAer),
 	
 	CElementSetup//5
 	("ignis",
@@ -96,7 +131,9 @@ const array<CElementSetup> elementlist =
 	@padIgnis,
 	@wardIgnis,
 	@bindBlank,
-	@sprayIgnis),
+	@sprayIgnis,
+	@vialIngestIgnis,
+	@vialSplashIgnis),
 	
 	CElementSetup//6
 	("terra",
@@ -105,8 +142,10 @@ const array<CElementSetup> elementlist =
 	@padTerra,
 	@wardTerra,
 	@bindBlank,
-	@sprayTerra),
-	
+	@sprayTerra,
+	@vialIngestTerra,
+	@vialSplashTerra),
+
 	CElementSetup//7
 	("order",
 	SColor(255, 255, 255, 255),
@@ -114,7 +153,9 @@ const array<CElementSetup> elementlist =
 	@padOrder,
 	@wardOrder,
 	@bindBlank,
-	@sprayOrder),
+	@sprayOrder,
+	@vialIngestOrder,
+	@vialSplashOrder),
 	
 	CElementSetup//8
 	("entropy",
@@ -123,7 +164,9 @@ const array<CElementSetup> elementlist =
 	@padEntropy,
 	@wardEntropy,
 	@bindBlank,
-	@sprayEntropy),
+	@sprayEntropy,
+	@vialIngestEntropy,
+	@vialSplashEntropy),
 	
 	CElementSetup//9
 	("aqua",
@@ -132,7 +175,9 @@ const array<CElementSetup> elementlist =
 	@padAqua,
 	@wardAqua,
 	@bindBlank,
-	@sprayAqua),
+	@sprayAqua,
+	@vialIngestAqua,
+	@vialSplashEntropy),
 	
 	CElementSetup//10
 	("corruption",
@@ -141,7 +186,9 @@ const array<CElementSetup> elementlist =
 	@padCorruption,
 	@wardCorruption,
 	@bindBlank,
-	@sprayCorruption),
+	@sprayCorruption,
+	@vialIngestCorruption,
+	@vialSplashCorruption),
 	
 	CElementSetup//11
 	("purity",
@@ -150,16 +197,20 @@ const array<CElementSetup> elementlist =
 	@padPurity,
 	@wardPurity,
 	@bindBlank,
-	@sprayPurity),
+	@sprayPurity,
+	@vialIngestPurity,
+	@vialSplashPurity),
 	
 	CElementSetup//12
 	("unholy",
 	SColor(255, 150, 0, 100),
 	"Unholy",
 	@padUnholy,
-	@wardBlank,
+	@wardUnholy,
 	@bindBlank,
-	@sprayBlank),
+	@sprayBlank,
+	@vialIngestUnholy,
+	@vialSplashUnholy),
 	
 	CElementSetup//13
 	("holy",
@@ -168,7 +219,9 @@ const array<CElementSetup> elementlist =
 	@padHoly,
 	@wardBlank,
 	@bindBlank,
-	@sprayBlank),
+	@sprayBlank,
+	@vialIngestHoly,
+	@vialSplashHoly),
 	
 	CElementSetup//14
 	("yeet",
@@ -177,7 +230,9 @@ const array<CElementSetup> elementlist =
 	@padAer,
 	@wardForce,
 	@bindBlank,
-	@sprayForce).setHidden(true)
+	@sprayForce,
+	@vialIngestYeet,
+	@vialSplashYeet).setHidden(true)
 };
 
 void renderElementsCentered(array<int>@ elements, Vec2f pos, bool excludeempty = true)

@@ -2,8 +2,8 @@
 
 void onInit(CBlob@ this)
 {
-	CAlchemyTank@ input = addTank(this, "input", true, Vec2f(0, -6));
-	CAlchemyTank@ output = addTank(this, "output", false, Vec2f(0, 6));
+	CAlchemyTank@ input = addTank(this, "Input", true, Vec2f(0, -6));
+	CAlchemyTank@ output = addTank(this, "Output", false, Vec2f(0, 6));
 	
 	input.maxelements = 100;
 	input.dynamictank = true;
@@ -26,8 +26,8 @@ void onInit(CSprite@ this)
 
 void onTick(CBlob@ this)
 {
-	CAlchemyTank@ input = getTank(this, "input");
-	CAlchemyTank@ output = getTank(this, "output");
+	CAlchemyTank@ input = getTank(this, "Input");
+	CAlchemyTank@ output = getTank(this, "Output");
 	if(input !is null && output !is null)
 		transferSimple(input, output, 1);
 	

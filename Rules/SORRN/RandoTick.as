@@ -9,6 +9,7 @@ float tickmult = 0.0025;
 
 void onInit(CRules@ this)
 {
+	onRestart(this);
 	CMap@ map = getMap();
 	if(map !is null)
 		printInt("Random tile ticks per tick: ", Maths::Ceil(map.tilemapwidth * map.tilemapheight * tickmult));
@@ -16,12 +17,18 @@ void onInit(CRules@ this)
 	this.set_u16("raincount", 24);
 }
 
+void onRestart(CRules@ this)
+{
+	this.set_u32("rainseed", XORRandom(0x7FFFFFFF));
+	this.Sync("rainseed", true);
+}
+
 void onTick(CRules@ this)
 {
 	//Going to move rain stuff to another file eventually
 	//i swear
 	CMap@ map = getMap();
-	Noise noise(0x8008135F);//lel
+	Noise noise(this.get_u32("rainseed"));//lel
 	float sample = (noise.Sample(getGameTime() / 5000.0, 0) - 0.5) * 4;
 	//print("" + sample);
 	float rainratio = Maths::Clamp(sample, 0, 1);
@@ -46,7 +53,7 @@ void onTick(CRules@ this)
 	if(raincount > 0)
 	{
 		CBlob@ b = getBlobByName("soundblob");
-		if(b is null)
+		if(b is null && isServer())
 			server_CreateBlob("soundblob");
 	}
 	if(getNet().isClient())
@@ -92,7 +99,7 @@ void onTick(CRules@ this)
 		Random rando(XORRandom(0x7FFFFFFF));
 		Vec2f nexttile(rando.NextRanged(map.tilemapwidth), rando.NextRanged(map.tilemapheight));
 		Tile tile = map.getTileFromTileSpace(nexttile);
-		if(tile.type >= 400 && tile.type <= 405)
+		if(tile.type >= 400 && tile.type <= 405 && getGameTime() % 2 == 0)
 		{
 			corruptTick(nexttile, map);
 		}

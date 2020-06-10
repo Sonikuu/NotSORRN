@@ -201,10 +201,15 @@ class CSwordEquipment : CEquipmentCore
 		keys usekey = attachedPoint == "FRONT_ARM" ? key_action1 :
 						attachedPoint == "BACK_ARM" ? key_action2 :
 						key_action1;
+		
+		bool actionkey = user.isKeyPressed(usekey);
+		
+		if(equipmentBlocked(user))//Override if menu open
+				actionkey = false;
 						
 		if(chargetime < 0)
 		{
-			if(speed + chargetime < 7)
+			if(chargetime - speed < 7)
 				useWeapon(blob, user, true);
 			chargetime++;
 			return;
@@ -215,12 +220,12 @@ class CSwordEquipment : CEquipmentCore
 		}
 		
 		
-		if(user.isKeyPressed(usekey) && chargetime == 0)
+		if(actionkey && chargetime == 0)
 		{
 			disabled = false;
 			timetocharge = speed;
 		}
-		if(user.isKeyPressed(usekey) && !jabonly)
+		if(actionkey && !jabonly)
 		{
 			if(!disabled)
 			{
@@ -346,18 +351,18 @@ class CSwordEquipment : CEquipmentCore
 				{
 					float currcoolratio = float(Maths::Abs(chargetime)) / float(jabtime);
 					if(chargetime < jabtime)
-						frame = 1 + currcoolratio * 7;
+						frame = 2 + int(currcoolratio * 8) * 2;
 					if(chargetime == jabtime)
-						frame = 9;
+						frame = 1;
 					if(chargetime == 0)
 						frame = 0;
 				}
 				else
 				{
 					if(chargetime > 0 && timetocharge != 0)
-						frame = 1 + float(chargetime) / float(timetocharge) * 7;
+						frame = 2 + int(float(chargetime) / float(timetocharge) * 8) * 2;
 					if(chargetime >= timetocharge)
-						frame = 9;
+						frame = 1;
 					if(chargetime == 0)
 						frame = 0;
 				}

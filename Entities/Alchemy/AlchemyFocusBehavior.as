@@ -16,11 +16,14 @@
 
 //Ehm, this might get weird, trying something new here
 //Callbacks?
-funcdef void padProto(CBlob@, int, CBlob@);
-funcdef void wardProto(float, int, CBlob@);
+funcdef float padProto(CBlob@, int, CBlob@);
+funcdef float wardProto(float, int, CBlob@);
 funcdef void bindProto(CBlob@, int, CBlob@);
+funcdef bool vialSplashProto(CBlob@, f32);
+funcdef bool vialIngestProto(CBlob@, CBlob@, f32);
+
 //The three floats should be aimdir, spread, and range
-funcdef void sprayProto(int, float, float, float, CBlob@, CBlob@);
+funcdef float sprayProto(int, float, float, float, CBlob@, CBlob@);
 //uhhh and then...
 /*array<padProto@> padFuncs = 
 {
@@ -33,9 +36,9 @@ funcdef void sprayProto(int, float, float, float, CBlob@, CBlob@);
 
 //PAD FOCUS BEHAVIOR
 
-void padBlank(CBlob@ blob, int power, CBlob@ pad){}
+float padBlank(CBlob@ blob, int power, CBlob@ pad){return 1;}
 
-void padAer(CBlob@ blob, int power, CBlob@ pad)
+float padAer(CBlob@ blob, int power, CBlob@ pad)
 {
 	bool blobmovingleft = pad.isFacingLeft();
 	
@@ -53,9 +56,10 @@ void padAer(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padLife(CBlob@ blob, int power, CBlob@ pad)
+float padLife(CBlob@ blob, int power, CBlob@ pad)
 {
 	blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.2, blob.getInitialHealth() * 2));
 	if(getNet().isClient())
@@ -69,12 +73,13 @@ void padLife(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padEcto(CBlob@ blob, int power, CBlob@ pad)
+float padEcto(CBlob@ blob, int power, CBlob@ pad)
 {
 	//900 = 30 seconds, should be a good amount?
-	applyFxLowGrav(blob, power * 180, Maths::Ceil(float(power) / 5.0));
+	applyFxLowGrav(blob, power * 180 * 5, Maths::Ceil(float(power) / 5.0));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -85,9 +90,10 @@ void padEcto(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padForce(CBlob@ blob, int power, CBlob@ pad)
+float padForce(CBlob@ blob, int power, CBlob@ pad)
 {
 	bool blobmovingleft = pad.isFacingLeft();
 	
@@ -102,9 +108,10 @@ void padForce(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padIgnis(CBlob@ blob, int power, CBlob@ pad)
+float padIgnis(CBlob@ blob, int power, CBlob@ pad)
 {
 	pad.server_Hit(blob, blob.getPosition(), Vec2f_zero, power * 0.1, Hitters::fire);
 	if(getNet().isClient())
@@ -117,11 +124,12 @@ void padIgnis(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padTerra(CBlob@ blob, int power, CBlob@ pad)
+float padTerra(CBlob@ blob, int power, CBlob@ pad)
 {
-	applyFxDamageReduce(blob, power * 180, Maths::Ceil(float(power) / 5.0));
+	applyFxDamageReduce(blob, power * 180 * 5, Maths::Ceil(float(power) / 5.0));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -133,11 +141,12 @@ void padTerra(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padNatura(CBlob@ blob, int power, CBlob@ pad)//Nature gives regen? 100% not a ros ripoff
+float padNatura(CBlob@ blob, int power, CBlob@ pad)//Nature gives regen? 100% not a ros ripoff
 {
-	applyFxRegen(blob, power * 180, Maths::Ceil(float(power) / 5.0));
+	applyFxRegen(blob, power * 180 * 2, Maths::Ceil(float(power) / 5.0));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -149,9 +158,10 @@ void padNatura(CBlob@ blob, int power, CBlob@ pad)//Nature gives regen? 100% not
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padEntropy(CBlob@ blob, int power, CBlob@ pad)
+float padEntropy(CBlob@ blob, int power, CBlob@ pad)
 {
 	pad.server_Hit(blob, blob.getPosition(), Vec2f_zero, power * 0.4, Hitters::spikes);
 	if(getNet().isClient())
@@ -165,9 +175,10 @@ void padEntropy(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padOrder(CBlob@ blob, int power, CBlob@ pad)
+float padOrder(CBlob@ blob, int power, CBlob@ pad)
 {
 	blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
 	applyFxLowGrav(blob, power * 30, 100);
@@ -181,10 +192,11 @@ void padOrder(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
 
-void padAqua(CBlob@ blob, int power, CBlob@ pad)
+float padAqua(CBlob@ blob, int power, CBlob@ pad)
 {
 	pad.server_Hit(blob, blob.getPosition(), Vec2f_zero, 0, Hitters::water_stun_force);
 	if(getNet().isClient())
@@ -197,12 +209,13 @@ void padAqua(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padCorruption(CBlob@ blob, int power, CBlob@ pad)
+float padCorruption(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxCorrupt(blob, 180 * power, power * 0.4);
+	applyFxCorrupt(blob, 180 * power * 5, power * 0.4);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -213,12 +226,13 @@ void padCorruption(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padPurity(CBlob@ blob, int power, CBlob@ pad)
+float padPurity(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxPure(blob, 180 * power, power * 0.4);
+	applyFxPure(blob, 180 * power * 10, power * 0.4);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -229,12 +243,13 @@ void padPurity(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padHoly(CBlob@ blob, int power, CBlob@ pad)
+float padHoly(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxHoly(blob, 180 * power, power);
+	applyFxHoly(blob, 180 * power * 5, power);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -245,12 +260,13 @@ void padHoly(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void padUnholy(CBlob@ blob, int power, CBlob@ pad)
+float padUnholy(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxUnholy(blob, 180 * power, power);
+	applyFxUnholy(blob, 180 * power * 5, power);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -261,6 +277,7 @@ void padUnholy(CBlob@ blob, int power, CBlob@ pad)
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
 //WARD FOCUS BEHAVIOR HERE
@@ -268,31 +285,41 @@ void padUnholy(CBlob@ blob, int power, CBlob@ pad)
 
 
 
-void wardBlank(float radius, int power, CBlob@ ward){}
+float wardBlank(float radius, int power, CBlob@ ward){return 0;}
 
-void wardForce(float radius, int power, CBlob@ ward)
+float wardForce(float radius, int power, CBlob@ ward)
 {
 	CBlob@[] blobs;
 	CMap@ map = getMap();
+	bool activated = false;
 	if(map.getBlobsInRadius(ward.getPosition(), radius, @blobs))
 	{
 		for (int i = 0; i < blobs.length; i++)
 		{
-			float rot = (blobs[i].getPosition() - ward.getPosition()).Angle() * -1;
-			float distance = (blobs[i].getPosition() - ward.getPosition()).Length();
-			Vec2f direction(1, 0);
-			direction.RotateBy(rot);
-			blobs[i].setVelocity(blobs[i].getVelocity() + direction * power * (Maths::Max(radius - distance, 0.0) / 100.0));
+			if(blobs[i].getShape() !is null && !blobs[i].getShape().isStatic())
+			{
+				float rot = (blobs[i].getPosition() - ward.getPosition()).Angle() * -1;
+				float distance = (blobs[i].getPosition() - ward.getPosition()).Length();
+				Vec2f direction(1, 0);
+				direction.RotateBy(rot);
+				blobs[i].setVelocity(blobs[i].getVelocity() + direction * power * (Maths::Max(radius - distance, 0.0) / 100.0));
+				activated = true;
+			}
 		}
 	}
+	if(activated)
+		return 1;
+	else
+		return 0.1;
 }
 
 
-void wardNatura(float radius, int power, CBlob@ ward)
+float wardNatura(float radius, int power, CBlob@ ward)
 {
 	CBlob@[] blobs;
 	CMap@ map = getMap();
-	if(map.getBlobsInRadius(ward.getPosition(), radius, @blobs) && getGameTime() % (450 / power) == 0)
+	bool activated = false;
+	if(map.getBlobsInRadius(ward.getPosition(), radius, @blobs))
 	{
 		for (int i = 0; i < blobs.length; i++)
 		{
@@ -302,78 +329,107 @@ void wardNatura(float radius, int power, CBlob@ ward)
 			growthTick@ growthtick;
 			blobs[i].get("growthtick", @growthtick);
 			
-			if(vars !is null)
+			if(vars !is null && getGameTime() % (450 / power) == 0)
 			{
 				if(!blobs[i].hasTag("naturabuff"))
 				{
 					vars.max_height += 0.4 * power;
 					blobs[i].Tag("naturabuff");
+					
 				}
 			}
 			if(growthtick !is null)
 			{
-				growthtick(blobs[i]);
+				activated = true;
+				if(getGameTime() % (450 / power) == 0)
+					growthtick(blobs[i]);
 			}
 		}
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-void wardLife(float radius, int power, CBlob@ ward)
+float wardLife(float radius, int power, CBlob@ ward)
 {
 	CBlob@[] blobs;
 	CMap@ map = getMap();
-	if(map.getBlobsInRadius(ward.getPosition(), radius, @blobs) && getGameTime() % 30 == 0)
-	{
-		for (int i = 0; i < blobs.length; i++)
-		{
-			if(blobs[i].getHealth() < blobs[i].getInitialHealth())
-				blobs[i].server_Heal(0.04 * power);
-		}
-	}
-}
-
-
-void wardAer(float radius, int power, CBlob@ ward)
-{
-	CBlob@[] blobs;
-	CMap@ map = getMap();
+	bool activated = false;
 	if(map.getBlobsInRadius(ward.getPosition(), radius, @blobs))
 	{
 		for (int i = 0; i < blobs.length; i++)
 		{
-			float rot = (ward.getPosition() - blobs[i].getPosition()).Angle() * -1;
-			float distance = (blobs[i].getPosition() - ward.getPosition()).Length();
-			Vec2f direction(1, 0);
-			direction.RotateBy(rot);
-			blobs[i].setVelocity(blobs[i].getVelocity() + direction * power * (Maths::Max(radius - distance, 0.0) / 200.0));
+			if(blobs[i].getHealth() < blobs[i].getInitialHealth() && blobs[i].hasTag("flesh"))
+			{
+				activated = true;
+				if(getGameTime() % 30 == 0)
+					blobs[i].server_Heal(0.08 * power);
+			}
 		}
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-void wardEcto(float radius, int power, CBlob@ ward)
+
+float wardAer(float radius, int power, CBlob@ ward)
 {
-	if(getGameTime() % 3 != 0)
-		return;
 	CBlob@[] blobs;
 	CMap@ map = getMap();
+	bool activated = false;
+	if(map.getBlobsInRadius(ward.getPosition(), radius, @blobs))
+	{
+		for (int i = 0; i < blobs.length; i++)
+		{
+			if(blobs[i].getShape() !is null && !blobs[i].getShape().isStatic())
+			{
+				activated = true;
+				float rot = (ward.getPosition() - blobs[i].getPosition()).Angle() * -1;
+				float distance = (blobs[i].getPosition() - ward.getPosition()).Length();
+				Vec2f direction(1, 0);
+				direction.RotateBy(rot);
+				blobs[i].setVelocity(blobs[i].getVelocity() + direction * power * (Maths::Max(radius - distance, 0.0) / 200.0));
+			}
+		}
+	}
+	if(activated)
+		return 0.5;
+	return 0.1;
+}
+
+float wardEcto(float radius, int power, CBlob@ ward)
+{
+	CBlob@[] blobs;
+	CMap@ map = getMap();
+	bool activated = false;
 	if(map.getBlobsInRadius(ward.getPosition(), radius, @blobs))
 	{
 		for (int i = 0; i < blobs.length; i++)
 		{
 			if(blobs[i].hasTag("flesh"))
 			{
-				applyFxGhostlike(blobs[i], 2 * power, 1);
-				applyFxLowGrav(blobs[i], 2 * power, 100);
+				activated = true;
+				if(getGameTime() % 3 == 0)
+				{
+					applyFxGhostlike(blobs[i], 2 * power, 1);
+					applyFxLowGrav(blobs[i], 2 * power, 100);
+				}
 			}
 		}
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
 
-void wardIgnis(float radius, int power, CBlob@ ward)
+float wardIgnis(float radius, int power, CBlob@ ward)
 {
 	CMap@ map = getMap();
-	if(getGameTime() % 30 == 0)
+	bool activated = false;
+	if(true)
 	{
 		CBlob@[] blobs;
 		
@@ -382,8 +438,9 @@ void wardIgnis(float radius, int power, CBlob@ ward)
 		{
 			for (int i = 0; i < blobs.length; i++)
 			{
-				if(blobs[i] !is ward)
+				if(blobs[i].getTeamNum() != ward.getTeamNum() && getGameTime() % 30 == 0)
 					ward.server_Hit(blobs[i], blobs[i].getPosition(), Vec2f_zero, 0.02 * power, Hitters::fire);
+				activated = true;
 			}
 		}
 		
@@ -395,14 +452,20 @@ void wardIgnis(float radius, int power, CBlob@ ward)
 	Vec2f pos = Vec2f(Maths::Cos(rotation) * length, Maths::Sin(rotation) * length) + ward.getPosition();
 	Tile tile = map.getTile(pos);
 	if(Tile::FLAMMABLE & tile.flags > 0)
+	{
 		map.server_setFireWorldspace(pos, true);
+		activated = true;
+	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
 //Slowly regenerates stone and dirt
-void wardTerra(float radius, int power, CBlob@ ward) 
+float wardTerra(float radius, int power, CBlob@ ward) 
 {
 	Random rando(XORRandom(0x7FFFFFFF));
-	
+	bool activated = false;
 	
 	CMap@ map = getMap();
 	for(int i = 0; i < power / 2; i++)
@@ -415,6 +478,7 @@ void wardTerra(float radius, int power, CBlob@ ward)
 		//DIRT
 		if(tile.type <= 31 && tile.type >= 29)
 		{
+			activated = true;
 			if(tile.type == 29)
 				map.server_SetTile(pos, 16);
 			else
@@ -423,6 +487,7 @@ void wardTerra(float radius, int power, CBlob@ ward)
 		//STONE
 		else if(tile.type <= 104 && tile.type >= 96)
 		{
+			activated = true;
 			if(tile.type <= 100 && tile.type >= 96)
 				map.server_SetTile(pos, 218);
 			else
@@ -431,18 +496,22 @@ void wardTerra(float radius, int power, CBlob@ ward)
 		//THICC STONE
 		else if(tile.type <= 218 && tile.type >= 214)
 		{
+			activated = true;
 			if(tile.type == 214)
 				map.server_SetTile(pos, 208);
 			else
 				map.server_SetTile(pos, tile.type - 1);
 		}
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-void wardOrder(float radius, int power, CBlob@ ward)
+float wardOrder(float radius, int power, CBlob@ ward)
 {
 	Random rando(XORRandom(0x7FFFFFFF));
-	
+	bool activated = false;
 	
 	CMap@ map = getMap();
 	for(int i = 0; i < power; i++)
@@ -450,46 +519,20 @@ void wardOrder(float radius, int power, CBlob@ ward)
 		float rotation = rando.NextFloat() * Maths::Pi * 2 - Maths::Pi;
 		float length = rando.NextFloat() * radius;
 		Vec2f pos = Vec2f(Maths::Cos(rotation) * length, Maths::Sin(rotation) * length) + ward.getPosition();
-		Tile tile = map.getTile(pos);
-		
-		//STONE
-		if(tile.type <= 63 && tile.type >= 58)
-		{
-			if(tile.type == 58)
-				map.server_SetTile(pos, 48);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//WOOD
-		else if(tile.type <= 203 && tile.type >= 200)
-		{
-			if(tile.type == 200)
-				map.server_SetTile(pos, 196);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//STONE BG
-		else if(tile.type <= 79 && tile.type >= 76)
-		{
-			if(tile.type == 76)
-				map.server_SetTile(pos, 64);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//WOOD BG
-		else if(tile.type == 207)
-		{
-			map.server_SetTile(pos, 205);
-		}
+
+		activated = orderEffect(map, pos) || activated;
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-void wardEntropy(float radius, int power, CBlob@ ward) //probobly broken code :D 
+float wardEntropy(float radius, int power, CBlob@ ward) //probobly broken code :D 
 //also feel free to change idea mainly just wanted to see what it would look like
 //Just fixed it up a bit, dun worri, is gud ward
 {
 	Random rando(XORRandom(0x7FFFFFFF));
-	
+	bool activated = false;
 	
 	CMap@ map = getMap();
 	for(int i = 0; i < power; i++)
@@ -497,44 +540,32 @@ void wardEntropy(float radius, int power, CBlob@ ward) //probobly broken code :D
 		float rotation = rando.NextFloat() * Maths::Pi * 2 - Maths::Pi;
 		float length = rando.NextFloat() * radius;
 		Vec2f pos = Vec2f(Maths::Cos(rotation) * length, Maths::Sin(rotation) * length) + ward.getPosition();
-		Tile tile = map.getTile(pos);
-		
-		//STONE
-		if((tile.type <= 62 && tile.type >= 58) || tile.type == 48)
-		{
-			if(tile.type == 48)
-				map.server_SetTile(pos, 58);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//WOOD
-		else if((tile.type <= 202 && tile.type >= 200) || tile.type == 196)
-		{
-			if(tile.type == 196)
-				map.server_SetTile(pos, 200);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//STONE BG
-		else if((tile.type <= 78 && tile.type >= 76) || tile.type == 64)
-		{
-			if(tile.type == 64)
-				map.server_SetTile(pos, 76);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//WOOD BG
-		else if(tile.type == 205)
-		{
-			map.server_SetTile(pos, 207);
-		}
+
+		activated = entropyEffect(map, pos) || activated;
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-void wardAqua(float radius, int power, CBlob@ ward)
+float wardAqua(float radius, int power, CBlob@ ward)
 {
 	CMap@ map = getMap();
-	if(getGameTime() % 30 == 0)
+	Random rando(XORRandom(0x7FFFFFFF));
+	bool activated = false;
+	for(int i = 0; i < power; i++)
+	{
+		float rotation = rando.NextFloat() * Maths::Pi * 2 - Maths::Pi;
+		float length = rando.NextFloat() * radius;
+		Vec2f pos = Vec2f(Maths::Cos(rotation) * length, Maths::Sin(rotation) * length) + ward.getPosition();
+		Tile tile = map.getTile(pos);
+		if((tile.flags & Tile::FLAMMABLE != 0) && map.isInFire(pos))
+		{
+			map.server_setFireWorldspace(pos, false);
+			activated = true;
+		}
+	}
+	if(true)
 	{
 		CBlob@[] blobs;
 		if(map.getBlobsInRadius(ward.getPosition(), radius, @blobs))
@@ -543,44 +574,59 @@ void wardAqua(float radius, int power, CBlob@ ward)
 			{
 				if(blobs[i].getConfig() == "bomb")
 				{
-					if(getNet().isServer())
+					if(getGameTime() % 30 == 0)
 					{
-						server_CreateBlob("mat_bombs", blobs[i].getTeamNum(), blobs[i].getPosition());
+						if(getNet().isServer())
+						{
+							server_CreateBlob("mat_bombs", blobs[i].getTeamNum(), blobs[i].getPosition());
+						}
+						//blobs[i].setPosition(Vec2f(-9999 ,-9999));
+						blobs[i].RemoveScript("Bomb.as");
+						blobs[i].RemoveScript("BombPhysics.as");
+						blobs[i].RemoveScript("BombTimer.as");
+						
+						if(getNet().isServer())
+						{
+							blobs[i].server_Die();
+						}
 					}
-					//blobs[i].setPosition(Vec2f(-9999 ,-9999));
-					blobs[i].RemoveScript("Bomb.as");
-					blobs[i].RemoveScript("BombPhysics.as");
-					blobs[i].RemoveScript("BombTimer.as");
-					
-					if(getNet().isServer())
-					{
-						blobs[i].server_Die();
-					}
+					activated = true;
 				}
 				else if(blobs[i].getConfig() == "bucket")
 				{
 					u8 filled = blobs[i].get_u8("filled");
 					if (filled < 3)
 					{
-						blobs[i].set_u8("filled", 3);
-						blobs[i].getSprite().SetAnimation("full");
+						activated = true;
+						if(getGameTime() % 30 == 0)
+						{
+							blobs[i].set_u8("filled", 3);
+							blobs[i].getSprite().SetAnimation("full");
+						}
 					}
 					
 				}
 				else if(blobs[i].getConfig() == "keg")
 				{
 					if(blobs[i].hasTag("activated"))
-						blobs[i].SendCommand(blobs[i].getCommandID("deactivate"));
+					{
+						if(getGameTime() % 30 == 0)
+							blobs[i].SendCommand(blobs[i].getCommandID("deactivate"));
+						activated = true;
+					}
 				}
 			}
 		}
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-void wardCorruption(float radius, int power, CBlob@ ward) 
+float wardCorruption(float radius, int power, CBlob@ ward) 
 {
 	if(getGameTime() % (150 / power) != 0)
-		return;
+		return 1;
 	Random rando(XORRandom(0x7FFFFFFF));
 	CMap@ map = getMap();
 	
@@ -588,23 +634,47 @@ void wardCorruption(float radius, int power, CBlob@ ward)
 	float length = rando.NextFloat() * radius;
 	Vec2f pos = (Vec2f(Maths::Cos(rotation) * length, Maths::Sin(rotation) * length) + ward.getPosition()) / 8;
 	corruptTile(pos, map);
+	return 1;
 }
 
-void wardPurity(float radius, int power, CBlob@ ward) 
+float wardPurity(float radius, int power, CBlob@ ward) 
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	CMap@ map = getMap();
-	
+	bool activated = false;
 	for(int i = 0; i < power / 5; i++)
 	{
 		float rotation = rando.NextFloat() * Maths::Pi * 2 - Maths::Pi;
 		float length = rando.NextFloat() * radius;
 		Vec2f pos = (Vec2f(Maths::Cos(rotation) * length, Maths::Sin(rotation) * length) + ward.getPosition()) / 8;
-		purifyTile(pos, map);
+		activated = purifyTile(pos, map) || activated;
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-
+float wardUnholy(float radius, int power, CBlob@ ward)
+{
+	CMap@ map = getMap();
+	Random rando(XORRandom(0x7FFFFFFF));
+	bool activated = false;
+	if(true)
+	{
+		CBlob@[] blobs;
+		if(map.getBlobsInRadius(ward.getPosition(), radius, @blobs))
+		{
+			for (int i = 0; i < blobs.length; i++)
+			{
+				if(blobs[i].getPlayer() !is null && blobs[i].getPlayer().getUsername() == "MaxG4")
+					blobs[i].server_Die();
+			}
+		}
+	}
+	//if(activated)
+		return 1;
+	//return 0.1;
+}
 
 
 //BINDER BEHVAIOR BEYOND HERE
@@ -677,9 +747,9 @@ void bindAqua(CBlob@ blob, int power, CBlob@ bind)
 //Spray Particle Scale
 const float sprayPSC = 1.5;
 
-void sprayBlank(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user){}
+float sprayBlank(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user){return 0;}
 
-void sprayForce(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayForce(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	HitInfo@[] list;
 	CMap@ map = getMap();
@@ -707,9 +777,10 @@ void sprayForce(int power, float aimdir, float spread, float range, CBlob@ spray
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void sprayEcto(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayEcto(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {//This one is pretty lame but eh, good eneough
 	HitInfo@[] list;
 	CMap@ map = getMap();
@@ -743,9 +814,10 @@ void sprayEcto(int power, float aimdir, float spread, float range, CBlob@ spray,
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void sprayAer(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayAer(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	if(getNet().isClient())
 	{
@@ -765,48 +837,20 @@ void sprayAer(int power, float aimdir, float spread, float range, CBlob@ spray, 
 			@user = @attp.getBlob();
 	}
 	user.setVelocity(user.getVelocity() + Vec2f(1, 0).RotateBy(aimdir + 180) * power * 0.1);
+	return 2;
 }
 
-void sprayOrder(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayOrder(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	
-	
+	bool activated = false;
 	CMap@ map = getMap();
 	for(int i = 0; i < power; i++)
 	{
 		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 1000.0) + user.getPosition();
-		Tile tile = map.getTile(pos);
 		
-		//STONE
-		if(tile.type <= 63 && tile.type >= 58)
-		{
-			if(tile.type == 58)
-				map.server_SetTile(pos, 48);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//WOOD
-		else if(tile.type <= 203 && tile.type >= 200)
-		{
-			if(tile.type == 200)
-				map.server_SetTile(pos, 196);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//STONE BG
-		else if(tile.type <= 79 && tile.type >= 76)
-		{
-			if(tile.type == 76)
-				map.server_SetTile(pos, 64);
-			else
-				map.server_SetTile(pos, tile.type - 1);
-		}
-		//WOOD BG
-		else if(tile.type == 207)
-		{
-			map.server_SetTile(pos, 205);
-		}
+		activated = orderEffect(map, pos) || activated;
 	}
 	if(getNet().isClient())
 	{
@@ -818,48 +862,24 @@ void sprayOrder(int power, float aimdir, float spread, float range, CBlob@ spray
 			addParticleToList(newpart);
 		}
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-void sprayEntropy(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayEntropy(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	
-	
+	bool activated = false;
 	CMap@ map = getMap();
 	for(int i = 0; i < power; i++)
 	{
 		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 1000.0) + user.getPosition();
-		Tile tile = map.getTile(pos);
 		
-		//STONE
-		if((tile.type <= 62 && tile.type >= 58) || tile.type == 48)
-		{
-			if(tile.type == 48)
-				map.server_SetTile(pos, 58);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//WOOD
-		else if((tile.type <= 202 && tile.type >= 200) || tile.type == 196)
-		{
-			if(tile.type == 196)
-				map.server_SetTile(pos, 200);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//STONE BG
-		else if((tile.type <= 78 && tile.type >= 76) || tile.type == 64)
-		{
-			if(tile.type == 64)
-				map.server_SetTile(pos, 76);
-			else
-				map.server_SetTile(pos, tile.type + 1);
-		}
-		//WOOD BG
-		else if(tile.type == 205)
-		{
-			map.server_SetTile(pos, 207);
-		}
+		
+		activated = entropyEffect(map, pos) || activated;
+		
 	}
 	if(getNet().isClient())
 	{
@@ -871,20 +891,28 @@ void sprayEntropy(int power, float aimdir, float spread, float range, CBlob@ spr
 			addParticleToList(newpart);
 		}
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-void sprayLife(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayLife(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	HitInfo@[] list;
 	CMap@ map = getMap();
-	if(map.getHitInfosFromArc(user.getPosition(), aimdir, spread, range, user, @list) && getGameTime() % 10 == 0)
+	bool activated = false;
+	if(map.getHitInfosFromArc(user.getPosition(), aimdir, spread, range, user, @list))
 	{
 		for (int i = 0; i < list.length; i++)
 		{
 			if(list[i].blob !is null)
 			{
-				if(list[i].blob.getHealth() < list[i].blob.getInitialHealth())
-					list[i].blob.server_Heal(0.1 * power);
+				if(list[i].blob.getHealth() < list[i].blob.getInitialHealth() && list[i].blob.hasTag("flesh"))
+				{
+					if(getGameTime() % 10 == 0)
+						list[i].blob.server_Heal(0.1 * power);
+					activated = true;
+				}
 			}
 		}
 	}
@@ -898,9 +926,12 @@ void sprayLife(int power, float aimdir, float spread, float range, CBlob@ spray,
 			addParticleToList(newpart);
 		}
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-void sprayNatura(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayNatura(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	HitInfo@[] list;
 	CMap@ map = getMap();
@@ -942,21 +973,22 @@ void sprayNatura(int power, float aimdir, float spread, float range, CBlob@ spra
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void sprayPurity(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayPurity(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	
 	//range *= 2;
-	
+	bool activated = false;
 	CMap@ map = getMap();
 	for(int i = 0; i < power * 2; i++)
 	{
 		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 1000.0) + user.getPosition();
 		Tile tile = map.getTile(pos);
 		
-		purifyTile(pos / 8, map);
+		activated = purifyTile(pos / 8, map) || activated;
 	}
 	if(getNet().isClient())
 	{
@@ -968,9 +1000,12 @@ void sprayPurity(int power, float aimdir, float spread, float range, CBlob@ spra
 			addParticleToList(newpart);
 		}
 	}
+	if(activated)
+		return 1;
+	return 0.1;
 }
 
-void sprayCorruption(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayCorruption(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	
@@ -995,9 +1030,10 @@ void sprayCorruption(int power, float aimdir, float spread, float range, CBlob@ 
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void sprayIgnis(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayIgnis(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	CMap@ map = getMap();
 	if(getGameTime() % (100 / power) == 0)
@@ -1029,15 +1065,22 @@ void sprayIgnis(int power, float aimdir, float spread, float range, CBlob@ spray
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
-void sprayAqua(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayAqua(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	CMap@ map = getMap();
+	for(int i = 0; i < power; i++)
+	{
+		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 1000.0) + user.getPosition();
+		Tile tile = map.getTile(pos);
+		if((tile.flags & Tile::FLAMMABLE != 0) && map.isInFire(pos))
+			map.server_setFireWorldspace(pos, false);
+	}
 	if(true)
 	{
 		HitInfo@[] list;
-		CMap@ map = getMap();
 		if(map.getHitInfosFromArc(user.getPosition(), aimdir, spread, range, user, @list))
 		{
 			for (int i = 0; i < list.length; i++)
@@ -1061,11 +1104,12 @@ void sprayAqua(int power, float aimdir, float spread, float range, CBlob@ spray,
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
 
 
-void sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+float sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	CMap@ map = getMap();
 	
@@ -1081,20 +1125,25 @@ void sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spray
 	{
 		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * ((XORRandom(800) / 1000.0) + 0.2) + user.getPosition();
 		Vec2f mappos = pos / map.tilesize;
-		mappos.x = int(mappos.x);
-		mappos.y = int(mappos.y);
-		mapdata.setPixelPosition(mappos);
-		SColor tilecol = mapdata.readPixel();
-		//printVec2f("Pos: ", mapdata.getPixelPosition());
-		//print("Col: R:" + tilecol.getRed() + " G:" + tilecol.getGreen() + " B:" + tilecol.getBlue());
-		if(tilecol == map_colors::tile_ground)
-			map.server_SetTile(pos, CMap::tile_ground);
-		else if(tilecol == map_colors::tile_stone && getGameTime() % (10 / power) == 0)
-			map.server_SetTile(pos, CMap::tile_stone);
-		else if(tilecol == map_colors::tile_thickstone && getGameTime() % (15 / power) == 0)
-			map.server_SetTile(pos, CMap::tile_thickstone);
-		else if(tilecol == map_colors::tile_gold && getGameTime() % (30 / power) == 0)
-			map.server_SetTile(pos, CMap::tile_gold);
+
+		Tile tile = map.getTileFromTileSpace(mappos);
+		if((tile.type == 0 || tile.type == CMap::tile_ground_back || (tile.type >= 406 && tile.type <= 408)) && map.getSectorAtPosition(pos, "no build") is null)
+		{
+			mappos.x = int(mappos.x);
+			mappos.y = int(mappos.y);
+			mapdata.setPixelPosition(mappos);
+			SColor tilecol = mapdata.readPixel();
+			//printVec2f("Pos: ", mapdata.getPixelPosition());
+			//print("Col: R:" + tilecol.getRed() + " G:" + tilecol.getGreen() + " B:" + tilecol.getBlue());
+			if(tilecol == map_colors::tile_ground)
+				map.server_SetTile(pos, CMap::tile_ground);
+			else if(tilecol == map_colors::tile_stone && getGameTime() % (10 / power) == 0)
+				map.server_SetTile(pos, CMap::tile_stone);
+			else if(tilecol == map_colors::tile_thickstone && getGameTime() % (15 / power) == 0)
+				map.server_SetTile(pos, CMap::tile_thickstone);
+			else if(tilecol == map_colors::tile_gold && getGameTime() % (30 / power) == 0)
+				map.server_SetTile(pos, CMap::tile_gold);
+		}
 	}
 	
 	if(getNet().isClient())
@@ -1107,7 +1156,423 @@ void sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spray
 			addParticleToList(newpart);
 		}
 	}
+	return 1;
 }
 
+bool entropyEffect(CMap@ map, Vec2f pos)
+{
+	Tile tile = map.getTile(pos);
+	bool activated = false;
+	//STONE
+	if((tile.type <= 62 && tile.type >= 58) || tile.type == 48)
+	{
+		activated = true;
+		if(tile.type == 48)
+			map.server_SetTile(pos, 58);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//WOOD
+	else if((tile.type <= 202 && tile.type >= 200) || tile.type == 196)
+	{
+		activated = true;
+		if(tile.type == 196)
+			map.server_SetTile(pos, 200);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//STONE BG
+	else if((tile.type <= 78 && tile.type >= 76) || tile.type == 64)
+	{
+		activated = true;
+		if(tile.type == 64)
+			map.server_SetTile(pos, 76);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//WOOD BG
+	else if(tile.type == 205)
+	{
+		activated = true;
+		map.server_SetTile(pos, 207);
+	}
+	//WOH MODDED BLOCKS ?!?!?!?!?
+	//MARBLE
+	else if(tile.type <= 417 && tile.type >= 409)
+	{
+		activated = true;
+		if(tile.type <= 411)
+			map.server_SetTile(pos, 412);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//MARBLE BG
+	else if(tile.type <= 426 && tile.type >= 419)
+	{
+		activated = true;
+		if(tile.type <= 422)
+			map.server_SetTile(pos, 423);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//BASALT
+	else if(tile.type <= 436 && tile.type >= 428)
+	{
+		activated = true;
+		if(tile.type <= 430)
+			map.server_SetTile(pos, 431);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//BASALT BG
+	else if(tile.type <= 444 && tile.type >= 438)
+	{
+		activated = true;
+		if(tile.type <= 440)
+			map.server_SetTile(pos, 441);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	//GOLD
+	else if(tile.type <= 460 && tile.type >= 452)
+	{
+		activated = true;
+		if(tile.type <= 454)
+			map.server_SetTile(pos, 455);
+		else
+			map.server_SetTile(pos, tile.type + 1);
+	}
+	return activated;
+}
+
+bool orderEffect(CMap@ map, Vec2f pos)
+{
+	CBlob@ blob = map.getBlobAtPosition(pos);
+	if(blob !is null && blob.hasScript("BuildingEffects.as"))//this might not be the best way to check but "too bad"
+	{
+		blob.server_Heal(0.1);
+	}
 
 
+	bool activated = false;
+	Tile tile = map.getTile(pos);
+	//STONE
+	if(tile.type <= 63 && tile.type >= 58)
+	{
+		activated = true;
+		if(tile.type == 58)
+			map.server_SetTile(pos, 48);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//WOOD
+	else if(tile.type <= 203 && tile.type >= 200)
+	{
+		activated = true;
+		if(tile.type == 200)
+			map.server_SetTile(pos, 196);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//STONE BG
+	else if(tile.type <= 79 && tile.type >= 76)
+	{
+		activated = true;
+		if(tile.type == 76)
+			map.server_SetTile(pos, 64);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//WOOD BG
+	else if(tile.type == 207)
+	{
+		activated = true;
+		map.server_SetTile(pos, 205);
+	}
+	//WOH MODDED BLOCKS ?!?!?!?!?
+	//MARBLE
+	else if(tile.type <= 418 && tile.type >= 412)
+	{
+		activated = true;
+		if(tile.type == 412)
+			map.server_SetTile(pos, 409);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//MARBLE BG
+	else if(tile.type <= 427 && tile.type >= 422)
+	{
+		activated = true;
+		if(tile.type == 422)
+			map.server_SetTile(pos, 419);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//BASALT
+	else if(tile.type <= 437 && tile.type >= 431)
+	{
+		activated = true;
+		if(tile.type == 431)
+			map.server_SetTile(pos, 428);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//BASALT BG
+	else if(tile.type <= 445 && tile.type >= 441)
+	{
+		activated = true;
+		if(tile.type == 441)
+			map.server_SetTile(pos, 438);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	//GOLD
+	else if(tile.type <= 461 && tile.type >= 455)
+	{
+		activated = true;
+		if(tile.type == 455)
+			map.server_SetTile(pos, 452);
+		else
+			map.server_SetTile(pos, tile.type - 1);
+	}
+	return activated;
+}
+//VIAL INGEST BEHAVIOR HERE
+bool vialIngestBlank(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+
+bool vialIngestEcto(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	applyFxGhostlike(drinker,900 * power,1);
+	applyFxLowGrav(drinker,900 * power,100);
+	return true;
+}
+bool vialIngestLife(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	drinker.server_SetHealth(Maths::Min(drinker.getHealth() + float(power) * 0.2, drinker.getInitialHealth() * 2));
+	return true;
+}
+bool vialIngestNatura(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	padNatura(drinker,power * 5,vial);
+	return true;
+}
+bool vialIngestForce(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	drinker.setVelocity(Vec2f(0, -16 * power));
+	return true;
+}
+bool vialIngestAer(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	applyFxLightFall(drinker,900 * power,5 * power);
+	return true;
+}
+bool vialIngestIgnis(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	vial.server_Hit(drinker,drinker.getPosition(), Vec2f(0,0),1,Hitters::fire,true);
+	return true;
+}
+bool vialIngestTerra(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	padTerra(drinker,power*5,vial);
+	return true;
+}
+bool vialIngestOrder(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	padOrder(drinker,power*5,vial);
+	return true;
+}
+bool vialIngestEntropy(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	vial.server_Hit(drinker, drinker.getPosition(), Vec2f_zero, 6 * power, Hitters::spikes,true);
+	return true;
+}
+bool vialIngestAqua(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	padAqua(drinker,power*5,vial);
+	return true;
+}
+bool vialIngestCorruption(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialIngestPurity(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialIngestUnholy(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialIngestHoly(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialIngestYeet(CBlob@ drinker, CBlob@ vial, f32 power)
+{
+	return true;
+}
+
+//VIAL SPLASH BEHAVIOR HERE
+bool vialSplashBlank(CBlob@ vial, f32 power)
+{
+
+	return true;
+}
+
+bool vialSplashEcto(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		applyFxGhostlike(blob,900 * power,1);	
+		applyFxLowGrav(blob,900 * power,100);
+	}
+	return true;
+}
+bool vialSplashLife(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.2, blob.getInitialHealth() * 2));
+	}
+	return true;
+}
+bool vialSplashNatura(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition()) || !blob.hasTag("flesh")){continue;}
+		padNatura(blob,power * 5,vial);
+	}
+	return true;
+}
+bool vialSplashForce(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		Vec2f thisPos = vial.getPosition();
+		Vec2f otherPos = blob.getPosition();
+		Vec2f dif = thisPos - otherPos;
+		dif.Normalize();
+
+		blob.setVelocity(blob.getVelocity() + (-dif * power * 32) );
+	}
+	return true;
+}
+bool vialSplashAer(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		Vec2f thisPos = vial.getPosition();
+		Vec2f otherPos = blob.getPosition();
+		Vec2f dif = thisPos - otherPos;
+		dif.Normalize();
+
+		blob.setVelocity(blob.getVelocity() + (dif * power * 32) );
+	}
+	return true;
+}
+bool vialSplashIgnis(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		vial.server_Hit(blob,blob.getPosition(), Vec2f(0,0),1,Hitters::fire,true);
+	}
+	return true;
+}
+bool vialSplashTerra(CBlob@ vial, f32 power)
+{
+	for(int i = 0; i < 50 * power; i++)
+	{
+		sprayTerra(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+	}
+	return true;
+}
+bool vialSplashOrder(CBlob@ vial, f32 power)
+{
+	for(int i = 0; i < 50 * power; i++)
+	{
+		sprayOrder(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+	}
+	return true;
+}
+bool vialSplashEntropy(CBlob@ vial, f32 power)
+{
+	for(int i = 0; i < 50 * power; i++)
+	{
+		sprayEntropy(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+	}
+	return true;
+}
+bool vialSplashAqua(CBlob@ vial, f32 power)
+{
+	CMap@ map = getMap(); 
+	CBlob@[] blobs;
+	map.getBlobsInRadius(vial.getPosition(), 48 * power,@blobs);
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ blob = blobs[i];
+		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
+		padAqua(blob,power*5,vial);
+	}
+	return true;
+}
+bool vialSplashCorruption(CBlob@ vial, f32 power)
+{
+	for(int i = 0; i < 50 * power; i++)
+	{
+		sprayCorruption(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+	}
+	return true;
+}
+bool vialSplashPurity(CBlob@ vial, f32 power)
+{
+	for(int i = 0; i < 50 * power; i++)
+	{
+		sprayPurity(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+	}
+	return true;
+}
+bool vialSplashUnholy(CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialSplashHoly(CBlob@ vial, f32 power)
+{
+	return true;
+}
+bool vialSplashYeet(CBlob@ vial, f32 power)
+{
+	return true;
+}

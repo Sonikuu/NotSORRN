@@ -4,7 +4,8 @@
 
 // modify seed.as to make custom seed appearances
 
-#include "ProductionCommon.as"
+#include "ProductionCommon.as";
+#include "PlantGrowthData.as";
 
 CBlob@ server_MakeSeed(Vec2f atpos, string blobname, u16 growtime, u8 spriteIndex, u8 created_blob_radius)
 {
@@ -37,7 +38,12 @@ CBlob@ server_MakeSeed(Vec2f atpos, string blobname, u16 growtime)
 
 CBlob@ server_MakeSeed(Vec2f atpos, string blobname)
 {
-	if (blobname == "tree_pine")
+	CPlantGrowthData@ seeddata = @getGrowthData(blobname);
+	if(seeddata !is null)
+	{
+		return server_MakeSeed(atpos, seeddata.blobname, seeddata.growthtime, seeddata.index, seeddata.radius);
+	}
+	else if (blobname == "tree_pine")
 	{
 		return server_MakeSeed(atpos, blobname, 600, 2, 4);
 	}

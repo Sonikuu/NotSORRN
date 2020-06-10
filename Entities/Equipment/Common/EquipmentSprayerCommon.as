@@ -60,6 +60,9 @@ class CSprayerEquipment : CEquipmentCore
 							attachedPoint == "BACK_ARM" ? user.isKeyPressed(key_action2) :
 							user.isKeyPressed(key_action1);
 
+			if(equipmentBlocked(user))//Override if menu open
+				actionkey = false;
+
 			if(blob !is null)
 			{
 				angle = (((user.getAimPos() - user.getPosition()).Angle() * -1 ) + 360.0) % 360.0;
@@ -83,14 +86,15 @@ class CSprayerEquipment : CEquipmentCore
 			{
 				if(tank.storage.elements[i] >= drain && tank.storage.elements[i] != 0)
 				{
-					elementlist[i].spraybehavior(power, angle, spread, range, blob, user);
+					float minout = blob.get_f32("leftovers");
+					minout += elementlist[i].spraybehavior(power, angle, spread, range, blob, user) * drain;
 					
-					draindec += drain;
+					//draindec += drain;
 					
-					if(draindec >= 1.0)
+					//if(draindec >= 1.0)
 					{
-						tank.storage.elements[i] -= draindec;
-						draindec = 0;
+						tank.storage.elements[i] -= int(minout);
+						blob.set_f32("leftovers", minout - int(minout));
 					}
 					break;
 				}

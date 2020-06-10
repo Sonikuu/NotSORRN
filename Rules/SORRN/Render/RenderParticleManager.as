@@ -23,6 +23,8 @@ void onTick(CRules@ this)
 			i--;
 		}
 	}
+	//if(getGameTime() % 30 == 0)
+	//	print("Particles: " + prlist.length);
 }
 
 void onRender(CRules@ this)
@@ -37,7 +39,7 @@ void onRender(CRules@ this)
 		prlist[i].appendVerts(@vertlist);
 	}
 	//if(getGameTime() % 90 == 0)
-		//printInt("ProjectleCount: ", prlist.length());
+	//	printInt("VertsCount: ", vertlist.length());
 	addRenderToExistingRender(RenderList(@vertlist, "Rules/Render/PixelWhite.png"));
 }
 
