@@ -18,6 +18,11 @@ class CRespawnData
 
 void onInit(CRules@ this)
 {
+    if(!isServer())
+    {
+		return;
+    }
+
 	array<CRespawnData@> spawnqueue(0);
 	this.set("spawnqueue", @spawnqueue);
 	
@@ -28,35 +33,37 @@ void onInit(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	if(!getNet().isServer())
+	if(!isServer())
+    {
 		return;
-	if(getNet().isServer())
-	{
-		array<CRespawnData@>@ spawnqueue;
-		this.get("spawnqueue", @spawnqueue);
-		if(spawnqueue !is null)
-		{
-			for (int i = 0; i < spawnqueue.length; i++)
-			{
-				//We live again!
-				if(spawnqueue[i].respawntime <= getGameTime())
-				{	
-					CPlayer@ player = getPlayerByUsername(spawnqueue[i].playername);
-					if(player !is null && player.getBlob() is null)
-						spawnPlayer(this, player);
-					spawnqueue.removeAt(i);
-					i--;
-					continue;
-				}
-			}
-		}
-	}
+    }
+    
+    array<CRespawnData@>@ spawnqueue;
+    this.get("spawnqueue", @spawnqueue);
+    if(spawnqueue !is null)
+    {
+        for (int i = 0; i < spawnqueue.length; i++)
+        {
+            //We live again!
+            if(spawnqueue[i].respawntime <= getGameTime())
+            {	
+                CPlayer@ player = getPlayerByUsername(spawnqueue[i].playername);
+                if(player !is null && player.getBlob() is null)
+                    spawnPlayer(this, player);
+                spawnqueue.removeAt(i);
+                i--;
+                continue;
+            }
+        }
+    }
 }
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	if(!getNet().isServer())
+	if(!isServer())
+    {
 		return;
+    }
 
 	CBlob@[] blobs;
 	getBlobsByTag(player.getUsername() + "'s soulless",@blobs);
@@ -87,8 +94,11 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 //If we dont do this nobody spawns on nextmap lel
 void onRestart(CRules@ this)
 {
-	if(!getNet().isServer())
+	if(!isServer())
+    {
 		return;
+    }
+    
 	for (int i = 0; i < getPlayersCount(); i++)
 	{
 		CPlayer@ targPlayer = getPlayer(i);
@@ -116,7 +126,7 @@ void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData
     //Note: this means still living blobs can be put in the respawn queue... there were some issues with not
 	//respawning, so we're gonna play it safe
     CBlob@ blob = victim.getBlob();
-    if(blob !is null)
+    if(blob != null && blob.getName() != "")
     {
         string blobname = getRespawnBlob(blob);
         if(blobname != "")
@@ -131,10 +141,14 @@ void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData
             params.write_u16(victim.getNetworkID());
             newblob.SendCommand(newblob.getCommandID("sync"), params);*/
             
-            newblob.set_u32("syncat", getGameTime() + 1);
-            newblob.set_u16("syncid", victim.getNetworkID());
+            //newblob.set_u32("syncat", getGameTime() + 1);
+            //newblob.set_u16("syncid", victim.getNetworkID());
             
-            newblob.server_SetPlayer(victim);
+            if(newblob != null && newblob.getName() != "")
+            {
+                blob.server_Die();
+                newblob.server_SetPlayer(victim);
+            }
         }
         else
         {
@@ -171,8 +185,10 @@ void onSetPlayer( CRules@ this, CBlob@ blob, CPlayer@ player )
 
 void spawnPlayer(CRules@ this, CPlayer@ player)
 {
-	if(!getNet().isServer())
+	if(!isServer())
+    {
 		return;
+    }
 	CBlob@[] spawns;
 	//Change bush to spawncave once implemented
 	//Actually we can have this function take a bloblist instead and have each player have their own spawn places
@@ -225,8 +241,10 @@ void spawnPlayer(CRules@ this, CPlayer@ player)
 
 void addRespawnQueue(CRules@ this, CPlayer@ player)
 {
-	if(!getNet().isServer())
+	if(!isServer())
+    {
 		return;
+    }
 	array<CRespawnData@>@ spawnqueue;
 	this.get("spawnqueue", @spawnqueue);
 	if(spawnqueue !is null && player !is null)
