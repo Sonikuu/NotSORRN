@@ -106,41 +106,46 @@ void onRestart(CRules@ this)
 //Nobody knows
 void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
 {
-	if(!getNet().isServer())
+	if(!isServer())
+    {
 		return;
-	//print("playerDie");
-	addRespawnQueue(this, victim);
-	//Note: this means still living blobs can be put in the respawn queue... there were some issues with not
+    }
+    //print("playerDie");
+	//addRespawnQueue(this, victim);
+	
+    //Note: this means still living blobs can be put in the respawn queue... there were some issues with not
 	//respawning, so we're gonna play it safe
-	if(getNet().isServer())
-	{
-		CBlob@ blob = victim.getBlob();
-		if(blob !is null)
-		{
-			string blobname = getRespawnBlob(blob);
-			if(blobname != "")
-			{
-				CBlob@ newblob = server_CreateBlob(blobname, blob.getTeamNum(), blob.getPosition());
+    CBlob@ blob = victim.getBlob();
+    if(blob !is null)
+    {
+        string blobname = getRespawnBlob(blob);
+        if(blobname != "")
+        {
+            CBlob@ newblob = server_CreateBlob(blobname, blob.getTeamNum(), blob.getPosition());
 
-				//blob_swap(blob, newblob);
-				//addElement(newblob, "ecto", getElement(newblob,"life"));
-				//setElement(newblob,"life",0);
-				
-				/*CBitStream params;
-				params.write_u16(victim.getNetworkID());
-				newblob.SendCommand(newblob.getCommandID("sync"), params);*/
-				
-				newblob.set_u32("syncat", getGameTime() + 1);
-				newblob.set_u16("syncid", victim.getNetworkID());
-				
-				//newblob.server_SetPlayer(victim);
-			}
-			//else
-				//addRespawnQueue(this, victim);
-		}
-		//else
-			//addRespawnQueue(this, victim);
-	}
+            //blob_swap(blob, newblob);
+            //addElement(newblob, "ecto", getElement(newblob,"life"));
+            //setElement(newblob,"life",0);
+            
+            /*CBitStream params;
+            params.write_u16(victim.getNetworkID());
+            newblob.SendCommand(newblob.getCommandID("sync"), params);*/
+            
+            newblob.set_u32("syncat", getGameTime() + 1);
+            newblob.set_u16("syncid", victim.getNetworkID());
+            
+            newblob.server_SetPlayer(victim);
+        }
+        else
+        {
+            addRespawnQueue(this, victim);
+        }
+    }
+    else
+    {
+        error("Something happened. SORRNRespawn.as");
+        addRespawnQueue(this, victim);
+    }
 }
 
 //This is going to be used to cause dead players to turn into ghosts and junk
@@ -149,7 +154,19 @@ string getRespawnBlob(CBlob@ deadblob)
 {
 	//if(deadblob.getConfig() == "knight" || deadblob.getConfig() == "builder" || deadblob.getConfig() == "crate")
 		//return "ghost";
+    string turn_on_death = deadblob.get_string("turn_on_death");
+    if(turn_on_death.size() > 0)
+    {
+        return turn_on_death;
+    }
 	return "";
+}
+
+void onSetPlayer( CRules@ this, CBlob@ blob, CPlayer@ player )
+{
+    //blob.set_string("turn_on_death", "golemites");
+    //Testing - Numan
+    
 }
 
 void spawnPlayer(CRules@ this, CPlayer@ player)
