@@ -255,7 +255,11 @@ class CConsume : CAbilityBase
                     blob.server_Heal(healAmmount == 0 ? 1 : healAmmount);
                     held.server_Die();
                     stomachItems++;
-                }
+                } else if (itemName == "golemitedust")
+				{
+					held.server_Die();
+					blob.set_string("turn_on_death", "golemites");
+				}
                 else if(itemName == "nothing") {addToMyChat("You prepare to take a big bite but then chop down on nothing\nYou can't eat nothing");}
                 if(stomachItems > stomachItemsBefore){nomSound(held);}
             }
