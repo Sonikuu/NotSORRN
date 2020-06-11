@@ -553,13 +553,17 @@ class COvertake : CAbilityBase
 			}
 			else
 			{
-				CBlob@ n = server_CreateBlob("golemites",blob.getTeamNum(),blob.getPosition());
-				n.set_s32("golemiteCount",blob.get_s32("golemiteCount"));
-				n.server_SetPlayer(blob.getPlayer());
+				if(isServer())
+				{
+					CBlob@ n = server_CreateBlob("golemites",blob.getTeamNum(),blob.getPosition());
+					n.set_s32("golemiteCount",blob.get_s32("golemiteCount"));
+					n.sync("golemiteCount",true);
+					n.server_SetPlayer(blob.getPlayer());
 
-				CAbilityManager@ manager;
-				blob.get("AbilityManager",@manager);
-				manager.abilityMenu.removeAbilityByName("Overtake");
+					CAbilityManager@ manager;
+					blob.get("AbilityManager",@manager);
+					manager.abilityMenu.removeAbilityByName("Overtake");
+				}
 			}
 		}
 	}
