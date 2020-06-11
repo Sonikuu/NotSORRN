@@ -548,6 +548,7 @@ class COvertake : CAbilityBase
 					b.set_s32("golemiteCount", blob.get_s32("golemiteCount"));
 					b.server_setTeamNum(blob.getTeamNum());
 					b.server_SetPlayer(blob.getPlayer());
+					b.set_string("turn_on_death","golemites");
 					blob.server_Die();
 				}
 			}
@@ -559,6 +560,7 @@ class COvertake : CAbilityBase
 					n.set_s32("golemiteCount",blob.get_s32("golemiteCount"));
 					n.Sync("golemiteCount",true);
 					n.server_SetPlayer(blob.getPlayer());
+					blob.set_string("turn_on_death","");
 
 					CAbilityManager@ manager;
 					blob.get("AbilityManager",@manager);
