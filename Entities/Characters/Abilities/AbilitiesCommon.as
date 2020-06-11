@@ -276,6 +276,8 @@ class CConsume : CAbilityBase
 				{
 					held.server_Die();
 					blob.set_string("turn_on_death", "golemites");
+					blob.set_s32("golemiteCount",500);
+					manager.abilityMenu.addAbility(EAbilities::Overtake);
 				}
                 else if(itemName == "nothing") {addToMyChat("You prepare to take a big bite but then chop down on nothing\nYou can't eat nothing");}
                 if(stomachItems > stomachItemsBefore){nomSound(held);}
@@ -447,13 +449,138 @@ class CAbsorb : CAbilityBase
 	}
 }
 
+class COvertake : CAbilityBase
+{
+	COvertake(string _textureName, CBlob@ _blob)
+	{
+		super(_textureName,_blob);
+
+		blob.addCommandID("Overtake_overtake");
+	}
+
+	string[] overtakeables =
+	{
+		"builder"
+	};
+
+	CBlob@ getNearbyOvertakable()
+	{
+		CMap@ m = getMap();
+		CBlob@[] blobs;
+
+		m.getBlobsInRadius(blob.getPosition(),24,@blobs);
+
+		int index = -1;
+		f32 best = 9999999999;
+
+		for(int i = 0; i < blobs.size(); i++)
+		{
+			bool overtakeable = false;
+			for(int j = 0; j < overtakeables.size(); j++)
+			{
+				if(overtakeables[j] == blobs[i].getConfig())
+				{
+					overtakeable = true;
+					break;
+				}
+			}
+			if(!overtakeable){continue;}
+			f32 dist = blobs[i].getDistanceTo(blob);
+			if(dist < best)
+			{
+				best = dist;
+				index = i;
+			}
+		}
+
+		if(index > -1)
+		{
+			return blobs[index];
+		}
+		return null;
+	}
+
+	void onRender(CSprite@ sprite)
+	{
+		if(blob.getConfig() == "golemites")
+		{
+			CAbilityManager@ manager;
+			blob.get("AbilityManager",@manager);
+
+			if(manager.abilityBar.getSelectedAbility().getName() == "Overtake")
+			{
+				CBlob@ b = getNearbyOvertakable();
+				if(b !is null)
+				{
+					GUI::DrawArrow(blob.getPosition(), b.getPosition(), SColor(255,127,60,30));
+				}
+			}
+		}
+	}
+
+	string getName(){return "Overtake";}
+	string getDescription(){return "Attempt to contorol a nearby creature or object";}
+
+	void activate() override
+	{
+		blob.SendCommand(blob.getCommandID("Overtake_overtake"));
+	}
+
+	void onCommand(u8 cmd, CBitStream@ params) override
+	{
+		if(cmd == blob.getCommandID("Overtake_overtake"))
+		{
+			if(blob.getConfig() == "golemites")
+			{
+				CBlob@ b = getNearbyOvertakable();
+				if(b !is null)
+				{
+					if(b.getPlayer() !is null)
+					{
+						addToMyChat("You attempt to control the nearby body but it's soul fights back");
+						return;
+					}
+
+					CAbilityManager@ manager;
+					b.get("AbilityManager",@manager);
+					manager.abilityMenu.addAbility(EAbilities::Overtake);
+
+					b.set_s32("golemiteCount", blob.get_s32("golemiteCount"));
+					b.server_setTeamNum(blob.getTeamNum());
+					b.server_SetPlayer(blob.getPlayer());
+					blob.server_Die();
+				}
+			}
+			else
+			{
+				CBlob@ n = server_CreateBlob("golemites",blob.getTeamNum(),blob.getPosition());
+				n.set_s32("golemiteCount",blob.get_s32("golemiteCount"));
+				n.server_SetPlayer(blob.getPlayer());
+
+				CAbilityManager@ manager;
+				blob.get("AbilityManager",@manager);
+				manager.abilityMenu.removeAbilityByName("Overtake");
+			}
+		}
+	}
+
+	void addToMyChat(string msg)
+    {
+        if(blob.isMyPlayer())
+        {
+            client_AddToChat(msg, SColor(255,60,60,255));
+        }
+    }
+}
+
 enum EAbilities
 {
 	Empty = 0,
 	Point = 1,
 	Consume = 2,
 	SelfDestruct = 3,
-	Absorb = 4
+	Absorb = 4,
+	Overtake = 5
 }
 
 class CAbilityMasterList
@@ -470,7 +597,8 @@ class CAbilityMasterList
 			CPoint("abilityPoint.png",blob),
 			CConsume("abilityConsume.png",blob),
 			CSelfDestruct("abilitySelfDestruct",blob),
-			CAbsorb("abilityAbsorb.png",blob)
+			CAbsorb("abilityAbsorb.png",blob),
+			COvertake("abilityOvertake.png",blob)
 		};
 		abilities = _abilities;//I can't figure out how to do an array litteral outside of right when you create a var so I just copy it into the main one
 	}

@@ -25,8 +25,11 @@ void onInit(CBlob@ this)
 
 	manager.abilityMenu.addAbility(EAbilities::Point);
 	manager.abilityMenu.addAbility(EAbilities::Absorb);
+	manager.abilityMenu.addAbility(EAbilities::Overtake);
 
 	manager.abilityBar.setSlot(0,EAbilities::Point);
 	manager.abilityBar.setSlot(1,EAbilities::Absorb);
+	manager.abilityBar.setSlot(2,EAbilities::Overtake);
+
 
 }
