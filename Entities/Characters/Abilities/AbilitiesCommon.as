@@ -17,6 +17,7 @@ interface IAbility
     void onCommand(u8 cmd, CBitStream @params);
     string getBorder();
     string getDescription();
+	string getName();
 }
 
 class CAbilityBase : IAbility
@@ -24,6 +25,7 @@ class CAbilityBase : IAbility
     void onTick(){}
 	void onDie(){}
 	void onInit(){}
+	string name = "CABilityBase";
     string getBorder(){return border;}
     string textureName;
     string border = "Border.png";
@@ -33,6 +35,7 @@ class CAbilityBase : IAbility
     string getTextureName() {return textureName;}
     string getDescription(){return description;}
     CBlob@ getBlob() {return blob;}
+	string getName(){return name;}
 
 
     CAbilityBase(string _textureName, CBlob@ _blob)
@@ -64,8 +67,12 @@ class CAbilityEmpty : CAbilityBase
 
     string getDescription() override
     {
-        return "Empty";
+        return "Does nothing";
     }
+	string getName() override
+	{
+		return "Empty";
+	}
 }
 
 class CToggleableAbillityBase : CAbilityBase
@@ -108,8 +115,14 @@ class CPoint : CAbilityBase
 
     string getDescription() override
     {
-        return "Point";
+        return "Draws arrow to cursor for all to see";
     }
+
+	string getName() override
+	{
+		return "Point";
+	}
+
 
     void activate() override
     {
@@ -148,10 +161,14 @@ class CConsume : CAbilityBase
         super(_textureName,_blob);
         blob.addCommandID("CONSUME_held_item");
     }
-    string getDescription() override
+    string getName() override
     {
         return "Consume";
     }
+	string getDescription() override
+	{
+		return "Eats currently held item if you aren't full";
+	}
 
     void activate() override
     {
@@ -351,8 +368,12 @@ class CSelfDestruct : CAbilityBase
 
     string getDescription() override
     {
-        return "Self Destruct";
+        return "Explode on command dealing extra damage to enemies";
     }
+	string getName() override
+	{
+		return "Self Destruct";
+	}
 
     void activate() override
     {
@@ -379,13 +400,60 @@ class CSelfDestruct : CAbilityBase
 	}
 }
 
+class CAbsorb : CAbilityBase
+{
+	CAbsorb(string _textureName, CBlob@ _blob)
+	{
+		super(_textureName, _blob);
+
+		blob.addCommandID("Absorb_activate");
+	}
+
+	void activate() override
+	{
+		blob.SendCommand(blob.getCommandID("Absorb_activate"));
+	}
+
+	string getDescription()
+	{
+		return "Absorbs stone or sand to increase your golemite count";
+	}
+
+	string getName()
+	{
+		return "Absorb";
+	}
+
+	void onCommand(u8 cmd, CBitStream@ params)
+	{
+		if(cmd == blob.getCommandID("Absorb_activate"))
+		{
+			if(blob.get_s32("golemiteCount") == blob.get_s32("golemiteMax")){return;}
+
+			CMap@ m = getMap();
+			CBlob@[] blobs;
+			m.getBlobsInRadius(blob.getPosition(),24,@blobs);
+			for(int i = 0; i < blobs.size(); i++)
+			{
+				CBlob@ b = blobs[i];
+				if(b.getConfig() == "mat_stone" || b.getConfig() == "mat_sand")
+				{
+					blob.set_s32("golemiteCount",Maths::Min(blob.get_s32("golemiteMax"), blob.get_s32("golemiteCount") + b.getQuantity()));
+					b.server_Die();
+					break;
+				}
+			}
+		}
+	}
+}
 
 enum EAbilities
 {
 	Empty = 0,
 	Point = 1,
 	Consume = 2,
-	SelfDestruct = 3
+	SelfDestruct = 3,
+	Absorb = 4
 }
 
 class CAbilityMasterList
@@ -401,7 +469,8 @@ class CAbilityMasterList
 			CAbilityEmpty(),
 			CPoint("abilityPoint.png",blob),
 			CConsume("abilityConsume.png",blob),
-			CSelfDestruct("abilitySelfDestruct",blob)
+			CSelfDestruct("abilitySelfDestruct",blob),
+			CAbsorb("abilityAbsorb.png",blob)
 		};
 		abilities = _abilities;//I can't figure out how to do an array litteral outside of right when you create a var so I just copy it into the main one
 	}
@@ -433,8 +502,8 @@ class CAbilityBar
 	private f32 backgroundThickness = 4;
 	private u32 selectedSlot = 0;
 	private u32[] slots = {
-		EAbilities::Point,
-		EAbilities::Consume,
+		EAbilities::Empty,
+		EAbilities::Empty,
 		EAbilities::Empty,
 		EAbilities::Empty,
 		EAbilities::Empty
@@ -587,9 +656,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	s32 heldItem = -1;
 
 	u32[] list = {
-		EAbilities::Empty,
-		EAbilities::Point,
-		EAbilities::Consume
+		EAbilities::Empty
 	};
 
 	CAbilityMenu(CAbilityMasterList@ _masterList, CAbilityBar@ _bar, CBlob@ _blob)
@@ -621,12 +688,29 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		return masterList.getAbility(list[i]);
 	}
 
-	void onTick()
+	void removeAbilityByName(string s)
 	{
 		for(int i = 0; i < list.size(); i++)
 		{
-			masterList.getAbility(list[i]).onTick();
+			if(getAbility(i).getName() == s)
+			{
+				list.erase(i);
+				i--;
+			}
 		}
+	}
+
+	void onTick()
+	{
+		string s = "{\n";
+		for(int i = 0; i < list.size(); i++)
+		{
+			masterList.getAbility(list[i]).onTick();
+
+			s += list[i] + '\n';
+		}
+		if(getControls().isKeyPressed(KEY_KEY_H))
+		print(s + '}');
 
 		if(blob.isMyPlayer())
 		{
@@ -660,7 +744,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 			{
 				if(menuOpen && heldItem > -1)
 				{
-					bar.setHoveredSlot(heldItem);
+					bar.setHoveredSlot(list[heldItem]);
 					heldItem = -1;
 				}
 			}
@@ -705,7 +789,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 			list.clear();
 			for(int i = 0; i < size; i++)
 			{
-				list.push_back(i);
+				list.push_back(params.read_u32());
 
 				if(!contains(oldList, i))
 				{
