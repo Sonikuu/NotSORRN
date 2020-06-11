@@ -192,7 +192,7 @@ void InitWorkshop(CBlob@ this)
 		AddIconToken("$vial$", "vial.png", Vec2f(8, 8), 0);
 	}
 	{
-		ShopItem@ s = addShopItem(this,  "Golemite Dust", "$golemitedust$", "GolemiteDust", "A mysterious substance that wiggles when you touch it", false);
+		ShopItem@ s = addShopItem(this,  "Golemite Dust", "$golemitedust$", "golemitedust", "A mysterious substance that wiggles when you touch it", false);
 		AddRequirement(s.requirements, "blob", "mat_purifiedgold", "Purified Gold", 1);
 		AddRequirement(s.requirements, "blob", "mat_sand", "Sand", 250);
 		
