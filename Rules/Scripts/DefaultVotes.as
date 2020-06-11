@@ -856,7 +856,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params)
 
 	if (cmd == this.getCommandID(votekick_id))
 	{
-		u16 playerid, byplayerid;
+		/*u16 playerid, byplayerid;
 		string reason;
 
 		if (!params.saferead_u16(playerid)) return;
@@ -867,7 +867,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params)
 		CPlayer@ byplayer = getPlayerByNetworkId(byplayerid);
 
 		if (player !is null && byplayer !is null)
-			Rules_SetVote(this, Create_Votekick(player, byplayer, reason));
+			Rules_SetVote(this, Create_Votekick(player, byplayer, reason));*/
 	}
 	else if (cmd == this.getCommandID(votenextmap_id))
 	{
@@ -886,7 +886,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params)
 	}
 	else if (cmd == this.getCommandID(votesurrender_id))
 	{
-		u16 byplayerid;
+		/*u16 byplayerid;
 
 		if (!params.saferead_u16(byplayerid)) return;
 
@@ -895,11 +895,11 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params)
 		if (byplayer !is null)
 			Rules_SetVote(this, Create_VoteSurrender(byplayer));
 
-		g_lastNextmapCounter = 0;
+		g_lastNextmapCounter = 0;*/
 	}
 	else if (cmd == this.getCommandID(votescramble_id))
 	{
-		u16 byplayerid;
+		/*u16 byplayerid;
 
 		if (!params.saferead_u16(byplayerid)) return;
 
@@ -908,6 +908,6 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params)
 		if (byplayer !is null)
 			Rules_SetVote(this, Create_VoteScramble(byplayer));
 
-		g_lastNextmapCounter = 0;
+		g_lastNextmapCounter = 0;*/
 	}
 }
