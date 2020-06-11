@@ -69,7 +69,7 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 	getBlobsByTag(player.getUsername() + "'s soulless",@blobs);
 	if(blobs.size() > 0)
 	{
-		if(!blobs[0].hasTag("dead"))
+		if(!blobs[0].hasTag("dead") && blobs[0].getPlayer() is null)
 		{
 			blobs[0].server_SetPlayer(player);
 			player.server_setTeamNum(blobs[0].getTeamNum());
