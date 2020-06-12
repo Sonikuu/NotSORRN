@@ -561,11 +561,10 @@ class COvertake : CAbilityBase
 					n.Sync("golemiteCount",true);
 					n.server_SetPlayer(blob.getPlayer());
 					blob.set_string("turn_on_death","");
-
-					CAbilityManager@ manager;
-					blob.get("AbilityManager",@manager);
-					manager.abilityMenu.removeAbilityByName("Overtake");
 				}
+				CAbilityManager@ manager;
+				blob.get("AbilityManager",@manager);
+				manager.abilityMenu.removeAbilityByName("Overtake");
 			}
 		}
 	}
