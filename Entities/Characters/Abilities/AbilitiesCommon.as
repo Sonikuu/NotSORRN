@@ -519,7 +519,7 @@ class COvertake : CAbilityBase
 	}
 
 	string getName(){return "Overtake";}
-	string getDescription(){return "Attempt to contorol a nearby creature or object";}
+	string getDescription(){return "Attempt to control a nearby creature or object";}
 
 	void activate() override
 	{
