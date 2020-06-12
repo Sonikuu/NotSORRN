@@ -67,7 +67,7 @@ class CAbilityEmpty : CAbilityBase
 
     string getDescription() override
     {
-        return "Does nothing";
+        return "Does absolutely nothing";
     }
 	string getName() override
 	{
@@ -1052,6 +1052,12 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 					{
 						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,getItemPos(i),fDrawScale);
 					}
+				}
+
+				if(getHoveredItem() > -1)
+				{
+					string desc = getAbility(getHoveredItem()).getDescription();
+					GUI::DrawText(desc, getControls().getMouseScreenPos() + Vec2f(64,0), Vec2f( 7 * desc.size(), getFontHeight() + 2), SColor(255,0,0,0), true, true,true);
 				}
 
 				//held icon
