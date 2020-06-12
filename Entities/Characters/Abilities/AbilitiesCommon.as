@@ -478,7 +478,7 @@ class COvertake : CAbilityBase
 			bool overtakeable = false;
 			for(int j = 0; j < overtakeables.size(); j++)
 			{
-				if(overtakeables[j] == blobs[i].getConfig())
+				if(overtakeables[j] == blobs[i].getConfig() && !blobs[i].hasTag("dead") && blobs[i].getPlayer() is null)
 				{
 					overtakeable = true;
 					break;
