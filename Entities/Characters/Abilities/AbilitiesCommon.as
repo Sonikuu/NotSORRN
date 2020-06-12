@@ -853,15 +853,10 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 
 	void onTick()
 	{
-		string s = "{\n";
 		for(int i = 0; i < list.size(); i++)
 		{
 			masterList.getAbility(list[i]).onTick();
-
-			s += list[i] + '\n';
 		}
-		if(getControls().isKeyPressed(KEY_KEY_H))
-		print(s + '}');
 
 		if(blob.isMyPlayer())
 		{
