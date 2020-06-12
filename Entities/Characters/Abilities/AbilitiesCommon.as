@@ -747,12 +747,28 @@ class CAbilityBar
 			}
 		}
 	}
-	
+	Vec2f getBarEndPos()
+	{
+		return getSlotPosition(slots.length - 1) + slotDimentions * fRealScale + Vec2f(backgroundThickness,backgroundThickness);
+	}
+	Vec2f getNameDrawStartPos()
+	{
+		CAbilityManager@ m;
+		blob.get("AbilityManager",@m);
+		return m.abilityMenu.menuOpenTargetPos+
+		Vec2f(m.abilityMenu.menuButtonDimentions.x*fRealScale,0);
+	}
+	Vec2f getNameDrawEndPos()
+	{
+		CAbilityManager@ m;
+		blob.get("AbilityManager",@m);
+		return Vec2f(getBarEndPos().x,m.abilityMenu.menuButtonDimentions.y * fRealScale + m.abilityMenu.menuOpenTargetPos.y);
+	}
 	void onRender()
 	{
 		if(blob.isMyPlayer())
 		{
-			GUI::DrawRectangle(initialBarOffset - Vec2f(backgroundThickness,-1), getSlotPosition(slots.length - 1) + slotDimentions * fRealScale + Vec2f(backgroundThickness,backgroundThickness) ); //draw background
+			GUI::DrawRectangle(initialBarOffset - Vec2f(backgroundThickness,-1), getBarEndPos()  ); //draw background
 
 			for(int i = 0; i < slots.size(); i++)//draw individual slots
 			{
@@ -769,6 +785,8 @@ class CAbilityBar
 			}
 
 			GUI::DrawIcon(getSelectedAbility().getBorder(),0,borderDimentions,getSlotPosition(selectedSlot) + borderOffset,fDrawScale);
+			GUI::DrawRectangle(getNameDrawStartPos(),getNameDrawEndPos());
+			GUI::DrawTextCentered(getSelectedAbility().getName(), (getNameDrawStartPos() + getNameDrawEndPos())/2, SColor(255,0,0,0));
 		}
 	}
 
@@ -779,12 +797,12 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	CAbilityMasterList@ masterList;
 	CAbilityBar@ bar;
 	CBlob@ blob;
-	private Vec2f menuStartPos = Vec2f(5,52);
-	private Vec2f menuOpenTargetPos = Vec2f(5,52);
-	private Vec2f menuClosedTargetPos; //set in constructor to prevent null poitner access
-	private Vec2f menuCurrentPos = Vec2f(0,0);
-	private Vec2f menuButtonDimentions = Vec2f(32,16);
-	private int columns = 5;
+	Vec2f menuStartPos = Vec2f(5,52);
+	Vec2f menuOpenTargetPos = Vec2f(5,52);
+	Vec2f menuClosedTargetPos; //set in constructor to prevent null poitner access
+	Vec2f menuCurrentPos = Vec2f(0,0);
+	Vec2f menuButtonDimentions = Vec2f(32,16);
+	int columns = 5;
 	bool menuOpen = false;
 	s32 heldItem = -1;
 
