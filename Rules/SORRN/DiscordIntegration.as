@@ -186,6 +186,14 @@ void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData
 		tcpr("discordchat SYSTEM SYSTEM " + victim.getCharacterName() + " died!");
 	}
 }
+void onNewPlayerJoin( CRules@ this, CPlayer@ player )
+{
+	tcpr("discordchat SYSTEM SYSTEM " + player.getCharacterName() + " joined the server!");
+}
+void onPlayerLeave( CRules@ this, CPlayer@ player )
+{
+	tcpr("discordchat SYSTEM SYSTEM " + player.getCharacterName() + " left the server.");
+}
 
 /*void discordChat(string input)
 {
