@@ -735,6 +735,7 @@ class CAbilityBar
 			if(controls.isKeyJustPressed(KEY_KEY_B))
 			{
 				activateSelectedAbility();
+				getRules().set_bool("activated_once",true);
 			}
 
 			if(controls.isKeyPressed(KEY_LSHIFT))
@@ -787,6 +788,11 @@ class CAbilityBar
 			GUI::DrawIcon(getSelectedAbility().getBorder(),0,borderDimentions,getSlotPosition(selectedSlot) + borderOffset,fDrawScale);
 			GUI::DrawRectangle(getNameDrawStartPos(),getNameDrawEndPos());
 			GUI::DrawTextCentered(getSelectedAbility().getName(), (getNameDrawStartPos() + getNameDrawEndPos())/2, SColor(255,0,0,0));
+			
+			if(!getRules().get_bool("activated_once") || u_showtutorial) 
+			{
+				GUI::DrawText("Press B to activate ability! Click to navigate GUI", getSlotPosition(slots.size() -1) + Vec2f(36,16), SColor(255,127,127,127));
+			}
 		}
 	}
 
