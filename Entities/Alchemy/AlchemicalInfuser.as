@@ -85,6 +85,16 @@ array<CAlchemyInfuse@> infuserecipes =
 	1,//output amount
 	150//processing time
 	),
+
+	@CAlchemyInfuse(
+	"life",//input element
+	"builder",//input item
+	"builder",//output item
+	250,//element amount
+	1,//item amount
+	1,//output amount
+	300//processing time
+	),
 	
 	//Can duplicate items sometimes...?
 	//Might have to have it merge with a stack if possible instead?
