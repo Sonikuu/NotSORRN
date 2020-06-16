@@ -2,7 +2,7 @@
 
 #include "CHitters.as";
 
-void corruptTile(Vec2f tilepos, CMap@ map)
+shared void corruptTile(Vec2f tilepos, CMap@ map)
 {
 	if(isServer())
 	{
@@ -110,7 +110,7 @@ void corruptTick(Vec2f tilepos, CMap@ map)
 	}
 }
 
-bool purifyTile(Vec2f tilepos, CMap@ map)
+shared bool purifyTile(Vec2f tilepos, CMap@ map)
 {
 	//if(isServer())
 	{

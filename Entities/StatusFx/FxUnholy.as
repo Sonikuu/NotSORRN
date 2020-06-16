@@ -1,34 +1,37 @@
 //UNHOLY effect
-string uhscriptname = "FxUnholyTick";
 
+namespace FxUnholy {
 
-void applyFxUnholy(CBlob@ blob, int time, int power)
-{
-	if(!blob.hasScript("FxHook"))
-		return;
-	if(blob.get_u16("fxunholytime") > 0)
+	shared string scriptname() {return "FxUnholyTick";}
+	shared void apply(CBlob@ blob, int time, int power)
 	{
-		if(blob.get_u16("fxunholypower") <= power)
+		if(!blob.hasScript("FxHook"))
+			return;
+		if(blob.get_u16("fxunholytime") > 0)
+		{
+			if(blob.get_u16("fxunholypower") <= power)
+			{
+				blob.set_u16("fxunholytime", time);
+				blob.set_u16("fxunholypower", power);
+			}
+		}
+		else
 		{
 			blob.set_u16("fxunholytime", time);
 			blob.set_u16("fxunholypower", power);
+			blob.AddScript(scriptname());
+			CSprite@ sprite = blob.getSprite();
+			if(sprite !is null)
+				sprite.AddScript(scriptname());
 		}
 	}
-	else
+
+	void remove(CBlob@ blob)
 	{
-		blob.set_u16("fxunholytime", time);
-		blob.set_u16("fxunholypower", power);
-		blob.AddScript(uhscriptname);
+		blob.RemoveScript(scriptname());
 		CSprite@ sprite = blob.getSprite();
 		if(sprite !is null)
-			sprite.AddScript(uhscriptname);
+			sprite.RemoveScript(scriptname());
 	}
-}
 
-void removeFxUnholy(CBlob@ blob)
-{
-	blob.RemoveScript(uhscriptname);
-	CSprite@ sprite = blob.getSprite();
-	if(sprite !is null)
-		sprite.RemoveScript(uhscriptname);
 }

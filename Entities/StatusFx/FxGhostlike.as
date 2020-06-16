@@ -1,43 +1,46 @@
 //Damage reduction status
 
 //#include "FxLowGrav.as";
+namespace FxGhostlike {
 
-string scriptnameghost = "FxGhostlikeTick";
+	shared string scriptname() {return "FxGhostlikeTick";}
 
-void applyFxGhostlike(CBlob@ blob, int time, int power)
-{
-	CShape@ shape = blob.getShape();
-	if(!blob.exists("ghostliketogglecoll") && shape !is null)
+	shared void apply(CBlob@ blob, int time, int power)
 	{
-		blob.set_bool("ghostliketogglecoll", shape.getConsts().mapCollisions);
-	}
-	if(blob.hasScript(scriptnameghost))
-	{
-		if(blob.get_u16("fxghostlikepower") <= power)
+		CShape@ shape = blob.getShape();
+		if(!blob.exists("ghostliketogglecoll") && shape !is null)
+		{
+			blob.set_bool("ghostliketogglecoll", shape.getConsts().mapCollisions);
+		}
+		if(blob.hasScript(scriptname()))
+		{
+			if(blob.get_u16("fxghostlikepower") <= power)
+			{
+				blob.set_u16("fxghostliketime", time);
+				blob.set_u16("fxghostlikepower", power);
+				//applyFxLowGrav(blob, time + 100, 100);
+			}
+		}
+		else
 		{
 			blob.set_u16("fxghostliketime", time);
 			blob.set_u16("fxghostlikepower", power);
 			//applyFxLowGrav(blob, time + 100, 100);
+			if(blob.get_bool("ghostliketogglecoll"))
+				shape.getConsts().mapCollisions = false;
+			blob.AddScript(scriptname());
 		}
 	}
-	else
-	{
-		blob.set_u16("fxghostliketime", time);
-		blob.set_u16("fxghostlikepower", power);
-		//applyFxLowGrav(blob, time + 100, 100);
-		if(blob.get_bool("ghostliketogglecoll"))
-			shape.getConsts().mapCollisions = false;
-		blob.AddScript(scriptnameghost);
-	}
-}
 
-void removeFxGhostlike(CBlob@ blob)
-{
-	if(!blob.hasScript(scriptnameghost))
-		return;
-	CShape@ shape = blob.getShape();
-	if(blob.get_bool("ghostliketogglecoll") && shape !is null)
-		shape.getConsts().mapCollisions = true;
-	blob.RemoveScript(scriptnameghost);
-	//removeFxLowGrav(blob);
+	void remove(CBlob@ blob)
+	{
+		if(!blob.hasScript(scriptname()))
+			return;
+		CShape@ shape = blob.getShape();
+		if(blob.get_bool("ghostliketogglecoll") && shape !is null)
+			shape.getConsts().mapCollisions = true;
+		blob.RemoveScript(scriptname());
+		//removeFxLowGrav(blob);
+	}
+
 }

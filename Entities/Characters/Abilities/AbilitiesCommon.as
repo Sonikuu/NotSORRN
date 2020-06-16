@@ -4,7 +4,7 @@
 #include "ExplosionCommon.as"
 #include "Hitters.as"
 
-interface IAbility
+shared interface IAbility
 {
     string getTextureName();
     CBlob@ getBlob();
@@ -20,7 +20,7 @@ interface IAbility
 	string getName();
 }
 
-class CAbilityBase : IAbility
+shared class CAbilityBase : IAbility
 {
     void onTick(){}
 	void onDie(){}
@@ -54,7 +54,7 @@ class CAbilityBase : IAbility
     void onCommand( u8 cmd, CBitStream @params ){}
 }
 
-class CAbilityEmpty : CAbilityBase
+shared class CAbilityEmpty : CAbilityBase
 {
 	string getTextureName() override
 	{
@@ -75,7 +75,7 @@ class CAbilityEmpty : CAbilityBase
 	}
 }
 
-class CToggleableAbillityBase : CAbilityBase
+shared class CToggleableAbillityBase : CAbilityBase
 {
     CToggleableAbillityBase()
     {
@@ -90,7 +90,7 @@ class CToggleableAbillityBase : CAbilityBase
     }
 }
 
-class CPoint : CAbilityBase
+shared class CPoint : CAbilityBase
 {
     CPoint(string textureName, CBlob@ blob)
     {
@@ -150,7 +150,7 @@ class CPoint : CAbilityBase
     }
 }
 
-class CConsume : CAbilityBase
+shared class CConsume : CAbilityBase
 {
 	int unstableCoresConsumed = 0;
 
@@ -322,14 +322,14 @@ class CConsume : CAbilityBase
 		f32 ammount = tank.storage.getElement(id);
 		f32 power = ammount/tank.maxelements;
 
-		elementlist[id].vialIngestbehavior(blob,vial,power);
+		getElementList()[id].vialIngestbehavior(blob,vial,power);
 
 		tank.storage.setElement(id,0);
 	}
 
 }
 
-class CSelfDestruct : CAbilityBase
+shared class CSelfDestruct : CAbilityBase
 {
 	f32 instability = 0;
 	bool cheaterMode = false;
@@ -402,7 +402,7 @@ class CSelfDestruct : CAbilityBase
 	}
 }
 
-class CAbsorb : CAbilityBase
+shared class CAbsorb : CAbilityBase
 {
 	CAbsorb(string _textureName, CBlob@ _blob)
 	{
@@ -449,7 +449,7 @@ class CAbsorb : CAbilityBase
 	}
 }
 
-class COvertake : CAbilityBase
+shared class COvertake : CAbilityBase
 {
 	COvertake(string _textureName, CBlob@ _blob)
 	{
@@ -599,7 +599,7 @@ enum EAbilities
 	Overtake = 5
 }
 
-class CAbilityMasterList
+shared class CAbilityMasterList
 {
 	private IAbility@[] abilities;
 	CBlob@ blob;
@@ -631,13 +631,23 @@ class CAbilityMasterList
 	}
 }
 
-f32 fDrawScale = 1; // this is actually 2x scale idk why kag does this
-f32 fRealScale = fDrawScale/0.5;
-Vec2f slotDimentions = Vec2f(16,16);
-Vec2f slotSpacing = Vec2f(4,0);
-Vec2f borderDimentions = Vec2f(18,18);
-Vec2f borderOffset = Vec2f(-2,-2);
-class CAbilityBar
+// Angelscript doesn't support shared global vars, so I'm grouping these into singleton
+// f32 fDrawScale = 1; // this is actually 2x scale idk why kag does this
+// f32 fRealScale = fDrawScale/0.5;
+// Vec2f slotDimensions = Vec2f(16,16);
+// Vec2f slotSpacing = Vec2f(4,0);
+// Vec2f borderDimentions = Vec2f(18,18);
+// Vec2f borderOffset = Vec2f(-2,-2);
+
+shared f32 fDrawScale()			{return 1;				}
+shared f32 fRealScale()			{return fDrawScale()/0.5;	}
+shared Vec2f slotDimensions()	{return Vec2f(16,16);	}
+shared Vec2f slotSpacing()		{return Vec2f(4,0);		}
+shared Vec2f borderDimentions()	{return Vec2f(18,18);	}
+shared Vec2f borderOffset()		{return Vec2f(-2,-2);	}
+
+
+shared class CAbilityBar
 {	
 	CAbilityMasterList@ masterList;
 	CBlob@ blob;
@@ -709,7 +719,7 @@ class CAbilityBar
 
 	Vec2f getSlotPosition(u32 i)
 	{
-		return initialBarOffset + (slotSpacing * i) + Vec2f(slotDimentions.x * i * fRealScale, initialBarOffset.y);
+		return initialBarOffset + (slotSpacing() * i) + Vec2f(slotDimensions().x * i * fRealScale(), initialBarOffset.y);
 	}
 
 	bool isSlotHovered(u32 i)
@@ -717,7 +727,7 @@ class CAbilityBar
 		Vec2f slotPos = getSlotPosition(i);
 		Vec2f mpos = getControls().getMouseScreenPos();
 
-		return mpos.x >= slotPos.x && mpos.x <= (slotPos.x + slotDimentions.x * fRealScale) && mpos.y >= slotPos.y && mpos.y <= (slotPos.y + slotDimentions.y * fRealScale);
+		return mpos.x >= slotPos.x && mpos.x <= (slotPos.x + slotDimensions().x * fRealScale()) && mpos.y >= slotPos.y && mpos.y <= (slotPos.y + slotDimensions().y * fRealScale());
 	}
 
 	int getHoveredSlot()
@@ -761,20 +771,20 @@ class CAbilityBar
 	}
 	Vec2f getBarEndPos()
 	{
-		return getSlotPosition(slots.length - 1) + slotDimentions * fRealScale + Vec2f(backgroundThickness,backgroundThickness);
+		return getSlotPosition(slots.length - 1) + slotDimensions() * fRealScale() + Vec2f(backgroundThickness,backgroundThickness);
 	}
 	Vec2f getNameDrawStartPos()
 	{
 		CAbilityManager@ m;
 		blob.get("AbilityManager",@m);
 		return m.abilityMenu.menuOpenTargetPos+
-		Vec2f(m.abilityMenu.menuButtonDimentions.x*fRealScale,0);
+		Vec2f(m.abilityMenu.menuButtonDimentions.x*fRealScale(),0);
 	}
 	Vec2f getNameDrawEndPos()
 	{
 		CAbilityManager@ m;
 		blob.get("AbilityManager",@m);
-		return Vec2f(getBarEndPos().x,m.abilityMenu.menuButtonDimentions.y * fRealScale + m.abilityMenu.menuOpenTargetPos.y);
+		return Vec2f(getBarEndPos().x,m.abilityMenu.menuButtonDimentions.y * fRealScale() + m.abilityMenu.menuOpenTargetPos.y);
 	}
 	void onRender()
 	{
@@ -788,15 +798,15 @@ class CAbilityBar
 
 				if(isSlotHovered(i))
 				{
-					GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale,SColor(127,255,255,255));
+					GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimensions(),drawPos,fDrawScale(),SColor(127,255,255,255));
 				}
 				else
 				{
-					GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale);
+					GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimensions(),drawPos,fDrawScale());
 				}
 			}
 
-			GUI::DrawIcon(getSelectedAbility().getBorder(),0,borderDimentions,getSlotPosition(selectedSlot) + borderOffset,fDrawScale);
+			GUI::DrawIcon(getSelectedAbility().getBorder(),0,borderDimentions(),getSlotPosition(selectedSlot) + borderOffset(),fDrawScale());
 			GUI::DrawRectangle(getNameDrawStartPos(),getNameDrawEndPos());
 			GUI::DrawTextCentered(getSelectedAbility().getName(), (getNameDrawStartPos() + getNameDrawEndPos())/2, SColor(255,0,0,0));
 			
@@ -809,7 +819,7 @@ class CAbilityBar
 
 }
 
-class CAbilityMenu //this will act as the "unlocked" abilities and run them every tick as well as acting as a menu to add to the bar
+shared class CAbilityMenu //this will act as the "unlocked" abilities and run them every tick as well as acting as a menu to add to the bar
 {
 	CAbilityMasterList@ masterList;
 	CAbilityBar@ bar;
@@ -990,12 +1000,12 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 
 	Vec2f getMenuDimentions()
 	{
-		return  Vec2f(3 + columns * (slotDimentions.x * fRealScale) + columns * slotSpacing.x, getRows() * (slotDimentions.y * fRealScale) + getRows() * slotSpacing.x) + Vec2f(0,4);
+		return  Vec2f(3 + columns * (slotDimensions().x * fRealScale()) + columns * slotSpacing().x, getRows() * (slotDimensions().y * fRealScale()) + getRows() * slotSpacing().x) + Vec2f(0,4);
 	}
 
 	Vec2f getItemPos(u32 i)
 	{
-		return Vec2f(i%columns * (slotDimentions.x * fRealScale + slotSpacing.x), (getRows() - 1) * (fRealScale * slotDimentions.y)) + menuCurrentPos + Vec2f(4,4);
+		return Vec2f(i%columns * (slotDimensions().x * fRealScale() + slotSpacing().x), (getRows() - 1) * (fRealScale() * slotDimensions().y)) + menuCurrentPos + Vec2f(4,4);
 	}
 
 	s32 getHoveredItem()
@@ -1005,7 +1015,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		{
 			Vec2f itemPos = getItemPos(i);
 
-			if(mpos.x >= itemPos.x && mpos.x <= itemPos.x + (slotDimentions.x * fRealScale) && mpos.y >= itemPos.y && mpos.y <= itemPos.y + (slotDimentions.y * fRealScale))
+			if(mpos.x >= itemPos.x && mpos.x <= itemPos.x + (slotDimensions().x * fRealScale()) && mpos.y >= itemPos.y && mpos.y <= itemPos.y + (slotDimensions().y * fRealScale()))
 			{
 				return i;
 			}
@@ -1029,9 +1039,9 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		Vec2f mpos = getControls().getMouseScreenPos();
 		return 
 		mpos.x >= menuOpenTargetPos.x &&
-		mpos.x <= menuOpenTargetPos.x + menuButtonDimentions.x * fRealScale &&
+		mpos.x <= menuOpenTargetPos.x + menuButtonDimentions.x * fRealScale() &&
 		mpos.y >= menuOpenTargetPos.y  &&
-		mpos.y <= menuOpenTargetPos.y + menuButtonDimentions.y * fRealScale;
+		mpos.y <= menuOpenTargetPos.y + menuButtonDimentions.y * fRealScale();
 
 	}
 
@@ -1047,11 +1057,11 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 			//menu button icon
 			if(isMenuButtonHovered())
 			{
-				GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuOpenTargetPos,fDrawScale,SColor(255,127,127,127));
+				GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuOpenTargetPos,fDrawScale(),SColor(255,127,127,127));
 			}
 			else
 			{
-				GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuOpenTargetPos,fDrawScale);
+				GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuOpenTargetPos,fDrawScale());
 			}
 
 			menuCurrentPos = Vec2f_lerp(menuCurrentPos,menuOpen ? menuOpenTargetPos : menuClosedTargetPos,0.1);
@@ -1063,11 +1073,11 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 				{
 					if(i == heldItem || (heldItem <= -1 && i == getHoveredItem()))
 					{
-						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,getItemPos(i),fDrawScale,SColor(127,255,255,255));
+						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimensions(),getItemPos(i),fDrawScale(),SColor(127,255,255,255));
 					}
 					else
 					{
-						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,getItemPos(i),fDrawScale);
+						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimensions(),getItemPos(i),fDrawScale());
 					}
 				}
 
@@ -1083,14 +1093,14 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 				//held icon
 				if(heldItem > -1)
 				{
-					GUI::DrawIcon(getAbility(heldItem).getTextureName(), 0, slotDimentions, getControls().getMouseScreenPos() - (slotDimentions * fRealScale)/2,fDrawScale);
+					GUI::DrawIcon(getAbility(heldItem).getTextureName(), 0, slotDimensions(), getControls().getMouseScreenPos() - (slotDimensions() * fRealScale())/2,fDrawScale());
 				}
 			}
 		}
 	}
 }
 
-class CAbilityManager
+shared class CAbilityManager
 {
     CAbilityMasterList@ abilityMasterList;
     CAbilityMenu@ abilityMenu;

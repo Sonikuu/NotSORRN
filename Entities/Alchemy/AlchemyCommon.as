@@ -2,7 +2,7 @@
 
 #include "ElementalCore.as";
 
-class CAlchemyTank
+shared class CAlchemyTank
 {
 	string name;
 	bool input;
@@ -36,7 +36,7 @@ class CAlchemyTank
 	
 }
 
-class CAlchemyTankController
+shared class CAlchemyTankController
 {
 	array<CAlchemyTank@> tanks;
 	
@@ -113,7 +113,7 @@ CAlchemyTank@ addTank(CBlob@ blob, string name, bool input, Vec2f offset)
 	return @controller.addTank(name, input, offset);
 }
 
-CAlchemyTank@ getTank(CBlob@ blob, string name)
+shared CAlchemyTank@ getTank(CBlob@ blob, string name)
 {
 	CAlchemyTankController@ controller;
 	blob.get("tankcontroller", @controller);
@@ -122,7 +122,7 @@ CAlchemyTank@ getTank(CBlob@ blob, string name)
 	return @controller.getTank(name);
 }
 
-CAlchemyTank@ getTank(CBlob@ blob, int id)
+shared CAlchemyTank@ getTank(CBlob@ blob, int id)
 {
 	CAlchemyTankController@ controller;
 	blob.get("tankcontroller", @controller);
@@ -131,7 +131,7 @@ CAlchemyTank@ getTank(CBlob@ blob, int id)
 	return @controller.getTank(id);
 }
 
-u8 getTankID(CBlob@ blob, string name)
+shared u8 getTankID(CBlob@ blob, string name)
 {
 	CAlchemyTankController@ controller;
 	blob.get("tankcontroller", @controller);
@@ -140,7 +140,7 @@ u8 getTankID(CBlob@ blob, string name)
 	return controller.getTankID(name);
 }
 
-u8 getTankID(CBlob@ blob, CAlchemyTank@ tank)
+shared u8 getTankID(CBlob@ blob, CAlchemyTank@ tank)
 {
 	CAlchemyTankController@ controller;
 	blob.get("tankcontroller", @controller);
@@ -159,9 +159,9 @@ void addToTank(CAlchemyTank@ tank, array<int>@ elements)
 
 void addToTank(CAlchemyTank@ tank, string element, int count)
 {
-	for (int i = 0; i < elementlist.length; i++)
+	for (int i = 0; i < getElementList().length; i++)
 	{
-		if(elementlist[i].name == element)
+		if(getElementList()[i].name == element)
 		{
 			tank.storage.elements[i] += count;
 			return;
@@ -197,7 +197,7 @@ int storageLeft(CAlchemyTank@ tank, int id)
 	return Maths::Max(tank.maxelements - output, 0);
 }
 
-int firstId(CAlchemyTank@ tank)
+shared int firstId(CAlchemyTank@ tank)
 {
 	for (int i = 0; i < tank.storage.elements.length; i++)
 	{
@@ -246,7 +246,7 @@ void transferBlacklist(CAlchemyTank@ input, CAlchemyTank@ output, int amount, ar
 		bool skip = false;
 		for (int j = 0; j < blacklist.length; j++)
 		{
-			if(elementlist[i].name == blacklist[j])
+			if(getElementList()[i].name == blacklist[j])
 			{
 				skip = true;
 				break;
@@ -316,7 +316,7 @@ void transferOnly(CAlchemyTank@ input, CAlchemyTank@ output, int amount, int onl
 		transferSimple(input, output, amount);
 		return;
 	}
-	string onlyname = elementlist[only].name;
+	string onlyname = getElementList()[only].name;
 	transferOnly(input, output, amount, onlyname);
 }
 
@@ -338,7 +338,7 @@ SColor getAverageElementColor(CAlchemyTank@ tank)
 	for (int i = 0; i < tank.storage.elements.length; i++)
 	{
 		float ratio = float(tank.storage.elements[i]) / float(tank.maxelements);
-		SColor elecol = elementlist[i].color;
+		SColor elecol = getElementList()[i].color;
 		output.set(255, output.getRed() + elecol.getRed() * ratio, output.getGreen() + elecol.getGreen() * ratio, output.getBlue() + elecol.getBlue() * ratio);
 	}
 	return output;

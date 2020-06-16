@@ -9,7 +9,7 @@
 
 const int HIDDEN_ELEMENTS = 1;
 
-class CElementSetup
+shared class CElementSetup
 {
 	string name;
 	SColor color;
@@ -47,7 +47,7 @@ class CElementSetup
 //Element list, all other parts should be able to work off of only this
 //When getting data about elements, use the element list
 
-enum EElement
+shared enum EElement
 {
 	ecto = 0,
 	life = 1,
@@ -66,7 +66,20 @@ enum EElement
 	yeet = 14
 }
 
-const array<CElementSetup> elementlist = 
+//Angelscript doesn't support shared global variables
+//this singleton is meant to kinda solve it
+shared array<CElementSetup> @getElementList() {
+	CRules @rules = getRules();
+	CElementVars @vars;
+	if (!rules.get("CElementVars @", @vars)) {
+		@vars = @CElementVars();
+		rules.set("CElementVars @", @vars);
+	}
+	return @vars.elementlist;
+}
+
+shared class CElementVars {
+array<CElementSetup> elementlist = 
 {
 	CElementSetup//0
 	("ecto",//Internal name for getting / setting element levels
@@ -234,17 +247,18 @@ const array<CElementSetup> elementlist =
 	@vialIngestYeet,
 	@vialSplashYeet).setHidden(true)
 };
+}
 
 void renderElementsCentered(array<int>@ elements, Vec2f pos, bool excludeempty = true)
 {
 	const int iconsize = 32;
 	const int spacing = 8;
 	
-	int iconcount = elementlist.length;
+	int iconcount = getElementList().length;
 	
 	if(excludeempty)
 	{
-		for (int i = 0; i < elementlist.length; i++)
+		for (int i = 0; i < getElementList().length; i++)
 		{
 			if(elements[i] <= 0)
 				iconcount--;
@@ -259,7 +273,7 @@ void renderElementsCentered(array<int>@ elements, Vec2f pos, bool excludeempty =
 	
 	int currpos = 0;
 	
-	for (int i = 0; i < elementlist.length; i++)
+	for (int i = 0; i < getElementList().length; i++)
 	{
 		if(excludeempty)
 		{
@@ -282,11 +296,11 @@ void renderElementsRight(array<int>@ elements, Vec2f pos, bool excludeempty = tr
 	const int iconsize = 32;
 	const int spacing = 8;
 	
-	int iconcount = elementlist.length;
+	int iconcount = getElementList().length;
 	
 	if(excludeempty)
 	{
-		for (int i = 0; i < elementlist.length; i++)
+		for (int i = 0; i < getElementList().length; i++)
 		{
 			if(elements[i] <= 0)
 				iconcount--;
@@ -301,7 +315,7 @@ void renderElementsRight(array<int>@ elements, Vec2f pos, bool excludeempty = tr
 	
 	int currpos = 0;
 	
-	for (int i = 0; i < elementlist.length; i++)
+	for (int i = 0; i < getElementList().length; i++)
 	{
 		if(excludeempty)
 		{
@@ -324,18 +338,18 @@ void drawElementIcon(Vec2f pos, int id, int amount)
 	GUI::DrawIcon("ElementBG.png", 0, Vec2f(16, 16), pos);
 	GUI::DrawIcon("ElementIcons.png", id, Vec2f(16, 16), pos);
 	
-	GUI::DrawTextCentered(elementlist[id].visiblename, pos + Vec2f(14, 0), SColor(255, 255, 255, 255));
+	GUI::DrawTextCentered(getElementList()[id].visiblename, pos + Vec2f(14, 0), SColor(255, 255, 255, 255));
 	
 	GUI::DrawTextCentered(formatInt(amount, ""), pos + Vec2f(14, 32), SColor(255, 255, 255, 255));
 }
 
 //Function for helping get the stuff and things
-int elementIdFromName(string element)
+shared int elementIdFromName(string element)
 {
 	
-	for (int i = 0; i < elementlist.length; i++)
+	for (int i = 0; i < getElementList().length; i++)
 	{
-		if(element == elementlist[i].name)
+		if(element == getElementList()[i].name)
 		{
 			
 			return i;
@@ -345,7 +359,7 @@ int elementIdFromName(string element)
 }
 
 
-class CElementalCore
+shared class CElementalCore
 {
 	//Maybe can get away with only one array?
 	array<int> elements;
@@ -353,7 +367,7 @@ class CElementalCore
 	CElementalCore()
 	{
 		//What this should do is reserve however much space we need for this
-		for (int i = 0; i < elementlist.length; i++)
+		for (int i = 0; i < getElementList().length; i++)
 		{
 			elements.push_back(0);
 		}
@@ -369,7 +383,7 @@ class CElementalCore
 	//Same thing but ID
 	int getElement(int element)
 	{
-		if(element < elementlist.length && element >= 0)
+		if(element < getElementList().length && element >= 0)
 			return elements[element];
 		return -1;
 	}
@@ -379,7 +393,7 @@ class CElementalCore
 	}
 	void setElement(int element, int amount)
 	{
-		if(element < elementlist.length && element >= 0)
+		if(element < getElementList().length && element >= 0)
 			elements[element] = amount;
 	}
 	void addElement(string element, int amount)
@@ -388,13 +402,13 @@ class CElementalCore
 	}
 	void addElement(int element, int amount)
 	{
-		if(element < elementlist.length && element >= 0)
+		if(element < getElementList().length && element >= 0)
 			elements[element] += amount;
 	}
 }
 
 //Gets element
-int getElement(CBlob@ blob, string element)
+shared int getElement(CBlob@ blob, string element)
 {
 	CElementalCore@ core;
 	blob.get("elementcore", @core);
@@ -405,7 +419,7 @@ int getElement(CBlob@ blob, string element)
 	}
 	return core.getElement(element);
 }
-int getElement(CBlob@ blob, int element)
+shared int getElement(CBlob@ blob, int element)
 {
 	CElementalCore@ core;
 	blob.get("elementcore", @core);
@@ -418,7 +432,7 @@ int getElement(CBlob@ blob, int element)
 }
 
 //Sets element to amount
-void setElement(CBlob@ blob, string element, int amount)
+shared void setElement(CBlob@ blob, string element, int amount)
 {
 	CElementalCore@ core;
 	blob.get("elementcore", @core);
@@ -429,7 +443,7 @@ void setElement(CBlob@ blob, string element, int amount)
 	}
 	core.setElement(element, amount);
 }
-void setElement(CBlob@ blob, int element, int amount)
+shared void setElement(CBlob@ blob, int element, int amount)
 {
 	CElementalCore@ core;
 	blob.get("elementcore", @core);
@@ -442,7 +456,7 @@ void setElement(CBlob@ blob, int element, int amount)
 }
 
 //Adds amount to the element
-void addElement(CBlob@ blob, string element, int amount)
+shared void addElement(CBlob@ blob, string element, int amount)
 {
 	CElementalCore@ core;
 	blob.get("elementcore", @core);
@@ -453,7 +467,7 @@ void addElement(CBlob@ blob, string element, int amount)
 	}
 	core.addElement(element, amount);
 }
-void addElement(CBlob@ blob, int element, int amount)
+shared void addElement(CBlob@ blob, int element, int amount)
 {
 	CElementalCore@ core;
 	blob.get("elementcore", @core);
@@ -501,9 +515,9 @@ addElement(blob, "ecto", 10)
 
 
 Prints the name of all elements and how much of it blob has
-for (int i = 0; i < elementlist.length; i++)
+for (int i = 0; i < getElementList().length; i++)
 {
-	printInt(elementlist[i].visiblename, getElement(blob, i));
+	printInt(getElementList()[i].visiblename, getElement(blob, i));
 }
 
 

@@ -34,6 +34,7 @@ void onTick(CBlob@ this)
 		this.add_u16("cooldown", -1);
 	else
 	{
+		array<CElementSetup> @elementlist = @getElementList();
 		CBlob@[] blobs;
 		if(this.getOverlapping(@blobs) && this.get_bool("active") && getNet().isServer())
 		{
@@ -69,6 +70,7 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 {
+	array<CElementSetup> @elementlist = @getElementList();
 	if(this.getCommandID("toggle") == cmd)
 	{
 		this.set_bool("active", this.get_bool("active") ? false : true);

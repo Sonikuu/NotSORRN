@@ -33,7 +33,8 @@ void onInit(CBlob@ this)
 	
 	//Can be changed in the blob's own scripts
 	this.set_u16("transferrate", 1);
-	
+
+	array<CElementSetup> @elementlist = @getElementList();
 	for(int i = 0; i < elementlist.length; i++)
 	{
 		AddIconToken("$element_" + elementlist[i].name + "$", "ElementIcons.png", Vec2f(16, 16), i);
@@ -68,6 +69,7 @@ void onRender(CSprite@ this)
 void onTick(CSprite@ this)
 {
 	CBlob@ blob = this.getBlob();
+	array<CElementSetup> @elementlist = @getElementList();
 	
 	CAlchemyTankController@ controller = getTankController(blob);
 	if(controller is null)
@@ -141,6 +143,7 @@ void onTick(CBlob@ this)
 {
 	manageConnectSys(this);
 	CAlchemyTankController@ controller = getTankController(this);
+	array<CElementSetup> @elementlist = @getElementList();
 	
 	if(controller is null)
 		return;

@@ -24,19 +24,20 @@ void onTick(CBlob@ this)
 {
 	if(this.get_bool("active"))
 	{
-	CBlob@ shard = this.getInventory().getItem(0);
+		array<CElementSetup> @elementlist = @getElementList();
+		CBlob@ shard = this.getInventory().getItem(0);
 
-	if(shard is null) {return;}
-	if(shard.getConfig() != "soul_chunk") {return;}
+		if(shard is null) {return;}
+		if(shard.getConfig() != "soul_chunk") {return;}
 
-	CPlayer@ player = getPlayerByUsername(shard.get_string("player_username"));
-	if(player is null) {return;}
-	CBlob@ pblob = player.getBlob();
-	if(pblob is null) {return;}
+		CPlayer@ player = getPlayerByUsername(shard.get_string("player_username"));
+		if(player is null) {return;}
+		CBlob@ pblob = player.getBlob();
+		if(pblob is null) {return;}
 
 
-	CAlchemyTank@ tank = getTank(this, 0);
-	//int active_elements = 0;
+		CAlchemyTank@ tank = getTank(this, 0);
+		//int active_elements = 0;
 		for (int i = 0; i < elementlist.length; i++)
 		{
 			if(tank.storage.elements[i] >= 1)

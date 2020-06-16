@@ -5,7 +5,7 @@
 void onTick(CBlob@ this)
 {
 	if(this.get_u16("fxgravtime") == 0)
-		removeFxLowGrav(this);
+		FxLowGrav::remove(this);
 	else
 		this.add_u16("fxgravtime", -1);
 }
@@ -14,7 +14,7 @@ void onRender(CSprite@ this)
 {
 	CBlob@ blob = this.getBlob();
 	if(blob.get_u16("fxgravtime") != 0)
-		//removeFxDamageReduce(blob);
+		//FxDamageReduce::remove(blob);
 	//else
 		lowGravRender(blob);
 }

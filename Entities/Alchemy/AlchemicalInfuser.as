@@ -197,8 +197,10 @@ void onTick(CSprite@ this)
 	CSpriteLayer@ layer = this.getSpriteLayer("runes");
 	CBlob@ blob = this.getBlob();
 	CAlchemyTank@ tank = getTank(blob, 0);
+	array<CElementSetup> @elementlist = @getElementList();
 	SColor color(255, 0, 0, 0);
 	int id = -1;
+
 	if(tank !is null)
 		id = firstId(tank);
 	if(id != -1)
@@ -249,6 +251,7 @@ void onTick(CSprite@ this)
 void onTick(CBlob@ this)
 {
 	CAlchemyTank@ input = getTank(this, 0);
+	array<CElementSetup> @elementlist = @getElementList();
 	//CAlchemyTank@ inputr = getTank(this, "inputr");
 	//CAlchemyTank@ output = getTank(this, "output");
 	

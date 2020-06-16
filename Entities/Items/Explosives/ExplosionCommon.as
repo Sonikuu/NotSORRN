@@ -21,7 +21,7 @@
 #include "ShieldCommon.as";
 #include "SplashWater.as";
 
-bool isOwnerBlob(CBlob@ this, CBlob@ that)
+shared bool isOwnerBlob(CBlob@ this, CBlob@ that)
 {
 	//easy check
 	if (this.getDamageOwnerPlayer() is that.getPlayer())
@@ -32,7 +32,7 @@ bool isOwnerBlob(CBlob@ this, CBlob@ that)
 	return (that.getNetworkID() == this.get_u16("explosive_parent"));
 }
 
-void makeSmallExplosionParticle(Vec2f pos)
+shared void makeSmallExplosionParticle(Vec2f pos)
 {
 	ParticleAnimated("Entities/Effects/Sprites/SmallExplosion" + (XORRandom(3) + 1) + ".png",
 	                 pos, Vec2f(0, 0.5f), 0.0f, 1.0f,
@@ -40,7 +40,7 @@ void makeSmallExplosionParticle(Vec2f pos)
 	                 -0.1f, true);
 }
 
-void makeLargeExplosionParticle(Vec2f pos)
+shared void makeLargeExplosionParticle(Vec2f pos)
 {
 	ParticleAnimated("Entities/Effects/Sprites/Explosion.png",
 	                 pos, Vec2f(0, 0.5f), 0.0f, 1.0f,
@@ -48,7 +48,7 @@ void makeLargeExplosionParticle(Vec2f pos)
 	                 -0.1f, true);
 }
 
-void Explode(CBlob@ this, Vec2f pos, f32 radius, f32 damage, string custom_explosion_sound, f32 map_damage_radius, f32 map_damage_ratio, bool map_damage_raycast, u8 custom_hitter, bool should_teamkill)
+shared void Explode(CBlob@ this, Vec2f pos, f32 radius, f32 damage, string custom_explosion_sound, f32 map_damage_radius, f32 map_damage_ratio, bool map_damage_raycast, u8 custom_hitter, bool should_teamkill)
 {
 	CMap@ map = getMap();
 
@@ -432,7 +432,7 @@ void BombermanExplosion(CBlob@ this, f32 radius, f32 damage, f32 map_damage_radi
 
 }
 
-bool canExplosionDamage(CMap@ map, Vec2f tpos, TileType t)
+shared bool canExplosionDamage(CMap@ map, Vec2f tpos, TileType t)
 {
 	CBlob@ blob = map.getBlobAtPosition(tpos); // TODO: make platform get detected
 	bool hasValidFrontBlob = false;
@@ -447,12 +447,12 @@ bool canExplosionDamage(CMap@ map, Vec2f tpos, TileType t)
 		   !(hasValidFrontBlob && isBackwall); // don't destroy backwall if there is a door or trap block
 }
 
-bool canExplosionDestroy(CMap@ map, Vec2f tpos, TileType t)
+shared bool canExplosionDestroy(CMap@ map, Vec2f tpos, TileType t)
 {
 	return !(map.isTileGroundStuff(t));
 }
 
-Vec2f getBombForce(f32 radius, Vec2f hit_blob_pos, Vec2f pos, f32 hit_blob_mass, f32 &out scale)
+shared Vec2f getBombForce(f32 radius, Vec2f hit_blob_pos, Vec2f pos, f32 hit_blob_mass, f32 &out scale)
 {
 	Vec2f offset = hit_blob_pos - pos;
 	f32 distance = offset.Length();
@@ -469,7 +469,7 @@ Vec2f getBombForce(f32 radius, Vec2f hit_blob_pos, Vec2f pos, f32 hit_blob_mass,
 	bombforce *= hit_blob_mass * (3.0f) * scale;
 	return bombforce;
 }
-bool HitBlob(CBlob@ this, CBlob@ hit_blob, f32 radius, f32 damage, const u8 hitter,
+shared bool HitBlob(CBlob@ this, CBlob@ hit_blob, f32 radius, f32 damage, const u8 hitter,
              const bool bother_raycasting = true, const bool should_teamkill = false)
 {
 	Vec2f pos = this.getPosition();
@@ -477,7 +477,7 @@ bool HitBlob(CBlob@ this, CBlob@ hit_blob, f32 radius, f32 damage, const u8 hitt
             bother_raycasting, should_teamkill);
 }
 
-bool HitBlob(CBlob@ this, Vec2f pos, CBlob@ hit_blob, f32 radius, f32 damage, const u8 hitter,
+shared bool HitBlob(CBlob@ this, Vec2f pos, CBlob@ hit_blob, f32 radius, f32 damage, const u8 hitter,
              const bool bother_raycasting = true, const bool should_teamkill = false)
 {
 	CMap@ map = this.getMap();

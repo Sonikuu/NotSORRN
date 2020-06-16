@@ -36,21 +36,21 @@ funcdef float sprayProto(int, float, float, float, CBlob@, CBlob@);
 
 //PAD FOCUS BEHAVIOR
 
-float padBlank(CBlob@ blob, int power, CBlob@ pad){return 1;}
+shared float padBlank(CBlob@ blob, int power, CBlob@ pad){return 1;}
 
-float padAer(CBlob@ blob, int power, CBlob@ pad)
+shared float padAer(CBlob@ blob, int power, CBlob@ pad)
 {
 	bool blobmovingleft = pad.isFacingLeft();
 	
 	blob.setVelocity(Vec2f(blobmovingleft ? 3 : -3, -3) * power + blob.getVelocity());
 	
-	applyFxLightFall(blob, power * 30, power);
+	FxLightFall::apply(blob, power * 30, power);
 	
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 30, 1, elementlist[4].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 30, 1, getElementList()[4].color, true, 0, 5);
 			newpart.velocity = Vec2f((float(XORRandom(1000) - 500) / 1000.0) + (pad.isFacingLeft() ? 2 : -2), (XORRandom(1000) / 1000.0) * -2 + -3) * 5;
 			newpart.position = pad.getPosition() + Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 32, float(XORRandom(1000) / 1000.0 - 0.5) * 4);
 			addParticleToList(newpart);
@@ -59,14 +59,14 @@ float padAer(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padLife(CBlob@ blob, int power, CBlob@ pad)
+shared float padLife(CBlob@ blob, int power, CBlob@ pad)
 {
 	blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.2, blob.getInitialHealth() * 2));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0, elementlist[1].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0, getElementList()[1].color, true, 0, 5);
 			float temprot = XORRandom(1000) / 500.0 * Maths::Pi;
 			newpart.velocity = Vec2f(Maths::Cos(temprot + Maths::Pi), Maths::Sin(temprot + Maths::Pi)) * 3;
 			newpart.position = blob.getPosition() + Vec2f(Maths::Cos(temprot), Maths::Sin(temprot)) * 30;
@@ -76,15 +76,15 @@ float padLife(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padEcto(CBlob@ blob, int power, CBlob@ pad)
+shared float padEcto(CBlob@ blob, int power, CBlob@ pad)
 {
 	//900 = 30 seconds, should be a good amount?
-	applyFxLowGrav(blob, power * 180 * 5, Maths::Ceil(float(power) / 5.0));
+	FxLowGrav::apply(blob, power * 180 * 5, Maths::Ceil(float(power) / 5.0));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0.25, elementlist[0].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0.25, getElementList()[0].color, true, 0, 5);
 			newpart.velocity = Vec2f(float(XORRandom(1000) - 500) / 1000.0, (XORRandom(1000) / 1000.0) * -2 + -3);
 			newpart.position = pad.getPosition() + Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 32, float(XORRandom(1000) / 1000.0 - 0.5) * 4);
 			addParticleToList(newpart);
@@ -93,7 +93,7 @@ float padEcto(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padForce(CBlob@ blob, int power, CBlob@ pad)
+shared float padForce(CBlob@ blob, int power, CBlob@ pad)
 {
 	bool blobmovingleft = pad.isFacingLeft();
 	
@@ -102,7 +102,7 @@ float padForce(CBlob@ blob, int power, CBlob@ pad)
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 30, 0.1, elementlist[3].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 30, 0.1, getElementList()[3].color, true, 0, 5);
 			newpart.velocity = Vec2f((float(XORRandom(1000) - 500) / 1000.0) + (pad.isFacingLeft() ? 2 : -2), (XORRandom(1000) / 1000.0) * -0.2 + -0.3) * 7;
 			newpart.position = pad.getPosition() + Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 32, float(XORRandom(1000) / 1000.0 - 0.5) * 4);
 			addParticleToList(newpart);
@@ -111,14 +111,14 @@ float padForce(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padIgnis(CBlob@ blob, int power, CBlob@ pad)
+shared float padIgnis(CBlob@ blob, int power, CBlob@ pad)
 {
 	pad.server_Hit(blob, blob.getPosition(), Vec2f_zero, power * 0.1, Hitters::fire);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0, elementlist[5].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0, getElementList()[5].color, true, 0, 5);
 			newpart.velocity = Vec2f(float(XORRandom(1000) - 500) / 1000.0, (XORRandom(1000) / 1000.0) * -2 + -3);
 			newpart.position = pad.getPosition() + Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 32, float(XORRandom(1000) / 1000.0 - 0.5) * 4);
 			addParticleToList(newpart);
@@ -127,14 +127,14 @@ float padIgnis(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padTerra(CBlob@ blob, int power, CBlob@ pad)
+shared float padTerra(CBlob@ blob, int power, CBlob@ pad)
 {
-	applyFxDamageReduce(blob, power * 180 * 5, Maths::Ceil(float(power) / 5.0));
+	FxDamageReduce::apply(blob, power * 180 * 5, Maths::Ceil(float(power) / 5.0));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0, elementlist[6].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0, getElementList()[6].color, true, 0, 5);
 			float temprot = XORRandom(1000) / 500.0 * Maths::Pi;
 			newpart.velocity = Vec2f(Maths::Cos(temprot + Maths::Pi), Maths::Sin(temprot + Maths::Pi)) * 3;
 			newpart.position = blob.getPosition() + Vec2f(Maths::Cos(temprot), Maths::Sin(temprot)) * 30;
@@ -144,14 +144,14 @@ float padTerra(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padNatura(CBlob@ blob, int power, CBlob@ pad)//Nature gives regen? 100% not a ros ripoff
+shared float padNatura(CBlob@ blob, int power, CBlob@ pad)//Nature gives regen? 100% not a ros ripoff
 {
-	applyFxRegen(blob, power * 180 * 2, Maths::Ceil(float(power) / 5.0));
+	FxRegen::apply(blob, power * 180 * 2, Maths::Ceil(float(power) / 5.0));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0, elementlist[2].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0, getElementList()[2].color, true, 0, 5);
 			float temprot = XORRandom(1000) / 500.0 * Maths::Pi;
 			newpart.velocity = Vec2f(Maths::Cos(temprot + Maths::Pi), Maths::Sin(temprot + Maths::Pi)) * 3;
 			newpart.position = blob.getPosition() + Vec2f(Maths::Cos(temprot), Maths::Sin(temprot)) * 30;
@@ -161,14 +161,14 @@ float padNatura(CBlob@ blob, int power, CBlob@ pad)//Nature gives regen? 100% no
 	return 1;
 }
 
-float padEntropy(CBlob@ blob, int power, CBlob@ pad)
+shared float padEntropy(CBlob@ blob, int power, CBlob@ pad)
 {
 	pad.server_Hit(blob, blob.getPosition(), Vec2f_zero, power * 0.4, Hitters::spikes);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0, elementlist[8].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0, getElementList()[8].color, true, 0, 5);
 			float temprot = XORRandom(1000) / 500.0 * Maths::Pi;
 			newpart.velocity = Vec2f(Maths::Cos(temprot + Maths::Pi), Maths::Sin(temprot + Maths::Pi)) * 3;
 			newpart.position = blob.getPosition() + Vec2f(Maths::Cos(temprot), Maths::Sin(temprot)) * 30;
@@ -178,15 +178,15 @@ float padEntropy(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padOrder(CBlob@ blob, int power, CBlob@ pad)
+shared float padOrder(CBlob@ blob, int power, CBlob@ pad)
 {
 	blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxLowGrav(blob, power * 30, 100);
+	FxLowGrav::apply(blob, power * 30, 100);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 100, 0, elementlist[7].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 100, 0, getElementList()[7].color, true, 0, 5);
 			newpart.velocity = Vec2f(float(XORRandom(1000) - 500) / 1000.0, (XORRandom(1000) / 1000.0) * -0.3 + -2.5);
 			newpart.position = pad.getPosition() + Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 32, float(XORRandom(1000) / 1000.0 - 0.5) * 4);
 			addParticleToList(newpart);
@@ -196,14 +196,14 @@ float padOrder(CBlob@ blob, int power, CBlob@ pad)
 }
 
 
-float padAqua(CBlob@ blob, int power, CBlob@ pad)
+shared float padAqua(CBlob@ blob, int power, CBlob@ pad)
 {
 	pad.server_Hit(blob, blob.getPosition(), Vec2f_zero, 0, Hitters::water_stun_force);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0.5, elementlist[9].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0.5, getElementList()[9].color, true, 0, 5);
 			newpart.velocity = Vec2f(float(XORRandom(1000) - 500) / 1000.0, (XORRandom(1000) / 1000.0) * -2 + -3);
 			newpart.position = pad.getPosition() + Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 32, float(XORRandom(1000) / 1000.0 - 0.5) * 4);
 			addParticleToList(newpart);
@@ -212,15 +212,15 @@ float padAqua(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padCorruption(CBlob@ blob, int power, CBlob@ pad)
+shared float padCorruption(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxCorrupt(blob, 180 * power * 5, power * 0.4);
+	FxCorrupt::apply(blob, 180 * power * 5, power * 0.4);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0.5, elementlist[10].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0.5, getElementList()[10].color, true, 0, 5);
 			newpart.velocity = Vec2f(float(XORRandom(1000) - 500) / 1000.0, (XORRandom(1000) / 1000.0) * -0.3 + -2.5);
 			newpart.position = pad.getPosition() + Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 32, float(XORRandom(1000) / 1000.0 - 0.5) * 4);
 			addParticleToList(newpart);
@@ -229,15 +229,15 @@ float padCorruption(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padPurity(CBlob@ blob, int power, CBlob@ pad)
+shared float padPurity(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxPure(blob, 180 * power * 10, power * 0.4);
+	FxPure::apply(blob, 180 * power * 10, power * 0.4);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0.5, elementlist[11].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0.5, getElementList()[11].color, true, 0, 5);
 			newpart.velocity = Vec2f(float(XORRandom(1000) - 500) / 1000.0, (XORRandom(1000) / 1000.0) * -0.3 + -2.5);
 			newpart.position = pad.getPosition() + Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 32, float(XORRandom(1000) / 1000.0 - 0.5) * 4);
 			addParticleToList(newpart);
@@ -246,15 +246,15 @@ float padPurity(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padHoly(CBlob@ blob, int power, CBlob@ pad)
+shared float padHoly(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxHoly(blob, 180 * power * 5, power);
+	FxHoly::apply(blob, 180 * power * 5, power);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0.5, elementlist[13].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0.5, getElementList()[13].color, true, 0, 5);
 			newpart.velocity = Vec2f(float(XORRandom(1000) - 500) / 1000.0, (XORRandom(1000) / 1000.0) * -0.3 + -2.5);
 			newpart.position = pad.getPosition() + Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 32, float(XORRandom(1000) / 1000.0 - 0.5) * 4);
 			addParticleToList(newpart);
@@ -263,15 +263,15 @@ float padHoly(CBlob@ blob, int power, CBlob@ pad)
 	return 1;
 }
 
-float padUnholy(CBlob@ blob, int power, CBlob@ pad)
+shared float padUnholy(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxUnholy(blob, 180 * power * 5, power);
+	FxUnholy::apply(blob, 180 * power * 5, power);
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			CRenderParticleString newpart(1, false, false, 10, 0.5, elementlist[12].color, true, 0, 5);
+			CRenderParticleString newpart(1, false, false, 10, 0.5, getElementList()[12].color, true, 0, 5);
 			newpart.velocity = Vec2f(float(XORRandom(1000) - 500) / 1000.0, (XORRandom(1000) / 1000.0) * -0.3 + -2.5);
 			newpart.position = pad.getPosition() + Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 32, float(XORRandom(1000) / 1000.0 - 0.5) * 4);
 			addParticleToList(newpart);
@@ -285,9 +285,9 @@ float padUnholy(CBlob@ blob, int power, CBlob@ pad)
 
 
 
-float wardBlank(float radius, int power, CBlob@ ward){return 0;}
+shared float wardBlank(float radius, int power, CBlob@ ward){return 0;}
 
-float wardForce(float radius, int power, CBlob@ ward)
+shared float wardForce(float radius, int power, CBlob@ ward)
 {
 	CBlob@[] blobs;
 	CMap@ map = getMap();
@@ -314,7 +314,7 @@ float wardForce(float radius, int power, CBlob@ ward)
 }
 
 
-float wardNatura(float radius, int power, CBlob@ ward)
+shared float wardNatura(float radius, int power, CBlob@ ward)
 {
 	CBlob@[] blobs;
 	CMap@ map = getMap();
@@ -351,7 +351,7 @@ float wardNatura(float radius, int power, CBlob@ ward)
 	return 0.1;
 }
 
-float wardLife(float radius, int power, CBlob@ ward)
+shared float wardLife(float radius, int power, CBlob@ ward)
 {
 	CBlob@[] blobs;
 	CMap@ map = getMap();
@@ -374,7 +374,7 @@ float wardLife(float radius, int power, CBlob@ ward)
 }
 
 
-float wardAer(float radius, int power, CBlob@ ward)
+shared float wardAer(float radius, int power, CBlob@ ward)
 {
 	CBlob@[] blobs;
 	CMap@ map = getMap();
@@ -399,7 +399,7 @@ float wardAer(float radius, int power, CBlob@ ward)
 	return 0.1;
 }
 
-float wardEcto(float radius, int power, CBlob@ ward)
+shared float wardEcto(float radius, int power, CBlob@ ward)
 {
 	CBlob@[] blobs;
 	CMap@ map = getMap();
@@ -413,8 +413,8 @@ float wardEcto(float radius, int power, CBlob@ ward)
 				activated = true;
 				if(getGameTime() % 3 == 0)
 				{
-					applyFxGhostlike(blobs[i], 2 * power, 1);
-					applyFxLowGrav(blobs[i], 2 * power, 100);
+					FxGhostlike::apply(blobs[i], 2 * power, 1);
+					FxLowGrav::apply(blobs[i], 2 * power, 100);
 				}
 			}
 		}
@@ -425,7 +425,7 @@ float wardEcto(float radius, int power, CBlob@ ward)
 }
 
 
-float wardIgnis(float radius, int power, CBlob@ ward)
+shared float wardIgnis(float radius, int power, CBlob@ ward)
 {
 	CMap@ map = getMap();
 	bool activated = false;
@@ -462,7 +462,7 @@ float wardIgnis(float radius, int power, CBlob@ ward)
 }
 
 //Slowly regenerates stone and dirt
-float wardTerra(float radius, int power, CBlob@ ward) 
+shared float wardTerra(float radius, int power, CBlob@ ward) 
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	bool activated = false;
@@ -508,7 +508,7 @@ float wardTerra(float radius, int power, CBlob@ ward)
 	return 0.1;
 }
 
-float wardOrder(float radius, int power, CBlob@ ward)
+shared float wardOrder(float radius, int power, CBlob@ ward)
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	bool activated = false;
@@ -527,7 +527,7 @@ float wardOrder(float radius, int power, CBlob@ ward)
 	return 0.1;
 }
 
-float wardEntropy(float radius, int power, CBlob@ ward) //probobly broken code :D 
+shared float wardEntropy(float radius, int power, CBlob@ ward) //probobly broken code :D 
 //also feel free to change idea mainly just wanted to see what it would look like
 //Just fixed it up a bit, dun worri, is gud ward
 {
@@ -548,7 +548,7 @@ float wardEntropy(float radius, int power, CBlob@ ward) //probobly broken code :
 	return 0.1;
 }
 
-float wardAqua(float radius, int power, CBlob@ ward)
+shared float wardAqua(float radius, int power, CBlob@ ward)
 {
 	CMap@ map = getMap();
 	Random rando(XORRandom(0x7FFFFFFF));
@@ -623,7 +623,7 @@ float wardAqua(float radius, int power, CBlob@ ward)
 	return 0.1;
 }
 
-float wardCorruption(float radius, int power, CBlob@ ward) 
+shared float wardCorruption(float radius, int power, CBlob@ ward) 
 {
 	if(getGameTime() % (150 / power) != 0)
 		return 1;
@@ -637,7 +637,7 @@ float wardCorruption(float radius, int power, CBlob@ ward)
 	return 1;
 }
 
-float wardPurity(float radius, int power, CBlob@ ward) 
+shared float wardPurity(float radius, int power, CBlob@ ward) 
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	CMap@ map = getMap();
@@ -654,7 +654,7 @@ float wardPurity(float radius, int power, CBlob@ ward)
 	return 0.1;
 }
 
-float wardUnholy(float radius, int power, CBlob@ ward)
+shared float wardUnholy(float radius, int power, CBlob@ ward)
 {
 	CMap@ map = getMap();
 	Random rando(XORRandom(0x7FFFFFFF));
@@ -680,7 +680,7 @@ float wardUnholy(float radius, int power, CBlob@ ward)
 //BINDER BEHVAIOR BEYOND HERE
 
 
-void bindBlank(CBlob@ blob, int power, CBlob@ bind){}
+shared void bindBlank(CBlob@ blob, int power, CBlob@ bind){}
 /*
 void bindAer(CBlob@ blob, int power, CBlob@ bind)
 {
@@ -689,17 +689,17 @@ void bindAer(CBlob@ blob, int power, CBlob@ bind)
 	blob.setVelocity(Vec2f(blobmovingleft ? 3 : -3, -3) * power + blob.getVelocity());
 }
 */
-void bindLife(CBlob@ blob, int power, CBlob@ bind)
+shared void bindLife(CBlob@ blob, int power, CBlob@ bind)
 {
 	if(getGameTime() % 30 == 0)
 		blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.05, blob.getInitialHealth() * 2));
 }
 
-void bindEcto(CBlob@ blob, int power, CBlob@ bind)
+shared void bindEcto(CBlob@ blob, int power, CBlob@ bind)
 {
 	//900 = 30 seconds, should be a good amount?
 	if(getGameTime() % 30 == 0)
-		applyFxLowGrav(blob, power * 10, Maths::Ceil(float(power) / 5.0));
+		FxLowGrav::apply(blob, power * 10, Maths::Ceil(float(power) / 5.0));
 }
 /*
 void bindForce(CBlob@ blob, int power, CBlob@ bind)
@@ -709,16 +709,16 @@ void bindForce(CBlob@ blob, int power, CBlob@ bind)
 	blob.setVelocity(Vec2f(blobmovingleft ? 5 : -5, 0) * power + blob.getVelocity());
 }
 */
-void bindIgnis(CBlob@ blob, int power, CBlob@ bind)
+shared void bindIgnis(CBlob@ blob, int power, CBlob@ bind)
 {
 	if(getGameTime() % 30 == 0)
 		bind.server_Hit(blob, blob.getPosition(), Vec2f_zero, power * 0.1, Hitters::fire);
 }
 
-void bindTerra(CBlob@ blob, int power, CBlob@ bind)
+shared void bindTerra(CBlob@ blob, int power, CBlob@ bind)
 {
 	if(getGameTime() % 30 == 0)
-		applyFxDamageReduce(blob, power * 10, Maths::Ceil(float(power) / 5.0));
+		FxDamageReduce::apply(blob, power * 10, Maths::Ceil(float(power) / 5.0));
 }
 /*
 void bindEntropy(CBlob@ blob, int power, CBlob@ bind)
@@ -726,11 +726,11 @@ void bindEntropy(CBlob@ blob, int power, CBlob@ bind)
 	bind.server_Hit(blob, blob.getPosition(), Vec2f_zero, power * 0.4, Hitters::spikes);
 }
 */
-void bindOrder(CBlob@ blob, int power, CBlob@ bind)
+shared void bindOrder(CBlob@ blob, int power, CBlob@ bind)
 {
 	blob.setVelocity(Vec2f(0, -0.02) * power + blob.getVelocity());
 	if(getGameTime() % 30 == 0)
-		applyFxLowGrav(blob, power * 10, 100);
+		FxLowGrav::apply(blob, power * 10, 100);
 }
 
 /*
@@ -747,9 +747,9 @@ void bindAqua(CBlob@ blob, int power, CBlob@ bind)
 //Spray Particle Scale
 const float sprayPSC = 1.5;
 
-float sprayBlank(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user){return 0;}
+shared float sprayBlank(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user){return 0;}
 
-float sprayForce(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayForce(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	HitInfo@[] list;
 	CMap@ map = getMap();
@@ -771,7 +771,7 @@ float sprayForce(int power, float aimdir, float spread, float range, CBlob@ spra
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[3].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[3].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -780,7 +780,7 @@ float sprayForce(int power, float aimdir, float spread, float range, CBlob@ spra
 	return 1;
 }
 
-float sprayEcto(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayEcto(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {//This one is pretty lame but eh, good eneough
 	HitInfo@[] list;
 	CMap@ map = getMap();
@@ -808,7 +808,7 @@ float sprayEcto(int power, float aimdir, float spread, float range, CBlob@ spray
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[0].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[0].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -817,13 +817,13 @@ float sprayEcto(int power, float aimdir, float spread, float range, CBlob@ spray
 	return 1;
 }
 
-float sprayAer(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayAer(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[4].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[4].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 6)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -840,7 +840,7 @@ float sprayAer(int power, float aimdir, float spread, float range, CBlob@ spray,
 	return 2;
 }
 
-float sprayOrder(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayOrder(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	
@@ -856,7 +856,7 @@ float sprayOrder(int power, float aimdir, float spread, float range, CBlob@ spra
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[7].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[7].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -867,7 +867,7 @@ float sprayOrder(int power, float aimdir, float spread, float range, CBlob@ spra
 	return 0.1;
 }
 
-float sprayEntropy(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayEntropy(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	
@@ -885,7 +885,7 @@ float sprayEntropy(int power, float aimdir, float spread, float range, CBlob@ sp
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[8].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[8].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -896,7 +896,7 @@ float sprayEntropy(int power, float aimdir, float spread, float range, CBlob@ sp
 	return 0.1;
 }
 
-float sprayLife(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayLife(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	HitInfo@[] list;
 	CMap@ map = getMap();
@@ -920,7 +920,7 @@ float sprayLife(int power, float aimdir, float spread, float range, CBlob@ spray
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[1].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[1].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -931,7 +931,7 @@ float sprayLife(int power, float aimdir, float spread, float range, CBlob@ spray
 	return 0.1;
 }
 
-float sprayNatura(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayNatura(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	HitInfo@[] list;
 	CMap@ map = getMap();
@@ -967,7 +967,7 @@ float sprayNatura(int power, float aimdir, float spread, float range, CBlob@ spr
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[2].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[2].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -976,7 +976,7 @@ float sprayNatura(int power, float aimdir, float spread, float range, CBlob@ spr
 	return 1;
 }
 
-float sprayPurity(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayPurity(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	
@@ -994,7 +994,7 @@ float sprayPurity(int power, float aimdir, float spread, float range, CBlob@ spr
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[11].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[11].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -1005,7 +1005,7 @@ float sprayPurity(int power, float aimdir, float spread, float range, CBlob@ spr
 	return 0.1;
 }
 
-float sprayCorruption(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayCorruption(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	Random rando(XORRandom(0x7FFFFFFF));
 	
@@ -1024,7 +1024,7 @@ float sprayCorruption(int power, float aimdir, float spread, float range, CBlob@
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[10].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[10].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -1033,7 +1033,7 @@ float sprayCorruption(int power, float aimdir, float spread, float range, CBlob@
 	return 1;
 }
 
-float sprayIgnis(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayIgnis(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	CMap@ map = getMap();
 	if(getGameTime() % (100 / power) == 0)
@@ -1059,7 +1059,7 @@ float sprayIgnis(int power, float aimdir, float spread, float range, CBlob@ spra
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[5].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[5].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -1068,7 +1068,7 @@ float sprayIgnis(int power, float aimdir, float spread, float range, CBlob@ spra
 	return 1;
 }
 
-float sprayAqua(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayAqua(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	CMap@ map = getMap();
 	for(int i = 0; i < power; i++)
@@ -1098,7 +1098,7 @@ float sprayAqua(int power, float aimdir, float spread, float range, CBlob@ spray
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[9].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[9].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition() /*+ Vec2f(float(XORRandom(1000) / 1000.0 - 0.5) * 16, float(XORRandom(1000) / 1000.0 - 0.5) * 16)*/;
 			addParticleToList(newpart);
@@ -1109,7 +1109,7 @@ float sprayAqua(int power, float aimdir, float spread, float range, CBlob@ spray
 
 
 
-float sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
+shared float sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spray, CBlob@ user)
 {
 	CMap@ map = getMap();
 	
@@ -1150,7 +1150,7 @@ float sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spra
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, elementlist[6].color, true, 0);
+			CRenderParticleArrow newpart(sprayPSC, false, false, 4, 0, getElementList()[6].color, true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * (XORRandom(1000) / 2000.0 + 0.5) / 8;
 			newpart.position = user.getPosition();
 			addParticleToList(newpart);
@@ -1159,7 +1159,7 @@ float sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spra
 	return 1;
 }
 
-bool entropyEffect(CMap@ map, Vec2f pos)
+shared bool entropyEffect(CMap@ map, Vec2f pos)
 {
 	Tile tile = map.getTile(pos);
 	bool activated = false;
@@ -1245,7 +1245,7 @@ bool entropyEffect(CMap@ map, Vec2f pos)
 	return activated;
 }
 
-bool orderEffect(CMap@ map, Vec2f pos)
+shared bool orderEffect(CMap@ map, Vec2f pos)
 {
 	CBlob@ blob = map.getBlobAtPosition(pos);
 	if(blob !is null && blob.hasScript("BuildingEffects.as"))//this might not be the best way to check but "too bad"
@@ -1338,91 +1338,91 @@ bool orderEffect(CMap@ map, Vec2f pos)
 	return activated;
 }
 //VIAL INGEST BEHAVIOR HERE
-bool vialIngestBlank(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestBlank(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	return true;
 }
 
-bool vialIngestEcto(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestEcto(CBlob@ drinker, CBlob@ vial, f32 power)
 {
-	applyFxGhostlike(drinker,900 * power,1);
-	applyFxLowGrav(drinker,900 * power,100);
+	FxGhostlike::apply(drinker,900 * power,1);
+	FxLowGrav::apply(drinker,900 * power,100);
 	return true;
 }
-bool vialIngestLife(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestLife(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	drinker.server_SetHealth(Maths::Min(drinker.getHealth() + float(power) * 0.2, drinker.getInitialHealth() * 2));
 	return true;
 }
-bool vialIngestNatura(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestNatura(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	padNatura(drinker,power * 5,vial);
 	return true;
 }
-bool vialIngestForce(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestForce(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	drinker.setVelocity(Vec2f(0, -16 * power));
 	return true;
 }
-bool vialIngestAer(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestAer(CBlob@ drinker, CBlob@ vial, f32 power)
 {
-	applyFxLightFall(drinker,900 * power,5 * power);
+	FxLightFall::apply(drinker,900 * power,5 * power);
 	return true;
 }
-bool vialIngestIgnis(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestIgnis(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	vial.server_Hit(drinker,drinker.getPosition(), Vec2f(0,0),1,Hitters::fire,true);
 	return true;
 }
-bool vialIngestTerra(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestTerra(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	padTerra(drinker,power*5,vial);
 	return true;
 }
-bool vialIngestOrder(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestOrder(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	padOrder(drinker,power*5,vial);
 	return true;
 }
-bool vialIngestEntropy(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestEntropy(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	vial.server_Hit(drinker, drinker.getPosition(), Vec2f_zero, 6 * power, Hitters::spikes,true);
 	return true;
 }
-bool vialIngestAqua(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestAqua(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	padAqua(drinker,power*5,vial);
 	return true;
 }
-bool vialIngestCorruption(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestCorruption(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	return true;
 }
-bool vialIngestPurity(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestPurity(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	return true;
 }
-bool vialIngestUnholy(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestUnholy(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	return true;
 }
-bool vialIngestHoly(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestHoly(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	return true;
 }
-bool vialIngestYeet(CBlob@ drinker, CBlob@ vial, f32 power)
+shared bool vialIngestYeet(CBlob@ drinker, CBlob@ vial, f32 power)
 {
 	return true;
 }
 
 //VIAL SPLASH BEHAVIOR HERE
-bool vialSplashBlank(CBlob@ vial, f32 power)
+shared bool vialSplashBlank(CBlob@ vial, f32 power)
 {
 
 	return true;
 }
 
-bool vialSplashEcto(CBlob@ vial, f32 power)
+shared bool vialSplashEcto(CBlob@ vial, f32 power)
 {
 	CMap@ map = getMap(); 
 	CBlob@[] blobs;
@@ -1431,12 +1431,12 @@ bool vialSplashEcto(CBlob@ vial, f32 power)
 	{
 		CBlob@ blob = blobs[i];
 		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
-		applyFxGhostlike(blob,900 * power,1);	
-		applyFxLowGrav(blob,900 * power,100);
+		FxGhostlike::apply(blob,900 * power,1);	
+		FxLowGrav::apply(blob,900 * power,100);
 	}
 	return true;
 }
-bool vialSplashLife(CBlob@ vial, f32 power)
+shared bool vialSplashLife(CBlob@ vial, f32 power)
 {
 	CMap@ map = getMap(); 
 	CBlob@[] blobs;
@@ -1449,7 +1449,7 @@ bool vialSplashLife(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashNatura(CBlob@ vial, f32 power)
+shared bool vialSplashNatura(CBlob@ vial, f32 power)
 {
 	CMap@ map = getMap(); 
 	CBlob@[] blobs;
@@ -1462,7 +1462,7 @@ bool vialSplashNatura(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashForce(CBlob@ vial, f32 power)
+shared bool vialSplashForce(CBlob@ vial, f32 power)
 {
 	CMap@ map = getMap(); 
 	CBlob@[] blobs;
@@ -1480,7 +1480,7 @@ bool vialSplashForce(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashAer(CBlob@ vial, f32 power)
+shared bool vialSplashAer(CBlob@ vial, f32 power)
 {
 	CMap@ map = getMap(); 
 	CBlob@[] blobs;
@@ -1498,7 +1498,7 @@ bool vialSplashAer(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashIgnis(CBlob@ vial, f32 power)
+shared bool vialSplashIgnis(CBlob@ vial, f32 power)
 {
 	CMap@ map = getMap(); 
 	CBlob@[] blobs;
@@ -1511,7 +1511,7 @@ bool vialSplashIgnis(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashTerra(CBlob@ vial, f32 power)
+shared bool vialSplashTerra(CBlob@ vial, f32 power)
 {
 	for(int i = 0; i < 50 * power; i++)
 	{
@@ -1519,7 +1519,7 @@ bool vialSplashTerra(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashOrder(CBlob@ vial, f32 power)
+shared bool vialSplashOrder(CBlob@ vial, f32 power)
 {
 	for(int i = 0; i < 50 * power; i++)
 	{
@@ -1527,7 +1527,7 @@ bool vialSplashOrder(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashEntropy(CBlob@ vial, f32 power)
+shared bool vialSplashEntropy(CBlob@ vial, f32 power)
 {
 	for(int i = 0; i < 50 * power; i++)
 	{
@@ -1535,7 +1535,7 @@ bool vialSplashEntropy(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashAqua(CBlob@ vial, f32 power)
+shared bool vialSplashAqua(CBlob@ vial, f32 power)
 {
 	CMap@ map = getMap(); 
 	CBlob@[] blobs;
@@ -1548,7 +1548,7 @@ bool vialSplashAqua(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashCorruption(CBlob@ vial, f32 power)
+shared bool vialSplashCorruption(CBlob@ vial, f32 power)
 {
 	for(int i = 0; i < 50 * power; i++)
 	{
@@ -1556,7 +1556,7 @@ bool vialSplashCorruption(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashPurity(CBlob@ vial, f32 power)
+shared bool vialSplashPurity(CBlob@ vial, f32 power)
 {
 	for(int i = 0; i < 50 * power; i++)
 	{
@@ -1564,15 +1564,15 @@ bool vialSplashPurity(CBlob@ vial, f32 power)
 	}
 	return true;
 }
-bool vialSplashUnholy(CBlob@ vial, f32 power)
+shared bool vialSplashUnholy(CBlob@ vial, f32 power)
 {
 	return true;
 }
-bool vialSplashHoly(CBlob@ vial, f32 power)
+shared bool vialSplashHoly(CBlob@ vial, f32 power)
 {
 	return true;
 }
-bool vialSplashYeet(CBlob@ vial, f32 power)
+shared bool vialSplashYeet(CBlob@ vial, f32 power)
 {
 	return true;
 }

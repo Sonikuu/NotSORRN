@@ -25,7 +25,7 @@ void onTick(CBlob@ this)
 	{
 		this.add_u16("fxdamagereducetime", -1);
 		if(this.get_u16("fxdamagereducetime") == 0)
-			removeFxDamageReduce(this);
+			FxDamageReduce::remove(this);
 	}
 	
 	//FxCorrupt
@@ -33,7 +33,7 @@ void onTick(CBlob@ this)
 	{
 		this.add_u16("fxcorrupttime", -1);
 		if(this.get_u16("fxcorrupttime") == 0)
-			removeFxCorrupt(this);
+			FxCorrupt::remove(this);
 	}
 	
 	//FxPure
@@ -41,7 +41,7 @@ void onTick(CBlob@ this)
 	{
 		this.add_u16("fxpuretime", -1);
 		if(this.get_u16("fxpuretime") == 0)
-			removeFxPure(this);
+			FxPure::remove(this);
 	}
 }
 

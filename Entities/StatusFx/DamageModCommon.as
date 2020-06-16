@@ -1,13 +1,13 @@
 //This will set up a system for damage modifiers
 
-funcdef f32 damageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata);
+//funcdef f32 damageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata);
 
-interface IDamageMod
+shared interface IDamageMod
 {
 	f32 damageMod(CBlob@, CBlob@, f32, u8);
 }
 
-class CDamageModCore : IDamageMod
+shared class CDamageModCore : IDamageMod
 {
 	string name;
 	
@@ -22,7 +22,7 @@ class CDamageModCore : IDamageMod
 	}
 }
 
-void addDamageMod(CBlob@ this, CDamageModCore@ mod)
+shared void addDamageMod(CBlob@ this, CDamageModCore@ mod)
 {
 	array<CDamageModCore@>@ list;
 	this.get("damagemods", @list);

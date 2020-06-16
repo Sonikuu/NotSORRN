@@ -17,6 +17,7 @@ void onInit(CBlob@ this)
 void onTick(CBlob@ this)
 {
 	CAlchemyTank@ output = getTank(this, 0);
+	array<CElementSetup> @elementlist = @getElementList();
 	
 	for (int i = 0; i < elementlist.length; i++)
 	{
@@ -37,6 +38,7 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 {
+	array<CElementSetup> @elementlist = @getElementList();
 	if(this.getCommandID("configmenu") == cmd)
 	{
 		CBlob@ caller = getBlobByNetworkID(params.read_u16());

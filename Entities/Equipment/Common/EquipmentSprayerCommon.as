@@ -75,6 +75,7 @@ class CSprayerEquipment : CEquipmentCore
 	
 	void fireWeapon(CBlob@ blob, CBlob@ user)
 	{
+		array<CElementSetup> @elementlist = @getElementList();
 		lastshotrotation = angle;
 		fixedsprite = false;
 		//if(this.get_bool("active"))

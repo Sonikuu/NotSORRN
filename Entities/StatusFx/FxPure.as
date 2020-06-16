@@ -2,52 +2,65 @@
 #include "DamageModCommon.as";
 #include "CHitters.as";
 
-string puscriptname = "FxPureTick";
+namespace FxPure {	
 
-class CPureDamageMod : CDamageModCore
-{
-	CPureDamageMod(string name)
-	{super(name);}
-	
-	f32 damageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata)
+	shared string scriptname() {return "FxPureTick";}
+
+	shared class CPureDamageMod : CDamageModCore
 	{
-		if(this.get_u16("fxpurepower") == 0)
-			return damage;
-		if(customdata == CHitters::corrupt)
-			return damage / float(this.get_u16("fxpurepower"));
-		return damage;
-	}	
-}
-
-CPureDamageMod puremod(puscriptname);
-
-void applyFxPure(CBlob@ blob, int time, int power)
-{
-	if(!blob.hasScript("FxHook"))
-		return;
-	if(blob.get_u16("fxpuretime") > 0)
-	{
-		if(blob.get_u16("fxpurepower") <= power)
+		CPureDamageMod(string name)
+		{super(name);}
+		
+		f32 damageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata)
 		{
+			if(this.get_u16("fxpurepower") == 0)
+				return damage;
+			if(customdata == CHitters::corrupt)
+				return damage / float(this.get_u16("fxpurepower"));
+			return damage;
+		}	
+	}
+
+	shared CPureDamageMod @getDamageMod() {
+		CRules @rules = getRules();
+		CPureDamageMod @dm;
+
+		if (!rules.get("puremod @", @dm)) {
+			@dm = @CPureDamageMod(scriptname());
+			rules.set("puremod @", @dm);
+		}
+		return @dm;
+	}
+
+	shared void apply(CBlob@ blob, int time, int power)
+	{
+		if(!blob.hasScript("FxHook"))
+			return;
+		if(blob.get_u16("fxpuretime") > 0)
+		{
+			if(blob.get_u16("fxpurepower") <= power)
+			{
+				blob.set_u16("fxpuretime", time);
+				blob.set_u16("fxpurepower", power);
+			}
+		}
+		else
+		{
+			addDamageMod(blob, @getDamageMod());
 			blob.set_u16("fxpuretime", time);
 			blob.set_u16("fxpurepower", power);
+			CSprite@ sprite = blob.getSprite();
+			if(sprite !is null)
+				sprite.AddScript(scriptname());
 		}
 	}
-	else
+
+	void remove(CBlob@ blob)
 	{
-		addDamageMod(blob, @puremod);
-		blob.set_u16("fxpuretime", time);
-		blob.set_u16("fxpurepower", power);
+		removeDamageMod(blob, @getDamageMod());
 		CSprite@ sprite = blob.getSprite();
 		if(sprite !is null)
-			sprite.AddScript(puscriptname);
+			sprite.RemoveScript(scriptname());
 	}
-}
 
-void removeFxPure(CBlob@ blob)
-{
-	removeDamageMod(blob, @puremod);
-	CSprite@ sprite = blob.getSprite();
-	if(sprite !is null)
-		sprite.RemoveScript(puscriptname);
 }

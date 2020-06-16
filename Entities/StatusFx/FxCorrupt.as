@@ -1,53 +1,64 @@
 //Corruption effect
 #include "DamageModCommon.as";
 
-string cscriptname = "FxCorruptTick";
+namespace FxCorrupt {
+	shared string scriptname() {return "FxCorruptTick";}
 
-class CCorruptDamageMod : CDamageModCore
-{
-	CCorruptDamageMod(string name)
-	{super(name);}
-	
-	f32 damageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata)
+	shared class CCorruptDamageMod : CDamageModCore
 	{
-		return damage * this.get_u16("fxcorruptpower");
-	}	
-}
-
-CCorruptDamageMod corruptmod(cscriptname);
-
-void applyFxCorrupt(CBlob@ blob, int time, int power)
-{
-	if(!blob.hasScript("FxHook"))
-		return;
-	if(blob.get_u16("fxcorrupttime") > 0)
-	{
-		if(blob.get_u16("fxcorruptpower") <= power)
+		CCorruptDamageMod(string name)
+		{super(name);}
+		
+		f32 damageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata)
 		{
+			return damage * this.get_u16("fxcorruptpower");
+		}	
+	}
+
+	shared CCorruptDamageMod @getDamageMod() {
+		CRules @rules = getRules();
+		CCorruptDamageMod @dm;
+
+		if (!rules.get("corruptmod @", @dm)) {
+			@dm = @CCorruptDamageMod(scriptname());
+			rules.set("corruptmod @", @dm);
+		}
+		return @dm;
+	}
+
+	shared void apply(CBlob@ blob, int time, int power)
+	{
+		if(!blob.hasScript("FxHook"))
+			return;
+		if(blob.get_u16("fxcorrupttime") > 0)
+		{
+			if(blob.get_u16("fxcorruptpower") <= power)
+			{
+				blob.set_u16("fxcorrupttime", time);
+				blob.set_u16("fxcorruptpower", power);
+			}
+		}
+		else
+		{
+			addDamageMod(blob, @getDamageMod());
 			blob.set_u16("fxcorrupttime", time);
 			blob.set_u16("fxcorruptpower", power);
+			CSprite@ sprite = blob.getSprite();
+			if(sprite !is null)
+				sprite.AddScript(scriptname());
 		}
 	}
-	else
+
+	void remove(CBlob@ blob)
 	{
-		addDamageMod(blob, @corruptmod);
-		blob.set_u16("fxcorrupttime", time);
-		blob.set_u16("fxcorruptpower", power);
+		removeDamageMod(blob, @getDamageMod());
 		CSprite@ sprite = blob.getSprite();
 		if(sprite !is null)
-			sprite.AddScript(cscriptname);
+			sprite.RemoveScript(scriptname());
 	}
-}
 
-void removeFxCorrupt(CBlob@ blob)
-{
-	removeDamageMod(blob, @corruptmod);
-	CSprite@ sprite = blob.getSprite();
-	if(sprite !is null)
-		sprite.RemoveScript(cscriptname);
-}
-
-shared f32 corruptDamageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata)
-{
-	return damage * this.get_u16("fxcorruptpower");
+	f32 DamageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata)
+	{
+		return damage * this.get_u16("fxcorruptpower");
+	}
 }

@@ -20,6 +20,7 @@ void onInit(CSprite@ this)
 void onTick(CBlob@ this)
 {
     CAlchemyTank@ tank = getTank(this, 0);
+    array<CElementSetup> @elementlist = @getElementList();
     int id = firstId(tank);
     this.setInventoryName(id > -1 ? ("Vial of " + elementlist[id].visiblename) : "Empty Vial");
 }
@@ -29,6 +30,7 @@ void onTick(CSprite@ this)
     CBlob@ blob = this.getBlob();
 
     CAlchemyTank@ tank = getTank(blob, 0);
+    array<CElementSetup> @elementlist = @getElementList();
     CSpriteLayer@ layer = this.getSpriteLayer("content");
 
     if(getGameTime() % 4 == 0)
@@ -73,6 +75,7 @@ void onDie(CBlob@ this)
     Sound::Play("shatter.ogg", this.getPosition(),1, 0.75 + (XORRandom(25)/100.0));
 
     CAlchemyTank@ tank = getTank(this, 0);
+    array<CElementSetup> @elementlist = @getElementList();
     int id = firstId(tank);
     if(id <= -1){return;}
     f32 ammount = tank.storage.getElement(id);

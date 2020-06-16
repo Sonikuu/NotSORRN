@@ -43,6 +43,8 @@ void onTick(CSprite@ this)
 {
 	CSpriteLayer@ layer = this.getSpriteLayer("runes");
 	CBlob@ blob = this.getBlob();
+	array<CElementSetup> @elementlist = @getElementList();
+
 	if(blob.get_u8("lasteleid") == 255)
 	{
 		layer.SetColor(SColor(0, 0, 0, 0));
@@ -58,6 +60,7 @@ void renderArea(CBlob@ this, int id)
 {
 	if(this.get_u8("lasteleid") == 255)
 		return;
+	array<CElementSetup> @elementlist = @getElementList();
 	array<Vertex> vertlist(0);
 	
 		
@@ -104,6 +107,7 @@ void renderArea(CBlob@ this, int id)
 
 void onTick(CBlob@ this)
 {
+	array<CElementSetup> @elementlist = @getElementList();
 	this.set_u8("lasteleid", 255);
 	if(this.get_bool("active"))
 	{

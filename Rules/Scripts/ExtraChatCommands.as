@@ -59,6 +59,7 @@ class Vial :CommandBase
 
 	bool CommandCode(CRules@ this, string[]@ tokens, CPlayer@ player, CBlob@ blob, Vec2f pos, int team, CPlayer@ target_player, CBlob@ target_blob) override
     {
+        array<CElementSetup> @elementlist = @getElementList();
 		int id = -1;
 		id = elementIdFromName(tokens[1]);
 

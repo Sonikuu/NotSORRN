@@ -53,6 +53,7 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 {
+	array<CElementSetup> @elementlist = @getElementList();
 	if(this.getCommandID("configmenu") == cmd)
 	{
 		CBlob@ caller = getBlobByNetworkID(params.read_u16());
@@ -85,6 +86,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 
 void makeSorterMenu(CBlob@ this, CBlob@ caller)
 {
+	array<CElementSetup> @elementlist = @getElementList();
 	caller.ClearMenus();
 	int buttons = elementlist.length + 2 - HIDDEN_ELEMENTS;
 	Vec2f screencenter(getScreenWidth() / 2, getScreenHeight() / 2);

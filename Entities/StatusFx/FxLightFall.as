@@ -1,35 +1,39 @@
 //Light Fall effect
 //Just handled in FallDamage.as
 
-string lfscriptname = "FxLightFallTick";
+namespace FxLightFall {	
 
-void applyFxLightFall(CBlob@ blob, int time, int power)
-{
-	if(!blob.hasScript("FxHook"))
-		return;
-	if(blob.get_u16("fxlightfalltime") > 0)
+	shared string scriptname() {return "FxLightFallTick";}
+
+	shared void apply(CBlob@ blob, int time, int power)
 	{
-		if(blob.get_u16("fxlightfallpower") <= power)
+		if(!blob.hasScript("FxHook"))
+			return;
+		if(blob.get_u16("fxlightfalltime") > 0)
+		{
+			if(blob.get_u16("fxlightfallpower") <= power)
+			{
+				blob.set_u16("fxlightfalltime", time);
+				blob.set_u16("fxlightfallpower", power);
+			}
+		}
+		else
 		{
 			blob.set_u16("fxlightfalltime", time);
 			blob.set_u16("fxlightfallpower", power);
+			blob.AddScript(scriptname());
+			CSprite@ sprite = blob.getSprite();
+			if(sprite !is null)
+				sprite.AddScript(scriptname());
 		}
 	}
-	else
+
+	void remove(CBlob@ blob)
 	{
-		blob.set_u16("fxlightfalltime", time);
-		blob.set_u16("fxlightfallpower", power);
-		blob.AddScript(lfscriptname);
+		blob.RemoveScript(scriptname());
 		CSprite@ sprite = blob.getSprite();
 		if(sprite !is null)
-			sprite.AddScript(lfscriptname);
+			sprite.RemoveScript(scriptname());
 	}
-}
 
-void removeFxLightFall(CBlob@ blob)
-{
-	blob.RemoveScript(lfscriptname);
-	CSprite@ sprite = blob.getSprite();
-	if(sprite !is null)
-		sprite.RemoveScript(lfscriptname);
 }

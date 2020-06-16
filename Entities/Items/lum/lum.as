@@ -58,7 +58,7 @@ void onTick(CSprite@ this)
     {
         CBlob@ blob = blobs[i];
         CAlchemyTank@ tank = getTank(blob, 0);
-
+        array<CElementSetup> @elementlist = @getElementList();
         if(tank !is null)
         {
             for(int i = 0; i < elementlist.size(); i++)

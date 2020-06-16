@@ -73,6 +73,7 @@ void onTick(CBlob@ this)
 	CAlchemyTank@ inputl = getTank(this, "Left Input");
 	CAlchemyTank@ inputr = getTank(this, "Right Input");
 	CAlchemyTank@ output = getTank(this, "Output");
+	array<CElementSetup> @elementlist = @getElementList();
 	
 	if(inputl !is null && inputr !is null && output !is null)
 	{
