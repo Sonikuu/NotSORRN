@@ -5,7 +5,7 @@
 void onTick(CBlob@ this)
 {
 	if(this.get_u16("fxregentime") == 0)
-		removeFxRegen(this);
+		FxRegen::remove(this);
 	else
 		this.add_u16("fxregentime", -1);
 	
@@ -19,7 +19,7 @@ void onRender(CSprite@ this)
 {
 	CBlob@ blob = this.getBlob();
 	//if(blob.get_u16("fxdamagereducetime") == 0)
-	//	removeFxDamageReduce(blob);
+	//	FxDamageReduce::remove(blob);
 	//else
 		regenRender(blob);
 }

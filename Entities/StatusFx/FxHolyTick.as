@@ -14,7 +14,7 @@ void onTick(CBlob@ this)
 {
 	this.add_u16("fxholytime", -1);
 	if(this.get_u16("fxholytime") == 0)
-		removeFxHoly(this);
+		FxHoly::remove(this);
 
 	
 	float movemult = 10.0 / (10.0 + float(this.get_u16("fxholypower")));

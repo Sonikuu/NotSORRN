@@ -6,7 +6,7 @@ void onRender(CSprite@ this)
 {
 	CBlob@ blob = this.getBlob();
 	if(blob.get_u16("fxpuretime") != 0)
-	//	removeFxCorrupt(blob);
+	//	FxCorrupt::remove(blob);
 	//else
 		pureFxRender(blob);
 }

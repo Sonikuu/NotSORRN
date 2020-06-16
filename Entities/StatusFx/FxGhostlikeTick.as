@@ -4,7 +4,7 @@
 void onTick(CBlob@ this)
 {
 	if(this.get_u16("fxghostliketime") == 0)
-		removeFxGhostlike(this);
+		FxGhostlike::remove(this);
 	else
 		this.add_u16("fxghostliketime", -1);
 		

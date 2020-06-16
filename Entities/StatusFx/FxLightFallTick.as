@@ -5,7 +5,7 @@
 void onTick(CBlob@ this)
 {
 	if(this.get_u16("fxlightfalltime") == 0)
-		removeFxLightFall(this);
+		FxLightFall::remove(this);
 	else
 		this.add_u16("fxlightfalltime", -1);
 }
@@ -14,7 +14,7 @@ void onRender(CSprite@ this)
 {
 	CBlob@ blob = this.getBlob();
 	if(blob.get_u16("fxlightfalltime") != 0)
-	//	removeFxCorrupt(blob);
+	//	FxCorrupt::remove(blob);
 	//else
 		lightFallFxRender(blob);
 }

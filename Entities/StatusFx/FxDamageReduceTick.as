@@ -6,7 +6,7 @@ void onRender(CSprite@ this)
 {
 	CBlob@ blob = this.getBlob();
 	//if(blob.get_u16("fxdamagereducetime") == 0)
-	//	removeFxDamageReduce(blob);
+	//	FxDamageReduce::remove(blob);
 	//else
 		damageReduceRender(blob);
 }
