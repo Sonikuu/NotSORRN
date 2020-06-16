@@ -78,7 +78,7 @@ class CMechTool : CMechCore
 		if(driver !is getLocalPlayerBlob()) return;
 		
 		CMap@ map = getMap();
-		for(int i = 0; i < bpid.length(); i++)
+		for(int i = 0; i < bpid.size(); i++)
 		{
 			Vec2f marker = bppos[i];
 			CControls@ controls = getControls();
@@ -190,7 +190,7 @@ class CMechTool : CMechCore
 				float seldist = 0;
 				Vec2f selpos = Vec2f_zero;
 				
-				for(int i = 0; i < bpid.length(); i++)
+				for(int i = 0; i < bpid.size(); i++)
 				{
 
 					SetTileAimpos(part, bc, bppos[i]);

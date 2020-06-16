@@ -24,7 +24,7 @@ void onTick(CBlob@ this)
 		map.getBlobsInRadius(this.getPosition(), 256, @blobs);
 		int zerrcount = 0;
 		bool dospawn = true;
-		for(int i = 0; i < blobs.length(); i++)
+		for(int i = 0; i < blobs.size(); i++)
 		{
 			if(blobs[i].getConfig() == "zerr")
 			{

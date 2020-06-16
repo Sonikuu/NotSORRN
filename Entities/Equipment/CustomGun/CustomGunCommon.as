@@ -247,7 +247,7 @@ void buildGun(CBlob@ this)
 	array<gunHitTile@> tilefx;
 	
 	array<CGunPart@> parts = {@corepart, @barrelpart, @stockpart, @grippart, @magpart};
-	for(int i = 0; i < parts.length(); i++)
+	for(int i = 0; i < parts.size(); i++)
 	{
 		if(parts[i].blobfx !is null)
 			blobfx.push_back(@parts[i].blobfx);

@@ -31,7 +31,7 @@ void onTick(CRules@ this)
 	//Think all this has to do is empty the list
 	array<RenderList@>@ list;
 	this.get("RLtick", @list);
-	for(int i = 0; i < list.length(); i++)
+	for(int i = 0; i < list.size(); i++)
 	{
 		if(list[i].timetodie <= 0)
 		{
@@ -56,7 +56,7 @@ void onRender(CRules@ this)
 	this.get("RLrender", @list);
 	if(list is null)
 		return;
-	for(int i = 0; i < list.length(); i++)
+	for(int i = 0; i < list.size(); i++)
 	{
 		if(list[i].timetodie <= 1)
 		{
@@ -80,14 +80,14 @@ void renderLists(int id)
 	array<RenderList@>@ list;
 	CRules@ rules = getRules();
 	rules.get("RLtick", @list);
-	for(int i = 0; i < list.length(); i++)
+	for(int i = 0; i < list.size(); i++)
 	{
 		//print("Rendering");
 		Render::RawQuads(list[i].sprite, list[i].verts);
 	}
 	//They both get rendered the same way, only difference is when they're cleared
 	rules.get("RLrender", @list);
-	for(int i = 0; i < list.length(); i++)
+	for(int i = 0; i < list.size(); i++)
 	{
 		//print("Rendering");
 		Render::RawQuads(list[i].sprite, list[i].verts);
@@ -102,7 +102,7 @@ void renderGUI(int id)
 	CRules@ rules = getRules();
 	//GUI Rendering
 	rules.get("RLgui", @list);
-	for(int i = 0; i < list.length(); i++)
+	for(int i = 0; i < list.size(); i++)
 	{
 		//print("Rendering");
 		Render::RawQuads(list[i].sprite, list[i].verts);
@@ -127,7 +127,7 @@ void renderBG(int id)
 	CRules@ rules = getRules();
 	//GUI Rendering
 	rules.get("RLbg", @list);
-	for(int i = 0; i < list.length(); i++)
+	for(int i = 0; i < list.size(); i++)
 	{
 		//print("Rendering");
 		Render::RawQuads(list[i].sprite, list[i].verts);
