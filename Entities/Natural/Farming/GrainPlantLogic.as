@@ -26,7 +26,7 @@ void onInit(CBlob@ this)
 	}
 	// this script gets removed so onTick won't be run on client on server join, just onInit
 	//haha nope
-	if (this.hasTag("instant_grow"))
+	if (this.hasTag("instant_grow") || this.hasTag(grown_tag))
 	{
 		GrowGrain(this);
 	}

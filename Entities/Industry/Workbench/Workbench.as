@@ -102,14 +102,14 @@ void InitWorkshop(CBlob@ this)
 	}
 	{
 		ShopItem@ s = addShopItem(this,  "Ammo x10", "$mat_ammo$", "mat_ammo-10", "Basic ammo for basic guns", false);
-		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 5);
+		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 10);
 		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 1);
 		
 		AddIconToken("$mat_ammo$", "MaterialAmmo.png", Vec2f(16, 16), 3);
 	}
 	{
 		ShopItem@ s = addShopItem(this,  "Piercing Ammo x10", "$mat_pierceammo$", "mat_pierceammo-10", "Piercing ammo for piercing magazines", false);
-		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 5);
+		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 10);
 		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 1);
 		AddRequirement(s.requirements, "blob", "mat_glass", "Glass", 10);
 		
@@ -118,7 +118,7 @@ void InitWorkshop(CBlob@ this)
 	}
 	{
 		ShopItem@ s = addShopItem(this,  "Explosive Ammo x10", "$mat_explosiveammo$", "mat_explosiveammo-10", "Explosive ammo for explosive magazines", false);
-		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 5);
+		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 10);
 		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 1);
 		AddRequirement(s.requirements, "blob", "blazecore", "Blaze Core", 1);
 		
@@ -204,6 +204,11 @@ void InitWorkshop(CBlob@ this)
 		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 100);
 		
 		AddIconToken("$mine$", "Mine.png", Vec2f(16, 16), 1);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Keg", "$keg$", "keg", "Barrel full of gunpowder", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 100);
+		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 250);
 	}
 }
 

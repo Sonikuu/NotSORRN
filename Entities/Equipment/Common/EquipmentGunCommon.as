@@ -446,7 +446,8 @@ class CGunEquipment : CEquipmentCore
 			for(int i = 0; i < inv.getItemsCount(); i++)
 			{
 				CBlob@ item = inv.getItem(i);
-				if(item !is null && item.getConfig() == ammotype)
+				//INDIVIDUAL BULLET
+				/*if(item !is null && item.getConfig() == ammotype)
 				{
 					int consumed = Maths::Min(item.getQuantity(), maxammo - blob.get_u16("ammo" + cmdstr));
 					if(consumed < item.getQuantity())
@@ -457,6 +458,19 @@ class CGunEquipment : CEquipmentCore
 					blob.add_u16("ammo" + cmdstr, consumed);
 					if(blob.get_u16("ammo" + cmdstr) >= maxammo)
 						break;
+				}*/
+
+				//CLIP/MAGAZINE/DRUM/WHATEVER I DONT CARE
+				if(item !is null && item.getConfig() == ammotype)
+				{
+					int consumed = 1;
+					if(consumed < item.getQuantity())
+						item.server_SetQuantity(item.getQuantity() - consumed);
+					else
+						item.server_Die();
+					gotammo = true;
+					blob.set_u16("ammo" + cmdstr, maxammo);
+					break;
 				}
 			}
 		}
@@ -1012,6 +1026,9 @@ class CSpoolGunEquipment : CGunEquipment
 										  
 		
 								user.isKeyPressed(key_action1));
+
+			if(equipmentBlocked(user))//Override if menu open
+				actionkey = false;
 								
 			if(!actionkey || reloadprog > 0)
 				 
@@ -1080,7 +1097,8 @@ class CChargeGunEquipment : CGunEquipment
 			bool actionkey = user.isKeyPressed(key_action1);
 									  
 
-			
+			if(equipmentBlocked(user))//Override if menu open
+				actionkey = false;
 			
 			
 			if(!actionkey && currcharge > 0)
