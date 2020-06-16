@@ -34,7 +34,13 @@ const string[] whitelist = {
 	"mat_metal",
 	"mat_marble",
 	"mat_basalt",
-	"log"
+	"log",
+	"lifelog",
+	"tomato",
+	"cucumber",
+	"lettuce",	
+	"lifefruit",
+	"blazecore"
 };
 
 bool stringContains(string[] list, string item)
