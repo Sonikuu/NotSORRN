@@ -12,7 +12,21 @@ void onTick(CBlob@ this)
 	this.get("ParticleList",particleList);
 	for(int a = 1; a < 6; a++)
 	{	
-		CParticle@ p = ParticlePixelUnlimited(-getRandomVelocity(0,10,360) + Pos,getRandomVelocity(0,10,360) + this.getVelocity(),a % 2 == 0 ? SColor(255,127,63,40) : SColor(255,63,30,20),true);
+		SColor color;
+		u8 rnd = XORRandom(3);
+		switch(rnd)
+		{
+			case 0:
+				color = SColor(255,127,63,40);
+			break;
+			case 1:
+				color = SColor(255,63,30,20);
+			break;
+			case 2:
+				color = SColor(255,151,167,146);
+			break;
+		}
+		CParticle@ p = ParticlePixelUnlimited(-getRandomVelocity(0,10,360) + Pos,getRandomVelocity(0,10,360) + this.getVelocity(),color ,true);
 		if(p !is null)
 		{
 			p.fastcollision = true;
