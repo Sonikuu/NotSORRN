@@ -22,7 +22,7 @@ void InitWorkshop(CBlob@ this)
 	InitCosts(); //read from cfg
 
 	this.set_Vec2f("shop offset", Vec2f_zero);
-	this.set_Vec2f("shop menu size", Vec2f(6, 7));
+	this.set_Vec2f("shop menu size", Vec2f(6, 8));
 
 	{
 		ShopItem@ s = addShopItem(this, "Lantern", "$lantern$", "lantern", Descriptions::lantern, false);
@@ -197,6 +197,13 @@ void InitWorkshop(CBlob@ this)
 		AddRequirement(s.requirements, "blob", "mat_sand", "Sand", 250);
 		
 		AddIconToken("$golemitedust$", "GolemiteDust.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Mine", "$mine$", "mine", "A sensitive explosive", false);
+		AddRequirement(s.requirements, "blob", "mat_component", "Mechanical Components", 2);
+		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 100);
+		
+		AddIconToken("$mine$", "Mine.png", Vec2f(16, 16), 1);
 	}
 }
 
