@@ -100,7 +100,7 @@ void InitWorkshop(CBlob@ this)
 		
 		AddIconToken("$alchemyeraser$", "AlchemyEraser.png", Vec2f(8, 8), 0);
 	}
-	{
+	/*{
 		ShopItem@ s = addShopItem(this,  "Ammo x10", "$mat_ammo$", "mat_ammo-10", "Basic ammo for basic guns", false);
 		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 10);
 		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 1);
@@ -124,7 +124,33 @@ void InitWorkshop(CBlob@ this)
 		
 		AddIconToken("$mat_explosiveammo$", "MaterialExplosiveAmmo.png", Vec2f(16, 16), 3);
 		AddIconToken("$blazecore$", "BlazeCore.png", Vec2f(8, 8), 0);
+	}*/
+	{
+		ShopItem@ s = addShopItem(this,  "Ammo Pack", "$ammopack$", "ammopack", "Basic ammo for basic guns", false);
+		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 25);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 2);
+		
+		AddIconToken("$ammopack$", "AmmoPack.png", Vec2f(16, 16), 0);
 	}
+	{
+		ShopItem@ s = addShopItem(this,  "Piercing Ammo Pack", "$piercingammopack$", "piercingammopack", "Piercing ammo for piercing guns", false);
+		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 25);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 2);
+		AddRequirement(s.requirements, "blob", "mat_glass", "Glass", 25);
+		
+		AddIconToken("$piercingammopack$", "PiercingAmmoPack.png", Vec2f(16, 16), 0);
+		AddIconToken("$mat_glass$", "MaterialGlass.png", Vec2f(16, 16), 3);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Explosive Ammo Pack", "$explosiveammopack$", "explosiveammopack", "Explosive ammo for explosive guns", false);
+		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 50);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 2);
+		AddRequirement(s.requirements, "blob", "blazecore", "Blaze Core", 1);
+		
+		AddIconToken("$explosiveammopack$", "ExplosiveAmmoPack.png", Vec2f(16, 16), 0);
+		AddIconToken("$blazecore$", "BlazeCore.png", Vec2f(8, 8), 0);
+	}
+
 	{
 		ShopItem@ s = addShopItem(this,  "Wooden Sword", "$woodsword$", "woodsword", "Basic Wooden Sword", false);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 80);
