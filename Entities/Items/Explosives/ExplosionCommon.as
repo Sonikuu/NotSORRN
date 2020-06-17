@@ -48,7 +48,7 @@ void makeLargeExplosionParticle(Vec2f pos)
 	                 -0.1f, true);
 }
 
-void Explode(CBlob@ this, Vec2f pos, f32 radius, f32 damage, string custom_explosion_sound, f32 map_damage_radius, f32 map_damage_ratio, bool map_damage_raycast, u8 custom_hitter, bool should_teamkill)
+void Explode(CBlob@ this, Vec2f pos, f32 radius, f32 damage, string custom_explosion_sound, f32 map_damage_radius, f32 map_damage_ratio, bool map_damage_raycast, u8 custom_hitter, bool should_teamkill, bool chancetiledam = false)
 {
 	CMap@ map = getMap();
 
@@ -135,7 +135,7 @@ void Explode(CBlob@ this, Vec2f pos, f32 radius, f32 damage, string custom_explo
 								Vec2f tpos = m_pos + offset;
 
 								TileType tile = map.getTile(tpos).type;
-								if (canExplosionDamage(map, tpos, tile))
+								if (canExplosionDamage(map, tpos, tile) && (!chancetiledam || (XORRandom(100) / 100.0 <= map_damage_ratio)))
 								{
 									if (!map.isTileBedrock(tile))
 									{

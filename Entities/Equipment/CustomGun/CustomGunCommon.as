@@ -160,13 +160,13 @@ array<array<CGunPart>> gunparts = {
 //CORES
 {
 	//DAMAGE, FIRERATE, BULLET COUNT, SPREAD, RANGE, MOVE SPEED, RECOIL, MAXAMMO, RELOAD SPEED
-	CGunPart(false, 0.5, 8, 1, 2, 512, 1.5, 3, 1, 1, "Pistol").setBarrel(Vec2f(1, 0)).setStock(Vec2f(-2, 0)).setMag(Vec2f(0, 1)).setSemi(true).setTileDamageChance(1),//PISTOL
-	CGunPart(false, 0.4, 4, 1, 3, 512, 1.2, 6, 2.5, 1.5, "Assault Rifle").setBarrel(Vec2f(4, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(0, 2)).setTileDamageChance(0.7).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//ASSUALT RIFLE
-	CGunPart(false, 0.3, 2, 1, 4, 512, 1, 6, 3.0, 2, "Sprayer").setBarrel(Vec2f(2, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(1, 2)).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//SOMETHING, UZI MAYBE
-	CGunPart(false, 1.2, 30, 1, 1, 512, 1, 16, 0.75, 1.75, "Charge Rifle").setBarrel(Vec2f(3, 0)).setStock(Vec2f(-5, -2)).setMag(Vec2f(-4, -1)).setGuntype(1).setTileDamageChance(3).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//CHARGE RIFLE
-	CGunPart(false, 0.3, 25, 6, 30, 400, 1, 40, 0.5, 1, "Shotgun").setBarrel(Vec2f(5, -1)).setStock(Vec2f(-6, 0)).setMag(Vec2f(-1, 0)).setSemi(true).setTileDamageChance(1).setAmmoGUI("AmmoGUIShotgun.png", Vec2f(7, 14)),//SHOTGUN
-	CGunPart(false, 0.9, 20, 1, 1, 512, 1, 40, 0.5, 1.5, "Sniper Rifle").setBarrel(Vec2f(5, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-2, 0)).setSemi(true).setTileDamageChance(2.5).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//SNIPER RIFLE
-	CGunPart(false, 0.4, 10, 1, 5, 512, 0.9, 4, 10.0, 2.5, "Gatling").setBarrel(Vec2f(6, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-3, 3)).setGuntype(2).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8))//GATLING
+	CGunPart(false, 0.5, 8, 1, 2, 512, 1.5, 3, 15, 20, "Pistol").setBarrel(Vec2f(1, 0)).setStock(Vec2f(-2, 0)).setMag(Vec2f(0, 1)).setSemi(true).setTileDamageChance(1),//PISTOL
+	CGunPart(false, 0.4, 4, 1, 3, 512, 1.2, 6, 40, 30, "Assault Rifle").setBarrel(Vec2f(4, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(0, 2)).setTileDamageChance(0.7).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//ASSUALT RIFLE
+	CGunPart(false, 0.3, 2, 1, 4, 512, 1, 6, 60, 50, "Sprayer").setBarrel(Vec2f(2, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(1, 2)).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//SOMETHING, UZI MAYBE
+	CGunPart(false, 1.2, 30, 1, 1, 512, 1, 16, 10, 35, "Charge Rifle").setBarrel(Vec2f(3, 0)).setStock(Vec2f(-5, -2)).setMag(Vec2f(-4, -1)).setGuntype(1).setTileDamageChance(3).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//CHARGE RIFLE
+	CGunPart(false, 0.3, 25, 6, 30, 400, 1, 40, 10, 30, "Shotgun").setBarrel(Vec2f(5, -1)).setStock(Vec2f(-6, 0)).setMag(Vec2f(-1, 0)).setSemi(true).setTileDamageChance(1).setAmmoGUI("AmmoGUIShotgun.png", Vec2f(7, 14)),//SHOTGUN
+	CGunPart(false, 0.9, 20, 1, 1, 512, 1, 40, 10, 40, "Sniper Rifle").setBarrel(Vec2f(5, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-2, 0)).setSemi(true).setTileDamageChance(2.5).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//SNIPER RIFLE
+	CGunPart(false, 0.4, 10, 1, 5, 512, 0.9, 4, 100, 70, "Gatling").setBarrel(Vec2f(6, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-3, 3)).setGuntype(2).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8))//GATLING
 },
 //BARRELS
 {
@@ -194,18 +194,18 @@ array<array<CGunPart>> gunparts = {
 	CGunPart(true, 1, 1, 1, 1, 1, 0.8, 0.6, 1, 1, "a Vertical Grip"),//VERT
 	CGunPart(true, 1, 1, 1, 0.75, 1, 0.8, 1, 1, 1, "a Horizontal Grip"),//HORZ
 	CGunPart(true, 0.8, 1, 1, 0.6, 0.9, 0.8, 0.5, 1, 1, "a Compensating Grip"),//COMP + GRIP
-	CGunPart(true, 0.75, 0.5, 1, 1, 0.9, 0.8, 0.9, 1.0, 1.4, "a Destabalizing Grip"),//UNSTABLE
+	CGunPart(true, 0.75, 0.5, 1, 1, 0.9, 0.8, 0.9, 1.2, 1.4, "a Destabalizing Grip"),//UNSTABLE
 	CGunPart(true, 1, 1, 1, 0.8, 1, 1, 1, 1, 1, "a Pretty Grip").setBlobFx(@prettyBlobHit).setTileFx(@prettyTileHit)//LUL
 },
 //MAG
 {
-	CGunPart(true, 1, 1, 1, 1, 1, 1, 0.8, 15, 20, "Basic"),//LOWCAL?
-	CGunPart(true, 1, 1, 1, 1, 1, 0.8, 1, 20, 30, "High Capacity"),//HIGHCAL?
-	CGunPart(true, 1, 1, 1, 1, 1, 1, 1, 15, 20, "Holy").setHittype(CHitters::pure).setTracerColor(SColor(255, 255, 255, 200)).setAmmotype("holyammopack"),//HOLY
-	CGunPart(true, 1, 1, 1, 1, 1, 0.7, 1, 25, 40, "Drum Fed"),//DRUM
-	CGunPart(true, 0.1, 2, 1, 0.7, 1, 1.2, 0.7, 15, 30, "YEETing").setHittype(CHitters::yeet).setTracerColor(SColor(255, 255, 150, 150)).setAmmotype("yeetammopack").setBlobFx(@yeetBlobHit),//YEET
-	CGunPart(true, 1, 1, 1, 1, 1, 1, 1, 10, 20, "Piercing").setBlobPiercing(2).setTracerColor(SColor(255, 0, 200, 200)).setTileDamageChance(2).setAmmotype("piercingammopack"),//PIERCING
-	CGunPart(true, 0.5, 1, 1, 1, 1, 1, 1, 10, 20, "Explosive").setTracerColor(SColor(255, 255, 200, 100)).setAmmotype("explosiveammopack").setBlobFx(@explosiveBlobHit).setTileFx(@explosiveTileHit)//EXPLOSIVE
+	CGunPart(true, 1, 1, 1, 1, 1, 1, 0.8, 		1, 1, "Basic"),//LOWCAL?
+	CGunPart(true, 1, 1, 1, 1, 1, 0.8, 1, 		1.5, 1, "High Capacity"),//HIGHCAL?
+	CGunPart(true, 1, 1, 1, 1, 1, 1, 1, 		1, 1, "Holy").setHittype(CHitters::pure).setTracerColor(SColor(255, 255, 255, 200)).setAmmotype("holyammopack"),//HOLY
+	CGunPart(true, 1, 1, 1, 1, 1, 0.7, 1, 		2.5, 2, "Drum Fed"),//DRUM
+	CGunPart(true, 0.1, 2, 1, 0.7, 1, 1.2, 0.7, 1, 1, "YEETing").setHittype(CHitters::yeet).setTracerColor(SColor(255, 255, 150, 150)).setAmmotype("yeetammopack").setBlobFx(@yeetBlobHit),//YEET
+	CGunPart(true, 1, 1, 1, 1, 1, 1, 1, 		1, 1, "Piercing").setBlobPiercing(2).setTracerColor(SColor(255, 0, 200, 200)).setTileDamageChance(2).setAmmotype("piercingammopack"),//PIERCING
+	CGunPart(true, 0.5, 1, 1, 1, 1, 1, 1, 		1, 1, "Explosive").setTracerColor(SColor(255, 255, 200, 100)).setAmmotype("explosiveammopack").setBlobFx(@explosiveBlobHit).setTileFx(@explosiveTileHit)//EXPLOSIVE
 }
 };
 
@@ -440,7 +440,7 @@ void mergeOnto(ImageData@ onto, ImageData@ fromimage, Vec2f offset, Vec2f startp
 float explosiveBlobHit(CBlob@ user, CBlob@ hit_blob, Vec2f pos, float angle, CGunEquipment@ gun, float damage)
 {
 	//radius 48, damage 3, sound Bomb.ogg, map radius 24, map ratio 0.4
-	Explode(user, pos, 24 * 2, damage, "Bomb.ogg", 12 * 2, damage * 0.15, true, gun.hittype, true);
+	Explode(user, pos, 48 * (damage * damage + 0.5), damage, "Bomb.ogg", 24 * (damage * damage + 0.5),  (damage) * 0.5, true, gun.hittype, true, true);
 	return damage;
 }
 
@@ -448,7 +448,7 @@ float explosiveTileHit(CBlob@ user, Vec2f pos, float angle, CGunEquipment@ gun, 
 {
 	float rotation = (angle / 180.0) * Maths::Pi;
 	pos -= Vec2f(Maths::Cos(rotation), Maths::Sin(rotation)) * 8;
-	Explode(user, pos, 24 * 2, damage, "Bomb.ogg", 12 * 2, damage * 0.15, true, gun.hittype, true);
+	Explode(user, pos, 48 * (damage * damage + 0.5), damage, "Bomb.ogg", 24 * (damage * damage + 0.5),  (damage) * 0.5, true, gun.hittype, true, true);
 	return damage;
 }
 
@@ -457,7 +457,7 @@ float prettyBlobHit(CBlob@ user, CBlob@ hit_blob, Vec2f pos, float angle, CGunEq
 {
 	if(getNet().isClient())
 	{
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < 16; i++)
 		{
 			CRenderParticleArrow newpart(2, false, false, 4, 0, SColor(255, XORRandom(255), XORRandom(255), XORRandom(255)), true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(XORRandom(360)) * 8 * (XORRandom(1000) / 2000.0 + 0.5);
@@ -474,7 +474,7 @@ float prettyTileHit(CBlob@ user, Vec2f pos, float angle, CGunEquipment@ gun, flo
 	pos -= Vec2f(Maths::Cos(rotation), Maths::Sin(rotation)) * 8;
 	if(getNet().isClient())
 	{
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < 16; i++)
 		{
 			CRenderParticleArrow newpart(2, false, false, 4, 0, SColor(255, XORRandom(255), XORRandom(255), XORRandom(255)), true, 0);
 			newpart.velocity = Vec2f(1, 0).RotateBy(XORRandom(360)) * 8 * (XORRandom(1000) / 2000.0 + 0.5);

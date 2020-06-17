@@ -536,7 +536,7 @@ class CGunEquipment : CEquipmentCore
 	
 	bool isSpriteShowing(CBlob@ blob)
 	{
-		return cooldown > -1 /*&& blob.get_u16("ammo") > 0*/;
+		return cooldown > -1 || reloadprog > 0;
 	}
 	
 	void onTick(CSprite@ sprite, CBlob@ user)
@@ -554,7 +554,7 @@ class CGunEquipment : CEquipmentCore
 			CSprite@ usersprite = user.getSprite();
 			if(usersprite !is null && usersprite.getSpriteLayer("equipgunfx") is null)
 			{
-				CSpriteLayer@ layer = (texture ? usersprite.addTexturedSpriteLayer("equipgunfx", sprite.getTextureName() + "hnd", sprite.getFrameWidth(), sprite.getFrameHeight()) :
+				CSpriteLayer@ layer = (texture ? usersprite.addTexturedSpriteLayer("equipgunfx", sprite.getTextureName(), sprite.getFrameWidth(), sprite.getFrameHeight()) :
 												usersprite.addSpriteLayer("equipgunfx", sprite.getFilename(), sprite.getFrameWidth(), sprite.getFrameHeight()));
 				layer.SetFrame(0);
 				layer.TranslateBy(spriteoffset);
