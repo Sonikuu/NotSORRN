@@ -511,7 +511,7 @@ shared class CRenderParticleString : CRenderParticleBase
 	
 	bool onTick()
 	{
-		if(lochist.length() > 0)
+		if(lochist.size() > 0)
 		{
 			lochist.removeAt(0);
 			rothist.removeAt(0);
@@ -528,12 +528,12 @@ shared class CRenderParticleString : CRenderParticleBase
 
 	void appendVerts(array<Vertex>@ verts)
 	{	
-		for(int i = 0; i < lochist.length() - 1; i++)
+		for(int i = 0; i < lochist.size() - 1; i++)
 		{
 			if(lochist[i] == Vec2f_zero)
 				continue;
-			float width = Maths::Cos((((float(i) + getInterpolationFactor()) / float(lochist.length())) * Maths::Pi) + Maths::Pi / 2) * scale;
-			float widthl = Maths::Cos((((float(i + 1) + getInterpolationFactor()) / float(lochist.length())) * Maths::Pi) + Maths::Pi / 2) * scale;
+			float width = Maths::Cos((((float(i) + getInterpolationFactor()) / float(lochist.size())) * Maths::Pi) + Maths::Pi / 2) * scale;
+			float widthl = Maths::Cos((((float(i + 1) + getInterpolationFactor()) / float(lochist.size())) * Maths::Pi) + Maths::Pi / 2) * scale;
 			
 			Vec2f temppos = lochist[i];
 			Vec2f tempposl = lochist[i + 1];

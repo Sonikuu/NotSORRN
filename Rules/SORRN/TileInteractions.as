@@ -72,7 +72,7 @@ void corruptTick(Vec2f tilepos, CMap@ map)
 				map.getBlobsInRadius(tilepos * map.tilesize, 320, @blobs);
 				int knokcount = 0;
 				bool dospawn = true;
-				for(int i = 0; i < blobs.length(); i++)
+				for(int i = 0; i < blobs.size(); i++)
 				{
 					if(blobs[i].getConfig() == "knokling")
 					{
@@ -95,7 +95,7 @@ void corruptTick(Vec2f tilepos, CMap@ map)
 				CBlob@[] blobs;
 				map.getBlobsInRadius(tilepos * map.tilesize, 480, @blobs);
 				bool dospawn = true;
-				for(int i = 0; i < blobs.length(); i++)
+				for(int i = 0; i < blobs.size(); i++)
 				{
 					if(blobs[i].getConfig() == "zest")
 					{

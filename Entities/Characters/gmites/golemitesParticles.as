@@ -40,9 +40,9 @@ void onTick(CBlob@ this)
 		}
 	}
 
-	for(int a = 0; a < particleList.length(); a++)
+	for(int a = 0; a < particleList.size(); a++)
 	{
-        if(a < particleList.length() - 1)
+        if(a < particleList.size() - 1)
         {
             particleList[a].position = Vec2f_lerp(particleList[a].position, particleList[a + 1].position, 0.25);
         }

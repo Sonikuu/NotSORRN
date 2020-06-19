@@ -15,7 +15,7 @@ void onTick(CRules@ this)
 {
 	array<IRenderParticleCore@>@ prlist;
 	this.get("PRlist", @prlist);
-	for(int i = 0; i < prlist.length(); i++)
+	for(int i = 0; i < prlist.size(); i++)
 	{
 		if(!prlist[i].onTick())
 		{
@@ -34,7 +34,7 @@ void onRender(CRules@ this)
 	array<Vertex> vertlist(0);
 	if(prlist is null)
 		return;
-	for(int i = 0; i < prlist.length(); i++)
+	for(int i = 0; i < prlist.size(); i++)
 	{
 		prlist[i].appendVerts(@vertlist);
 	}

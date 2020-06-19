@@ -67,14 +67,14 @@ shared void addVertsToExistingRender(array<Vertex>@ verts, string sprite, string
 	rules.get(listname, @list);
 	if(list is null)
 		return;
-	for(int i = 0; i < list.length(); i++)
+	for(int i = 0; i < list.size(); i++)
 	{
 		if(list[i].sprite == sprite)
 		{
 			//0xFFFF should be the max a vert array can handle
-			if(list[i].verts.length() + verts.length() > 0xFFFF)
+			if(list[i].verts.size() + verts.size() > 0xFFFF)
 				continue;
-			for(int j = 0; j < verts.length(); j++)
+			for(int j = 0; j < verts.size(); j++)
 			{
 				list[i].verts.insertLast(verts[j]);
 			}
@@ -82,7 +82,7 @@ shared void addVertsToExistingRender(array<Vertex>@ verts, string sprite, string
 		}
 	}
 	array<Vertex>@ newverts = @array<Vertex>();
-	for(int j = 0; j < verts.length(); j++)
+	for(int j = 0; j < verts.size(); j++)
 	{
 		newverts.insertLast(verts[j]);
 	}
