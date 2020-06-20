@@ -3,7 +3,7 @@
 
 string cscriptname = "FxCorruptTick";
 
-class CCorruptDamageMod : CDamageModCore
+/*class CCorruptDamageMod : CDamageModCore
 {
 	CCorruptDamageMod(string name)
 	{super(name);}
@@ -50,4 +50,4 @@ void removeFxCorrupt(CBlob@ blob)
 shared f32 corruptDamageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata)
 {
 	return damage * this.get_u16("fxcorruptpower");
-}
+}*/

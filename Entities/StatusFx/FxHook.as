@@ -6,72 +6,91 @@
 
 //Then I could have it be object oriented
 //And have it render a more reasonable way on screen
-#include "FxDamageReduce.as";
 #include "CHitters.as";
 #include "DamageModCommon.as";
-#include "FxCorrupt.as";
-#include "FxPure.as";
+#include "FxHookCommon.as";
 
+//Fook it, time to redo the fx systems
 void onInit(CBlob@ this)
 {
 	array<CDamageModCore@> mods;
 	this.set("damagemods", @mods);
+	array<IStatusEffect@> effects;
+	//We're gonna add all the effects to the active list on init, most if not all will be removed on the first tick but its worth it just to not deal with syncing
+	//Oh, and active list is just to try and save on performance a lil
+	for(int i = 0; i < effectlist.size(); i++)
+	{
+		if(this.get_u16(effectlist[i].getFxName() + "time") > 0)
+		{
+			effects.push_back(@effectlist[i]);
+			if(effectlist[i] is null)
+				print("	AAAA " + i);
+			else
+				effectlist[i].onApply(this);
+		}
+	}
+	this.set("effectls", @effects);
+}
+
+void onRender(CSprite@ this)
+{
+	CBlob@ blob = this.getBlob();
+	array<IStatusEffect@>@ effects;
+	blob.get("effectls", @effects);
+	if(effects !is null)
+	{
+		GUI::SetFont("menu");
+		for(int i = 0; i < effects.size(); i++)
+		{
+			Vec2f thiscenter = getEffectIconCenter(i);
+			Vec2f icondraw = thiscenter - Vec2f(16, 16);
+			effects[i].renderIcon(icondraw, blob);
+			//GUI::DrawIcon("EffectIcons.png", 0, Vec2f(16, 16), icondraw);
+			CControls@ con = getControls();
+			if(con !is null)
+			{
+				Vec2f mpos = con.getMouseScreenPos();
+				if(mpos.x >= icondraw.x && mpos.y >= icondraw.y && mpos.x <= icondraw.x + 32 && mpos.y <= icondraw.y + 32)
+					GUI::DrawText(effects[i].getHoverText(blob, con.isKeyPressed(KEY_LSHIFT)), con.getMouseScreenPos() - Vec2f(256, 64), con.getMouseScreenPos() + Vec2f(256, 64), color_black, true, true, true);
+			}
+		}
+	}
 }
 
 void onTick(CBlob@ this)
 {
-	//FxDamageReduce
-	if(this.get_u16("fxdamagereducetime") != 0)
+	this.set_f32("basegrav", 1.0);//Resetting, effect onticks can modify afterwards and it should apply to the next movement tick
+	array<IStatusEffect@>@ effects;
+	this.get("effectls", @effects);
+	if(effects !is null)
 	{
-		this.add_u16("fxdamagereducetime", -1);
-		if(this.get_u16("fxdamagereducetime") == 0)
-			removeFxDamageReduce(this);
-	}
-	
-	//FxCorrupt
-	if(this.get_u16("fxcorrupttime") != 0)
-	{
-		this.add_u16("fxcorrupttime", -1);
-		if(this.get_u16("fxcorrupttime") == 0)
-			removeFxCorrupt(this);
-	}
-	
-	//FxPure
-	if(this.get_u16("fxpuretime") != 0)
-	{
-		this.add_u16("fxpuretime", -1);
-		if(this.get_u16("fxpuretime") == 0)
-			removeFxPure(this);
+		for(int i = 0; i < effects.size(); i++)
+		{
+			string name = effects[i].getFxName();
+			if(this.get_u16(name + "time") == 0)
+			{
+				effects[i].onRemove(this);
+				removeFromList(name, @effects);
+			}
+			else
+			{
+				effects[i].onTick(this);
+				this.sub_u16(name + "time", 1);
+			}
+		}
 	}
 }
 
 f32 onHit( CBlob@ this, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitterBlob, u8 customData )
 {
-	//print("running onhit");
-	if(this.get_u16("fxdamagereducetime") != 0)
+	array<IStatusEffect@>@ effects;
+	this.get("effectls", @effects);
+	if(effects !is null)
 	{
-		damage /= float(this.get_u16("fxdamagereducepower") + 1);
-	}
-	
-	if(this.get_u16("fxcorrupttime") != 0)
-	{
-		if(customData == CHitters::pure)
-			damage *= float(this.get_u16("fxcorruptpower"));
-	}
-	
-	if(this.get_u16("fxpuretime") != 0)
-	{
-		if(customData == CHitters::pure)
-			damage /= float(this.get_u16("fxpurepower"));
-		if(customData == CHitters::corrupt)
-			damage = 0;//Complete corrupt damage immunity
-	}
-	
-	if(this.get_u16("fxholytime") != 0)
-	{
-	//yeet every game uses this armor calc
-		float damagemult = 2.5 / (2.5 + float(this.get_u16("fxholypower")));
-		damage *= damagemult;
+		for(int i = 0; i < effects.size(); i++)
+		{
+			damage = effects[i].onHit(this, worldPoint, velocity, damage, hitterBlob, customData);
+		}
 	}
 	return damage;
 }

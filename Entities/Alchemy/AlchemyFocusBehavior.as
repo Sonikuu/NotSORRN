@@ -1,18 +1,10 @@
 #include "AlchemyCommon.as";
 #include "Hitters.as";
-#include "FxLowGrav.as";
-#include "FxDamageReduce.as";
-#include "FxGhostlike.as";
-#include "FxCorrupt.as";
-#include "FxPure.as";
-#include "FxRegen.as";
-#include "FxLightFall.as";
-#include "FxHoly.as";
-#include "FxUnholy.as";
 #include "TreeCommon.as";
 #include "RenderParticleCommon.as";
 #include "TileInteractions.as";
 #include "LoaderColors.as";
+#include "FxHookCommon.as";
 
 //Ehm, this might get weird, trying something new here
 //Callbacks?
@@ -44,7 +36,7 @@ float padAer(CBlob@ blob, int power, CBlob@ pad)
 	
 	blob.setVelocity(Vec2f(blobmovingleft ? 3 : -3, -3) * power + blob.getVelocity());
 	
-	applyFxLightFall(blob, power * 30, power);
+	applyFx(blob, power * 30, power, "fxlightfall");
 	
 	if(getNet().isClient())
 	{
@@ -79,7 +71,7 @@ float padLife(CBlob@ blob, int power, CBlob@ pad)
 float padEcto(CBlob@ blob, int power, CBlob@ pad)
 {
 	//900 = 30 seconds, should be a good amount?
-	applyFxLowGrav(blob, power * 180 * 5, Maths::Ceil(float(power) / 5.0));
+	applyFx(blob, power * 180 * 5, power, "fxgrav");
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -129,7 +121,7 @@ float padIgnis(CBlob@ blob, int power, CBlob@ pad)
 
 float padTerra(CBlob@ blob, int power, CBlob@ pad)
 {
-	applyFxDamageReduce(blob, power * 180 * 5, Maths::Ceil(float(power) / 5.0));
+	applyFx(blob, power * 180 * 5, power, "fxdamagereduce");
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -146,7 +138,7 @@ float padTerra(CBlob@ blob, int power, CBlob@ pad)
 
 float padNatura(CBlob@ blob, int power, CBlob@ pad)//Nature gives regen? 100% not a ros ripoff
 {
-	applyFxRegen(blob, power * 180 * 2, Maths::Ceil(float(power) / 5.0));
+	applyFx(blob, power * 180 * 2, power, "fxregen");
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -181,7 +173,7 @@ float padEntropy(CBlob@ blob, int power, CBlob@ pad)
 float padOrder(CBlob@ blob, int power, CBlob@ pad)
 {
 	blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxLowGrav(blob, power * 30, 100);
+	applyFx(blob, power * 30, 100, "fxgrav");
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -215,7 +207,7 @@ float padAqua(CBlob@ blob, int power, CBlob@ pad)
 float padCorruption(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxCorrupt(blob, 180 * power * 5, power * 0.4);
+	applyFx(blob, 180 * power * 5, power, "fxcorrupt");
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -232,7 +224,7 @@ float padCorruption(CBlob@ blob, int power, CBlob@ pad)
 float padPurity(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxPure(blob, 180 * power * 10, power * 0.4);
+	applyFx(blob, 180 * power * 10, power, "fxpure");
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -249,7 +241,7 @@ float padPurity(CBlob@ blob, int power, CBlob@ pad)
 float padHoly(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxHoly(blob, 180 * power * 5, power);
+	applyFx(blob, 180 * power * 5, power, "fxholy");
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -266,7 +258,7 @@ float padHoly(CBlob@ blob, int power, CBlob@ pad)
 float padUnholy(CBlob@ blob, int power, CBlob@ pad)
 {
 	//blob.setVelocity(Vec2f(0, -0.5) * power + blob.getVelocity());
-	applyFxUnholy(blob, 180 * power * 5, power);
+	applyFx(blob, 180 * power * 5, power, "fxunholy");
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -413,8 +405,8 @@ float wardEcto(float radius, int power, CBlob@ ward)
 				activated = true;
 				if(getGameTime() % 3 == 0)
 				{
-					applyFxGhostlike(blobs[i], 2 * power, 1);
-					applyFxLowGrav(blobs[i], 2 * power, 100);
+					applyFx(blobs[i], 2 * power, 1, "fxghostlike");
+					applyFx(blobs[i], 2 * power, 495, "fxgrav");
 				}
 			}
 		}
@@ -699,7 +691,7 @@ void bindEcto(CBlob@ blob, int power, CBlob@ bind)
 {
 	//900 = 30 seconds, should be a good amount?
 	if(getGameTime() % 30 == 0)
-		applyFxLowGrav(blob, power * 10, Maths::Ceil(float(power) / 5.0));
+		applyFx(blob, power * 10, Maths::Ceil(float(power) / 5.0), "fxgrav");
 }
 /*
 void bindForce(CBlob@ blob, int power, CBlob@ bind)
@@ -718,7 +710,7 @@ void bindIgnis(CBlob@ blob, int power, CBlob@ bind)
 void bindTerra(CBlob@ blob, int power, CBlob@ bind)
 {
 	if(getGameTime() % 30 == 0)
-		applyFxDamageReduce(blob, power * 10, Maths::Ceil(float(power) / 5.0));
+		applyFx(blob, power * 10, Maths::Ceil(float(power) / 5.0), "fxdamagereduce");
 }
 /*
 void bindEntropy(CBlob@ blob, int power, CBlob@ bind)
@@ -730,7 +722,7 @@ void bindOrder(CBlob@ blob, int power, CBlob@ bind)
 {
 	blob.setVelocity(Vec2f(0, -0.02) * power + blob.getVelocity());
 	if(getGameTime() % 30 == 0)
-		applyFxLowGrav(blob, power * 10, 100);
+		applyFx(blob, power * 10, 100, "fxgrav");
 }
 
 /*
@@ -1345,8 +1337,8 @@ bool vialIngestBlank(CBlob@ drinker, CBlob@ vial, f32 power)
 
 bool vialIngestEcto(CBlob@ drinker, CBlob@ vial, f32 power)
 {
-	applyFxGhostlike(drinker,900 * power,1);
-	applyFxLowGrav(drinker,900 * power,100);
+	applyFx(drinker,900 * power, 1, "fxghostlike");
+	applyFx(drinker, 900 * power, 495, "fxgrav");
 	return true;
 }
 bool vialIngestLife(CBlob@ drinker, CBlob@ vial, f32 power)
@@ -1366,7 +1358,7 @@ bool vialIngestForce(CBlob@ drinker, CBlob@ vial, f32 power)
 }
 bool vialIngestAer(CBlob@ drinker, CBlob@ vial, f32 power)
 {
-	applyFxLightFall(drinker,900 * power,5 * power);
+	applyFx(drinker, 900 * power, 5 * power, "fxlightfall");
 	return true;
 }
 bool vialIngestIgnis(CBlob@ drinker, CBlob@ vial, f32 power)
@@ -1431,8 +1423,8 @@ bool vialSplashEcto(CBlob@ vial, f32 power)
 	{
 		CBlob@ blob = blobs[i];
 		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
-		applyFxGhostlike(blob,900 * power,1);	
-		applyFxLowGrav(blob,900 * power,100);
+		applyFx(blob, 900 * power, 1, "fxghostlike");	
+		applyFx(blob, 900 * power, 100, "fxgrav");
 	}
 	return true;
 }

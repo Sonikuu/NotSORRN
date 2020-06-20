@@ -1,5 +1,5 @@
 //UNHOLY effect
-string uhscriptname = "FxUnholyTick";
+/*string uhscriptname = "FxUnholyTick";
 
 
 void applyFxUnholy(CBlob@ blob, int time, int power)
@@ -31,4 +31,4 @@ void removeFxUnholy(CBlob@ blob)
 	CSprite@ sprite = blob.getSprite();
 	if(sprite !is null)
 		sprite.RemoveScript(uhscriptname);
-}
+}*/
