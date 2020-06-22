@@ -451,6 +451,17 @@ class CAbsorb : CAbilityBase
 					b.server_Die();
 					break;
 				}
+				else if(b.getConfig() == "boulder")
+				{
+					blob.set_s32("golemiteCount",Maths::Min(blob.get_s32("golemiteMax"), blob.get_s32("golemiteCount") + 30));
+					b.server_Die();
+				
+					CAbilityManager@ manager;
+					blob.get("AbilityManager",@manager);
+					manager.abilityMenu.addAbilityIfUnique(EAbilities::SynthesizeBoulder);
+
+					break;
+				}
 			}
 		}
 	}
@@ -596,6 +607,37 @@ class COvertake : CAbilityBase
     }
 }
 
+class CSynthesizeBoulder : CAbilityBase
+{
+	CSynthesizeBoulder(string _textureName, CBlob@ _blob)
+	{
+		super(_textureName,_blob);
+
+		blob.addCommandID("SynthesizeBoulder_activate");
+	}
+
+	string getName() override {return "Synthesize Boulder";}
+	string getDescription()override {return "Solidifys $RED$100$RED$ golemites into a boulder";}
+
+	void activate() override
+	{
+		blob.SendCommand(blob.getCommandID("SynthesizeBoulder_activate"));
+	}
+
+	void onCommand(u8 cmd, CBitStream@ params)
+	{
+		if(cmd == blob.getCommandID("SynthesizeBoulder_activate") && isServer())
+		{
+			CPlayer@ p = blob.getPlayer();
+			if(p is null){return;}
+			server_CreateBlob("boulder",blob.getTeamNum(),blob.getPosition()).SetDamageOwnerPlayer(p);
+
+			blob.add_s32("golemiteCount",-100);
+			blob.Sync("golemiteCount",true);
+		}
+	}
+}
+
 enum EAbilities
 {
 	Empty = 0,
@@ -603,7 +645,8 @@ enum EAbilities
 	Consume = 2,
 	SelfDestruct = 3,
 	Absorb = 4,
-	Overtake = 5
+	Overtake = 5,
+	SynthesizeBoulder = 6
 }
 
 class CAbilityMasterList
@@ -621,7 +664,8 @@ class CAbilityMasterList
 			CConsume("abilityConsume.png",blob),
 			CSelfDestruct("abilitySelfDestruct",blob),
 			CAbsorb("abilityAbsorb.png",blob),
-			COvertake("abilityOvertake.png",blob)
+			COvertake("abilityOvertake.png",blob),
+			CSynthesizeBoulder("abilitySynthesizeBoulder.png",blob)
 		};
 		abilities = _abilities;//I can't figure out how to do an array litteral outside of right when you create a var so I just copy it into the main one
 	}
@@ -828,7 +872,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	Vec2f menuButtonDimentions = Vec2f(32,16);
 	int columns = 5;
 	bool menuOpen = false;
-	bool newAbility = false;
+	bool newAbility = false;//note abilities are added right away so this is basically true by default
 	s32 heldItem = -1;
 
 	u32[] list = {
