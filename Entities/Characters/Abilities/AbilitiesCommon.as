@@ -828,6 +828,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	Vec2f menuButtonDimentions = Vec2f(32,16);
 	int columns = 5;
 	bool menuOpen = false;
+	bool newAbility = false;
 	s32 heldItem = -1;
 
 	u32[] list = {
@@ -856,6 +857,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	{
 		list.push_back(i);
 		masterList.getAbility(i).onInit();
+		newAbility = true;
 	}
 
 	bool addAbilityIfUnique(u32 i)
@@ -901,6 +903,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 			masterList.getAbility(list[i]).onTick();
 		}
 
+		if(menuOpen){newAbility = false;}
 		if(blob.isMyPlayer())
 		{
 			if(getGameTime() % 30 == 0)
@@ -1074,6 +1077,13 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 			if(isMenuButtonHovered())
 			{
 				GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuOpenTargetPos,fDrawScale,SColor(255,127,127,127));
+			}
+			else if(newAbility)
+			{
+				f32 val1 = (Maths::Sin(getGameTime()/2) + 1)/2;
+				f32 val2 = (Maths::Sin(getGameTime()/2.1) + 1)/2;
+				f32 val3 = (Maths::Sin(getGameTime()/1.9) + 1)/2;
+				GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuOpenTargetPos,fDrawScale,SColor(127,val1 * 255,val2 * 255, val3 * 255));
 			}
 			else
 			{
