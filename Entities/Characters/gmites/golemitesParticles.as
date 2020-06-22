@@ -8,9 +8,13 @@ void onTick(CBlob@ this)
 {
     Vec2f Pos = this.getPosition();
 
+	f32 golemiteCount = this.get_s32("golemiteCount");
+	f32 maxGolemites = this.get_s32("golemiteMax");
+	f32 percent = golemiteCount/maxGolemites;
+
     CParticle@[] particleList;
 	this.get("ParticleList",particleList);
-	for(int a = 1; a < 6; a++)
+	for(int a = 1; a < 6 * percent + 3; a++)
 	{	
 		SColor color;
 		u8 rnd = XORRandom(3);
