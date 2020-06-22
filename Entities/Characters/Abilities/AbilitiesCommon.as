@@ -574,10 +574,14 @@ class COvertake : CAbilityBase
 					b.get("AbilityManager",@manager);
 					manager.abilityMenu.addAbility(EAbilities::Overtake);
 
+					CAbilityManager@ gmanager;
+					blob.get("AbilityManager",@gmanager);
+
 					b.set_s32("golemiteCount", blob.get_s32("golemiteCount"));
 					b.server_setTeamNum(blob.getTeamNum());
 					b.server_SetPlayer(blob.getPlayer());
 					b.set_string("turn_on_death","golemites");
+					b.set_bool("hasSynthesizeBoulder",gmanager.abilityMenu.hasAbility(EAbilities::SynthesizeBoulder));
 					blob.server_Die();
 				}
 			}
@@ -588,6 +592,12 @@ class COvertake : CAbilityBase
 					CBlob@ n = server_CreateBlob("golemites",blob.getTeamNum(),blob.getPosition());
 					n.set_s32("golemiteCount",blob.get_s32("golemiteCount"));
 					n.Sync("golemiteCount",true);
+					if(blob.get_bool("hasSynthesizeBoulder"))
+					{
+						CAbilityManager@ nManager;
+						n.get("AbilityManager",@nManager);
+						nManager.abilityMenu.addAbility(EAbilities::SynthesizeBoulder); 
+					}
 					n.server_SetPlayer(blob.getPlayer());
 					blob.set_string("turn_on_death","");
 				}
@@ -909,7 +919,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 
 	bool addAbilityIfUnique(u32 i)
 	{
-		if(!haveAbility(i))
+		if(!hasAbility(i))
 		{
 			addAbility(i);
 			return true;
@@ -922,7 +932,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		return masterList.getAbility(list[i]);
 	}
 
-	bool haveAbility(u32 i)
+	bool hasAbility(u32 i)
 	{
 		for(int j = 0; j < list.size(); j++)
 		{
