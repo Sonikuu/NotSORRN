@@ -910,11 +910,14 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		menuCurrentPos = menuClosedTargetPos;
 	}
 
-	void addAbility(u32 i)
+	void addAbility(u32 i, bool activateNewAbility = true)
 	{
 		list.push_back(i);
 		masterList.getAbility(i).onInit();
-		newAbility = true;
+		if(activateNewAbility)
+		{
+			newAbility = true;
+		}
 	}
 
 	bool addAbilityIfUnique(u32 i)

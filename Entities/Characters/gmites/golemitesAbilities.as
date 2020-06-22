@@ -23,9 +23,9 @@ void onInit(CBlob@ this)
 	CAbilityManager@ manager;
 	this.get("AbilityManager",@manager);
 
-	manager.abilityMenu.addAbility(EAbilities::Point);
-	manager.abilityMenu.addAbility(EAbilities::Absorb);
-	manager.abilityMenu.addAbility(EAbilities::Overtake);
+	manager.abilityMenu.addAbility(EAbilities::Point,false);
+	manager.abilityMenu.addAbility(EAbilities::Absorb,false);
+	manager.abilityMenu.addAbility(EAbilities::Overtake,false);
 
 	manager.abilityBar.setSlot(0,EAbilities::Point);
 	manager.abilityBar.setSlot(1,EAbilities::Absorb);
