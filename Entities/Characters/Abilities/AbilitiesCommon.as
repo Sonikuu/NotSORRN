@@ -52,6 +52,14 @@ class CAbilityBase : IAbility
     void onRender(CSprite@ sprite){}
 
     void onCommand( u8 cmd, CBitStream @params ){}
+
+	void addToMyChat(string msg)
+    {
+        if(blob.isMyPlayer())
+        {
+            client_AddToChat(msg, SColor(255,60,60,255));
+        }
+    }
 }
 
 class CAbilityEmpty : CAbilityBase
@@ -458,7 +466,10 @@ class CAbsorb : CAbilityBase
 				
 					CAbilityManager@ manager;
 					blob.get("AbilityManager",@manager);
-					manager.abilityMenu.addAbilityIfUnique(EAbilities::SynthesizeBoulder);
+					if(manager.abilityMenu.addAbilityIfUnique(EAbilities::SynthesizeBoulder))
+					{
+						addToMyChat("After absorbing the boulder, you learn how to create more from your golemites");
+					}
 
 					break;
 				}
@@ -597,14 +608,6 @@ class COvertake : CAbilityBase
 			}
 		}
 	}
-
-	void addToMyChat(string msg)
-    {
-        if(blob.isMyPlayer())
-        {
-            client_AddToChat(msg, SColor(255,60,60,255));
-        }
-    }
 }
 
 class CSynthesizeBoulder : CAbilityBase
