@@ -1,5 +1,5 @@
 //HOLY effect
-string hoscriptname = "FxHolyTick";
+/*string hoscriptname = "FxHolyTick";
 
 
 void applyFxHoly(CBlob@ blob, int time, int power)
@@ -32,3 +32,4 @@ void removeFxHoly(CBlob@ blob)
 	if(sprite !is null)
 		sprite.RemoveScript(hoscriptname);
 }
+*/

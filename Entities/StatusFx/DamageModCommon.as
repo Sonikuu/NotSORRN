@@ -68,3 +68,37 @@ f32 calcAllDamageMods(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata)
 	}
 	return damage;
 }
+
+
+
+
+
+
+
+
+//Lets shove all these down here, aye?
+class CCorruptDamageMod : CDamageModCore
+{
+	CCorruptDamageMod(string name)
+	{super(name);}
+	
+	f32 damageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata)
+	{
+		return damage * (this.get_u16("fxcorruptpower") / 10.0 + 1);
+	}	
+}
+
+class CPureDamageMod : CDamageModCore
+{
+	CPureDamageMod(string name)
+	{super(name);}
+	
+	f32 damageMod(CBlob@ this, CBlob@ hitblob, f32 damage, u8 customdata)
+	{
+		if(this.get_u16("fxpurepower") == 0)
+			return damage;
+		if(customdata == CHitters::corrupt)
+			return damage / float(this.get_u16("fxpurepower") / 10.0 + 1);
+		return damage;
+	}	
+}

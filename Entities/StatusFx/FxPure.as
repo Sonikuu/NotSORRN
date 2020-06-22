@@ -2,7 +2,7 @@
 #include "DamageModCommon.as";
 #include "CHitters.as";
 
-string puscriptname = "FxPureTick";
+/*string puscriptname = "FxPureTick";
 
 class CPureDamageMod : CDamageModCore
 {
@@ -51,3 +51,4 @@ void removeFxPure(CBlob@ blob)
 	if(sprite !is null)
 		sprite.RemoveScript(puscriptname);
 }
+*/
