@@ -186,12 +186,12 @@ void onPlayerLeave( CRules@ this, CPlayer@ player )
 }
 void sendPlayerList()
 {
-	string s = "";
+	string s = "Players: ";
 	for(int  i = 0; i < getPlayersCount(); i++)
 	{
 		s += getPlayer(i).getCharacterName() + (i == getPlayersCount() -1 ? "" : ", ");
 	}
-	if(s == "")
+	if(s == "Players: ")
 	{
 		tcpr("discordchat SYSTEM SYSTEM no players :(");
 	}
