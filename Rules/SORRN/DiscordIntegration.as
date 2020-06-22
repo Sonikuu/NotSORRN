@@ -52,19 +52,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		}
 		else if(tokens.length > 2 && tokens[2] == "!players")
 		{
-			string s = "";
-			for(int  i = 0; i < getPlayersCount(); i++)
-			{
-				s += getPlayer(i).getCharacterName() + (i == getPlayersCount() -1 ? "" : ", ");
-			}
-			if(s == "")
-			{
-				tcpr("discordchat SYSTEM SYSTEM no players :(");
-			}
-			else
-			{
-				tcpr("discordchat SYSTEM SYSTEM " + s);
-			}
+			sendPlayerList();
 		}
 		// else if(tokens.length > 2 && tokens[2] == "!cache")
 		// {
@@ -189,12 +177,29 @@ void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData
 void onNewPlayerJoin( CRules@ this, CPlayer@ player )
 {
 	tcpr("discordchat SYSTEM SYSTEM " + player.getCharacterName() + " joined the server!");
+	sendPlayerList();
 }
 void onPlayerLeave( CRules@ this, CPlayer@ player )
 {
 	tcpr("discordchat SYSTEM SYSTEM " + player.getCharacterName() + " left the server.");
+	sendPlayerList();
 }
-
+void sendPlayerList()
+{
+	string s = "";
+	for(int  i = 0; i < getPlayersCount(); i++)
+	{
+		s += getPlayer(i).getCharacterName() + (i == getPlayersCount() -1 ? "" : ", ");
+	}
+	if(s == "")
+	{
+		tcpr("discordchat SYSTEM SYSTEM no players :(");
+	}
+	else
+	{
+		tcpr("discordchat SYSTEM SYSTEM " + s);
+	}
+}
 /*void discordChat(string input)
 {
 	CRules@ this = getRules();
