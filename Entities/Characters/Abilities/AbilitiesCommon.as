@@ -251,10 +251,17 @@ class CConsume : CAbilityBase
                     held.server_Die();
                 } else if(itemName == "chaoscore")
 				{
-					manager.abilityMenu.addAbility(EAbilities::SelfDestruct);
-					cast<CSelfDestruct>(manager.abilityMasterList.getAbility(EAbilities::SelfDestruct)).cheaterMode = true;
-					addToMyChat("uh oh someone is going to have a bad time");
+					if(manager.abilityMenu.addAbilityIfUnique(EAbilities::SelfDestruct))
+					{
+						cast<CSelfDestruct>(manager.abilityMasterList.getAbility(EAbilities::SelfDestruct)).cheaterMode = true;
+						addToMyChat("uh oh someone is going to have a bad time");
+					}
+					else
+					{
+						addToMyChat("You ate it but to no effect");
+					}
 					held.server_Die();
+
 				} else if(itemName == "thisisntajokeitem")
                 {
                     addToMyChat("Instead of eating the infinity dildo you think of a better idea and shove it in the other end\nYou feel excited and powerful");
@@ -851,9 +858,28 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		masterList.getAbility(i).onInit();
 	}
 
+	bool addAbilityIfUnique(u32 i)
+	{
+		if(!haveAbility(i))
+		{
+			addAbility(i);
+			return true;
+		}
+		return false;
+	}
+
 	IAbility@ getAbility(u32 i)
 	{
 		return masterList.getAbility(list[i]);
+	}
+
+	bool haveAbility(u32 i)
+	{
+		for(int j = 0; j < list.size(); j++)
+		{
+			if(list[j] == i) {return true;}
+		}
+		return false;
 	}
 
 	void removeAbilityByName(string s)
