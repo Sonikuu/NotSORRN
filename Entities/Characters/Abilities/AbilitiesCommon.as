@@ -1143,7 +1143,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 				f32 val1 = (Maths::Sin(getGameTime()/2) + 1)/2;
 				f32 val2 = (Maths::Sin(getGameTime()/2.1) + 1)/2;
 				f32 val3 = (Maths::Sin(getGameTime()/1.9) + 1)/2;
-				GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuOpenTargetPos,fDrawScale,SColor(127,val1 * 255,val2 * 255, val3 * 255));
+				GUI::DrawIcon("Manage.png", 0, menuButtonDimentions, menuOpenTargetPos,fDrawScale,SColor(255,val1 * 127 + 127,val2 * 127 + 127, val3 * 127 + 127));
 			}
 			else
 			{
