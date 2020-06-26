@@ -4,5 +4,5 @@ void onInit(CBlob@ this)
 {
 	this.Tag("ignore_saw");
 	
-	makeFoodImage(this);
+	makeFoodData(this);
 }

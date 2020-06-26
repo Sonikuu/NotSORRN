@@ -35,6 +35,8 @@ void onInit(CBlob@ this)
 void onRender(CSprite@ this)
 {
 	CBlob@ blob = this.getBlob();
+	if(blob !is getLocalPlayerBlob())
+		return;
 	array<IStatusEffect@>@ effects;
 	blob.get("effectls", @effects);
 	if(effects !is null)

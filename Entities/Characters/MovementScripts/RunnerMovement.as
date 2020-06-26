@@ -470,7 +470,7 @@ void onTick(CMovement@ this)
 			moveVars.jumpCount++;
 		}
 
-		if (up && vel.y > -moveVars.jumpMaxVel)
+		if (up && vel.y > -moveVars.jumpMaxVel * moveVars.jumpFactor)
 		{
 			moveVars.jumpStart = 0.7f;
 			moveVars.jumpMid = 0.2f;

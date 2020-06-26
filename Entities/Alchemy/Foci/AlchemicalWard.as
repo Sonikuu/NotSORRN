@@ -67,19 +67,37 @@ void renderArea(CBlob@ this, int id)
 	u32 color = (0xFF << 24) + (elecolor.getRed() << 16) + (elecolor.getGreen() << 8) + elecolor.getBlue();
 	
 	CMap@ map = getMap();
+
+	Vec2f wardpos = this.getPosition();
+
+	float rotdeg = (float(getGameTime() + this.getNetworkID()) + getInterpolationFactor()) * 8.0;
+
+	Vec2f ul = Vec2f(-wardrange, -wardrange).RotateBy(rotdeg)  + wardpos;
+	Vec2f ur = Vec2f(wardrange, -wardrange).RotateBy(rotdeg) + wardpos;
+	Vec2f lr = Vec2f(wardrange, wardrange).RotateBy(rotdeg) + wardpos;
+	Vec2f ll = Vec2f(-wardrange, wardrange).RotateBy(rotdeg) + wardpos;
+
+
+
+	vertlist.push_back(Vertex(ul.x, ul.y, 30, 0, 0, color));
+	vertlist.push_back(Vertex(ur.x, ur.y, 30, 1, 0, color));
+	vertlist.push_back(Vertex(lr.x, lr.y, 30, 1, 1, color));
+	vertlist.push_back(Vertex(ll.x, ll.y, 30, 0, 1, color));
 	
 	
-	float lastdegrees = -4;
+	/*float lastdegrees = -1;
 	float lastradians = (lastdegrees / 180) * Maths::Pi;
 	float lastwidth = Maths::Sin((lastradians + (float(getGameTime() + this.getNetworkID()) + getInterpolationFactor()) / 6) * 3) * (wardrange / 64.0);
 
 	Vec2f lastupperpos = Vec2f(Maths::Cos(lastradians), Maths::Sin(lastradians)) * (wardrange + lastwidth) + this.getPosition();
 	Vec2f lastlowerpos = Vec2f(Maths::Cos(lastradians), Maths::Sin(lastradians)) * (wardrange - lastwidth) + this.getPosition();
 	
-	for (uint i = 0; i < 90; i++)
+	for (uint i = 0; i < 360; i++)
 	{
 		
-		float degrees = i * 4;
+		float degrees = i * 1;
+		//if(i != 29)
+			//degrees += Maths::Sin(i + (float(getGameTime()) + getInterpolationFactor()) / 6.0) * 12.0;
 		float radians = (degrees / 180) * Maths::Pi;
 		float width = Maths::Sin((radians + (float(getGameTime() + this.getNetworkID()) + getInterpolationFactor()) / 6) * 3) * (wardrange / 64.0);
 		
@@ -98,8 +116,8 @@ void renderArea(CBlob@ this, int id)
 		
 		lastupperpos = upperpos;
 		lastlowerpos = lowerpos;
-	}
-	Render::RawQuads("PixelWhite.png", vertlist);
+	}*/
+	Render::RawQuads("WardCircle.png", vertlist);
 }
 
 void onTick(CBlob@ this)

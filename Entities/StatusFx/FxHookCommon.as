@@ -48,7 +48,23 @@ class CStatusDamageReduce : CStatusBase
 		damage /= float(this.get_u16("fxdamagereducepower") / 10.0 + 1);
 		return damage;
 	}
-
+	void onApply(CBlob@ this)
+	{
+		if(isClient())
+		{
+			CSpriteLayer@ l = this.getSprite().addSpriteLayer("fxdamagereduce", "DamageReduce.png", 8, 8);
+			l.TranslateBy(Vec2f(0, -24));
+			l.SetIgnoreParentFacing(true);
+			//l.SetRelativeZ(1);
+		}
+	}
+	void onRemove(CBlob@ this)
+	{
+		if(isClient())
+		{
+			this.getSprite().RemoveSpriteLayer("fxdamagereduce");
+		}
+	}
 	string getFxName()
 	{
 		return "fxdamagereduce";
@@ -204,6 +220,12 @@ class CStatusHoly : CStatusBase
 		}
 		moveVars.walkFactor /= movemult;
 		moveVars.jumpFactor /= movemult;
+		if((getGameTime() % 10 == 0) && isClient())
+		{
+			CParticle@ p = makeGibParticle("Holy.png", this.getPosition() + Vec2f(XORRandom(16) - 8, XORRandom(16) - 8), Vec2f(XORRandom(10) - 5, XORRandom(10) - 5) / 10.0, 0, XORRandom(4), Vec2f(8, 8), 0, 0, "");
+			p.gravity = Vec2f(0, 0);
+			p.scale = 0.5;
+		}
 	}
 	string getFxName()
 	{
@@ -262,6 +284,24 @@ class CStatusRegen : CStatusBase
 	{
 		return "fxregen";
 	}
+	void onApply(CBlob@ this)
+	{
+		if(isClient())
+		{
+			CSpriteLayer@ l = this.getSprite().addSpriteLayer("fxregen", "Regen.png", 8, 8);
+			l.TranslateBy(Vec2f(0, -16));
+			l.SetIgnoreParentFacing(true);
+			l.SetRelativeZ(1);
+		}
+	}
+
+	void onRemove(CBlob@ this)
+	{
+		if(isClient())
+		{
+			this.getSprite().RemoveSpriteLayer("fxregen");
+		}
+	}
 	void renderIcon(Vec2f pos, CBlob@ this)
 	{
 		GUI::DrawIcon("EffectIcons.png", 6, Vec2f(16, 16), pos);
@@ -273,12 +313,27 @@ class CStatusRegen : CStatusBase
 	{
 		if(algo)
 			return "Regenerate $GREEN$(power * 0.01)$GREEN$";
-		return "Regenerate $GREEN$" + formatFloat(this.get_u16("fxgravpower") * 0.01, "", 0, 1) + "$GREEN$HP every half-second";
+		return "Regenerate $GREEN$" + formatFloat(this.get_u16("fxregenpower") * 0.01, "", 0, 1) + "$GREEN$HP every half-second";
 	}
 }
 
 class CStatusLightFall : CStatusBase
 {
+	void onTick(CBlob@ this)
+	{
+		if((getGameTime() % 15 == 0 || (this.getVelocity().Length() >= 4 && getGameTime() % 2 == 0)) && isClient())
+		{
+			CParticle@ p = makeGibParticle("LightFall.png", this.getPosition() + Vec2f(XORRandom(16) - 8, XORRandom(16) - 8), Vec2f(XORRandom(10) - 5, XORRandom(10) - 5) / 10.0 + this.getVelocity() / 2, 0, XORRandom(4), Vec2f(8, 8), 0.1, 0, "");
+			p.fadeout = true;
+			p.gravity = Vec2f(0, 0.03 + XORRandom(30) / 1000.0);
+			p.damping = 0.98;
+			p.rotation = Vec2f(XORRandom(100) - 50, XORRandom(100) - 50) / 50.0;
+			p.diesoncollide = true;
+			p.scale = 1;
+			p.freerotationscale = 0.5;
+		}
+			
+	}
 	string getFxName()
 	{
 		return "fxlightfall";
@@ -342,7 +397,79 @@ class CStatusGhostLike : CStatusBase
 	}
 }
 
+class CStatusSpeed : CStatusBase
+{
+	void onTick(CBlob@ this)
+	{
+		float movemult = this.get_u16("fxspeedpower") / 7.5 + 1;
+		RunnerMoveVars@ moveVars;
+		if (!this.get("moveVars", @moveVars))
+		{
+			return;
+		}
+		moveVars.walkFactor *= movemult;
+		//moveVars.jumpFactor *= movemult;
+	}
+	string getFxName()
+	{
+		return "fxspeed";
+	}
+	void renderIcon(Vec2f pos, CBlob@ this)
+	{
+		GUI::DrawIcon("EffectIcons.png", 9, Vec2f(16, 16), pos);
+		GUI::DrawTextCentered("" + this.get_u16("fxspeedtime") / 30, pos + Vec2f(16, 32), SColor(255, 50, 255, 50));
+		GUI::DrawTextCentered("" + this.get_u16("fxspeedpower"), pos + Vec2f(16, -8), SColor(255, 50, 255, 50));
+	}
+	
+	string getHoverText(CBlob@ this, bool algo)
+	{
+		if(algo)
+			return "Multiply walking speed by $GREEN$((power / 7.5) + 1)$GREEN$";
+		return "Multiply walking speed by $GREEN$" + formatFloat(this.get_u16("fxspeedpower") / 7.5 + 1, "", 0, 1) + "$GREEN$";
+	}
+}
 
+class CStatusLeap : CStatusBase
+{
+	void onTick(CBlob@ this)
+	{
+		float movemult = this.get_u16("fxleappower") / 7.5 + 1;
+		RunnerMoveVars@ moveVars;
+		if (!this.get("moveVars", @moveVars))
+		{
+			return;
+		}
+		//moveVars.walkFactor *= movemult;
+		moveVars.jumpFactor *= movemult;
+		if(moveVars.jumpCount == 0 && this.isKeyPressed(key_up))
+		{
+			Vec2f force(0, 0);
+			if(this.isKeyPressed(key_left))
+				force.x -= 1;
+			if(this.isKeyPressed(key_right))
+				force.x += 1;
+			force *= movemult * 40.0f;
+			this.AddForce(force);
+		}
+	}
+	string getFxName()
+	{
+		return "fxleap";
+	}
+	void renderIcon(Vec2f pos, CBlob@ this)
+	{
+		GUI::DrawIcon("EffectIcons.png", 10, Vec2f(16, 16), pos);
+		GUI::DrawTextCentered("" + this.get_u16("fxleaptime") / 30, pos + Vec2f(16, 32), SColor(255, 50, 255, 50));
+		GUI::DrawTextCentered("" + this.get_u16("fxleappower"), pos + Vec2f(16, -8), SColor(255, 50, 255, 50));
+	}
+	
+	string getHoverText(CBlob@ this, bool algo)
+	{
+		if(algo)
+			return "Multiply jumping power by $GREEN$((power / 7.5) + 1)$GREEN$";
+		return "Multiply jumping power by $GREEN$" + formatFloat(this.get_u16("fxleappower") / 7.5 + 1, "", 0, 1) + "$GREEN$";
+	}
+}
 
 
 
@@ -362,15 +489,17 @@ class CStatusGhostLike : CStatusBase
 
 
 array<IStatusEffect@> effectlist = {
-	cast<IStatusEffect@>(@CStatusDamageReduce()),
-	cast<IStatusEffect@>(@CStatusCorrupt()),
-	cast<IStatusEffect@>(@CStatusPure()),
-	cast<IStatusEffect@>(@CStatusUnholy()),
-	cast<IStatusEffect@>(@CStatusHoly()),
-	cast<IStatusEffect@>(@CStatusGrav()),
-	cast<IStatusEffect@>(@CStatusRegen()),
-	cast<IStatusEffect@>(@CStatusLightFall()),
-	cast<IStatusEffect@>(@CStatusGhostLike())
+	cast<IStatusEffect@>(@CStatusDamageReduce()),	//0
+	cast<IStatusEffect@>(@CStatusCorrupt()),		//1
+	cast<IStatusEffect@>(@CStatusPure()),			//2
+	cast<IStatusEffect@>(@CStatusUnholy()),			//3
+	cast<IStatusEffect@>(@CStatusHoly()),			//4
+	cast<IStatusEffect@>(@CStatusGrav()),			//5
+	cast<IStatusEffect@>(@CStatusRegen()),			//6
+	cast<IStatusEffect@>(@CStatusLightFall()),		//7
+	cast<IStatusEffect@>(@CStatusGhostLike()),		//8
+	cast<IStatusEffect@>(@CStatusSpeed()),			//9
+	cast<IStatusEffect@>(@CStatusLeap())			//10
 };
 
 Vec2f getEffectIconCenter(int i)
@@ -447,6 +576,7 @@ void applyFx(CBlob@ blob, int time, int power, string name)
 	}
 	else
 	{
-		print("Failed to add effect " + name);
+		//print("Failed to add effect " + name);
+		//Removed debug print cause it happens a lot in normal play :V
 	}
 }

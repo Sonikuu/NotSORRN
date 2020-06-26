@@ -3,6 +3,7 @@
 #include "ElementalCore.as"
 #include "ExplosionCommon.as"
 #include "Hitters.as"
+#include "FxHookCommon.as"
 
 interface IAbility
 {
@@ -285,6 +286,10 @@ class CConsume : CAbilityBase
                 {
 					f32 healAmmount = getHealAmmount(held);
                     blob.server_Heal(healAmmount == 0 ? 1 : healAmmount);
+					//Hi, sonic speaking, im modifying your code :^)
+					if(held.exists("fxid"))
+						applyFx(blob, held.get_u32("fxduration"), held.get_u16("fxpower"), effectlist[held.get_u8("fxid")].getFxName());
+					//End sanic code
                     held.server_Die();
                     stomachItems++;
                 } else if (itemName == "golemitedust")

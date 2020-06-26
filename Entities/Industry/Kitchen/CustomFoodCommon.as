@@ -81,14 +81,14 @@ class CIngredientData
 
 array<CIngredientData@> ingredientdata =
 {
-	@CIngredientData("lettuce", 	"Lettuce",	2, 0, 0.25, 1, 1, 1, 1, 	SColor(255, 100, 155, 13),	Categories::Vegetable),
-	@CIngredientData("grain", 		"Wheat",	3, 0, 0.5, 	1, 1, 1.2, 1.2,	SColor(255, 196, 135, 58),	Categories::Grain),		//technially some generic grain, we'll treat it like wheat tho lel
-	@CIngredientData("tomato", 		"Tomato",	2, 0, 0.25, 1, 1, 1, 1, 	SColor(255, 213, 84, 63),	Categories::Vegetable | Categories::Fruit), //its not both, of course, but eh
-	@CIngredientData("cucumber", 	"Cucumber",	3, 0, 0.25, 1, 1, 1.1, 1.1, SColor(255, 150, 200, 65),	Categories::Vegetable),	//we need stuff with more flavor lel
-	@CIngredientData("steak",	 	"Beef",		4, 0, 0.5, 	1, 1, 1.3, 1.3, SColor(255, 213, 84, 63),	Categories::Meat),
-	@CIngredientData("fishy",	 	"Fish",		2, 0, 0.5, 	1, 1, 1, 1.5, 	SColor(255, 44, 175, 222),	Categories::Meat | Categories::Fish),		//Change to a cooked fish or whatever eventually, maybe
-	@CIngredientData("carrot",	 	"Carrot",	3, 0, 0.25, 1, 1, 1.4, 1, 	SColor(255, 230, 110, 0),	Categories::Vegetable),
-	@CIngredientData("lantern",	 	"Lantern?",	0, 0, 0, 	1, 1, 1, 1, 	SColor(255, 240, 230, 30),	Categories::Cheese)	//Temporary cheese substitute
+	@CIngredientData("lettuce", 	"Lettuce",	2, 6, 0.25, 4, 900, 1, 1, 	SColor(255, 100, 155, 13),	Categories::Vegetable),
+	@CIngredientData("grain", 		"Wheat",	4, 9, 0.5, 	4, 900, 1.2, 1.2,	SColor(255, 196, 135, 58),	Categories::Grain),		//technially some generic grain, we'll treat it like wheat tho lel
+	@CIngredientData("tomato", 		"Tomato",	3, 6, 0.25, 2, 1800, 1, 1, 	SColor(255, 213, 84, 63),	Categories::Vegetable | Categories::Fruit), //its not both, of course, but eh
+	@CIngredientData("cucumber", 	"Cucumber",	4, 0, 0.25, 4, 900, 1.1, 1.1, SColor(255, 150, 200, 65),	Categories::Vegetable),	//we need stuff with more flavor lel
+	@CIngredientData("steak",	 	"Beef",		8, 0, 0.5, 	7, 450, 1.3, 1.3, SColor(255, 213, 84, 63),	Categories::Meat),
+	@CIngredientData("fishy",	 	"Fish",		5, 0, 0.5, 	4, 900, 1, 1.5, 	SColor(255, 44, 175, 222),	Categories::Meat | Categories::Fish),		//Change to a cooked fish or whatever eventually, maybe
+	@CIngredientData("carrot",	 	"Carrot",	6, 10, 0.25, 4, 900, 1.4, 1, 	SColor(255, 230, 110, 0),	Categories::Vegetable),
+	@CIngredientData("lantern",	 	"Lantern?",	0, 0, 0, 	4, 900, 1, 1, 	SColor(255, 240, 230, 30),	Categories::Cheese)	//Temporary cheese substitute
 };
 
 CIngredientData@ getIngredientData(string input)
@@ -129,33 +129,33 @@ array<CRecipeData@> recipelist =
 {
 	@CRecipeData("Burger").addIngredient(Categories::Grain).addIngredient(Categories::Meat).addIngredient(Categories::Vegetable),
 	@CRecipeData("Salad").addIngredient(Categories::Vegetable).addIngredient(Categories::Vegetable).addIngredient(Categories::Vegetable),
-	@CRecipeData("Pizza").addIngredient(Categories::Grain).addIngredient(Categories::Cheese).addSpecific("tomato")
+	@CRecipeData("Pizza").addIngredient(Categories::Grain).addIngredient(Categories::Cheese).addSpecific("tomato"),
+	@CRecipeData("Pancakes").addIngredient(Categories::Grain).addIngredient(Categories::Grain).addIngredient(Categories::Grain)
 };
 
-void makeFoodImage(CBlob@ this)
+void makeFoodData(CBlob@ this)
 {
+	//First, we get the recipe used to make this food
+	u8 recipe = this.get_u8("recipe");
+	array<CIngredientData@> ingredients;
 
-	
-	if(isClient())
+	CRecipeData@ recdata;
+	if(recipe >= recipelist.size())
+		return;
+	@recdata = @recipelist[recipe];
+
+	//Then, all the ingredients from that recipe
+	string texname = "customfood";
+	for(int i = 0; i < recdata.ingredientlist.size(); i++)
 	{
-		//First, we get the recipe used to make this food
-		u8 recipe = this.get_u8("recipe");
-		array<CIngredientData@> ingredients;
+		ingredients.push_back(@getIngredientData(this.get_string("ingredient" + i)));
+		texname += getIngredientData(this.get_string("ingredient" + i)).id;
+	}
 
-		CRecipeData@ recdata;
-		if(recipe >= recipelist.size())
-			return;
-		@recdata = @recipelist[recipe];
-
-		//Then, all the ingredients from that recipe
+	//This part makes the custom sprite we use
+	if(isClient())
+	{	
 		CSprite@ sprite = this.getSprite();
-		string texname = "customfood";
-		for(int i = 0; i < recdata.ingredientlist.size(); i++)
-		{
-			ingredients.push_back(@getIngredientData(this.get_string("ingredient" + i)));
-			texname += getIngredientData(this.get_string("ingredient" + i)).id;
-		}
-
 		Vec2f spritesize(16, 16);
 		if(Texture::exists(texname) && false)
 		{
@@ -191,23 +191,49 @@ void makeFoodImage(CBlob@ this)
 			{
 				mergeOntoColored(newimage, baseimage, Vec2f_zero, startpos + Vec2f((i + 1) * spritesize.x, 0), startpos + Vec2f((i + 1) * spritesize.x, 0) + spritesize, ingredients[i].color);
 			}
-			/*startpos = Vec2f(32, 16 * barrelindex);
-			mergeOnto(newimage, baseimage, barrelpos, startpos, startpos + spritesize);
-			startpos = Vec2f(64, 16 * stockindex);
-			mergeOnto(newimage, baseimage, stockpos, startpos, startpos + spritesize);
-			startpos = Vec2f(96, 16 * gripindex);
-			mergeOnto(newimage, baseimage, grippos, startpos, startpos + spritesize);
-			startpos = Vec2f(128, 16 * magindex);
-			mergeOnto(newimage, baseimage, magpos, startpos, startpos + spritesize);*/
-			
-			//sprite.ReloadSprite(texname);
+
 			Texture::createFromData(texname, newimage);
 			sprite.SetTexture(texname, 16, 16);
 			sprite.SetFrame(0);
 			this.SetInventoryIcon("RecipeIcons.png", recipe, Vec2f(16, 16));
+			this.setInventoryName(recdata.recipename);
 			//Code partially stolen from custom gun stuff woo
 		}
 	}
+
+	//Now, we do the stats of the food
+	//Add specifics to the ingredients array 
+	for(int i = 0; i < recdata.ingredientspecific.size(); i++)
+	{
+		ingredients.push_back(@getIngredientData(recdata.ingredientspecific[i]));
+	}
+	//First, get the highest flavor, this will determine the basic stats
+	int flavorid = -1;
+	int highestflavor = -1;
+
+	for(int i = 0; i < ingredients.size(); i++)
+	{
+		if(ingredients[i].flavor > highestflavor)
+		{
+			flavorid = i;
+			highestflavor = ingredients[i].flavor;
+		}
+	}
+	//Now, extract base stats and multiply the rest into it
+	float foodpower = ingredients[flavorid].basepower;
+	float foodduration = ingredients[flavorid].baseduration;
+	for(int i = 0; i < ingredients.size(); i++)
+	{
+		if(i != flavorid)
+		{
+			foodpower *= ingredients[i].powermod;
+			foodduration *= ingredients[i].durationmod;
+		}
+	}
+	//Lit, now we just set the vars, and applying it will be handled in the food eating code, woo
+	this.set_u8("fxid", ingredients[flavorid].effect);
+	this.set_u16("fxpower", foodpower);
+	this.set_u32("fxduration", foodduration);
 }
 
 void mergeOntoColored(ImageData@ onto, ImageData@ fromimage, Vec2f offset, Vec2f startpos, Vec2f endpos, SColor color)
