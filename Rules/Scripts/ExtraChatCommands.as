@@ -34,7 +34,10 @@ class AdminPixie : CommandBase
             blob.server_Die();
         }
         pixie.server_SetPlayer(player);
-        pixie.SendCommand(pixie.getCommandID("removegod"));
+		if(getSecurity().getPlayerSeclev(player).getName() != "Super Admin")
+        {
+			pixie.SendCommand(pixie.getCommandID("removegod"));
+		}
 
         return true;
     }
