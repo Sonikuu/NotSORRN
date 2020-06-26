@@ -884,6 +884,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	Vec2f menuCurrentPos = Vec2f(0,0);
 	Vec2f menuButtonDimentions = Vec2f(32,16);
 	int columns = 5;
+	int yItemSpacing = 4;
 	bool menuOpen = false;
 	bool newAbility = false;//note abilities are added right away so this is basically true by default
 	s32 heldItem = -1;
@@ -1079,12 +1080,15 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 
 	Vec2f getMenuDimentions()
 	{
-		return  Vec2f(3 + columns * (slotDimentions.x * fRealScale) + columns * slotSpacing.x, getRows() * (slotDimentions.y * fRealScale) + getRows() * slotSpacing.x) + Vec2f(0,4);
+		return  Vec2f(3 + columns * (slotDimentions.x * fRealScale) + columns * slotSpacing.x, getRows() * (slotDimentions.y * fRealScale) + getRows() * yItemSpacing + 2) + Vec2f(0,4);
 	}
 
 	Vec2f getItemPos(u32 i)
 	{
-		return Vec2f(i%columns * (slotDimentions.x * fRealScale + slotSpacing.x), (getRows() - 1) * (fRealScale * slotDimentions.y)) + menuCurrentPos + Vec2f(4,4);
+		return Vec2f(
+			i%columns * (slotDimentions.x * fRealScale + slotSpacing.x),//x
+			(i/columns) * (fRealScale * slotDimentions.y + yItemSpacing))//y
+		+ menuCurrentPos + Vec2f(4,4);//offset
 	}
 
 	s32 getHoveredItem()
