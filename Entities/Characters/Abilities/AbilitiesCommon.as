@@ -583,6 +583,7 @@ class COvertake : CAbilityBase
 					blob.get("AbilityManager",@gmanager);
 
 					b.set_s32("golemiteCount", blob.get_s32("golemiteCount"));
+					b.set_s32("golemiteMax", blob.get_s32("golemiteMax"));
 					b.server_setTeamNum(blob.getTeamNum());
 					b.server_SetPlayer(blob.getPlayer());
 					b.set_string("turn_on_death","golemites");
