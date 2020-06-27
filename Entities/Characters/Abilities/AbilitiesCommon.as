@@ -603,6 +603,7 @@ class COvertake : CAbilityBase
 						CAbilityManager@ nManager;
 						n.get("AbilityManager",@nManager);
 						nManager.abilityMenu.addAbility(EAbilities::SynthesizeBoulder); 
+						n.SendCommand(n.getCommandID("Server_Menu_Sync"));
 					}
 					n.server_SetPlayer(blob.getPlayer());
 					blob.set_string("turn_on_death","");
@@ -969,15 +970,14 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		{
 			masterList.getAbility(list[i]).onTick();
 		}
+		if(isServer() && getGameTime() % 30 == 0)
+		{
+			sendSync();
+		}
 
 		if(menuOpen){newAbility = false;}
 		if(blob.isMyPlayer())
 		{
-			if(getGameTime() % 30 == 0)
-			{
-				sendSync();
-			}
-		
 			CControls@ controls = getControls();
 			if(controls.isKeyJustPressed(KEY_KEY_I))
 			{
