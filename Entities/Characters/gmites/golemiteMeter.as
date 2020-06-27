@@ -1,7 +1,7 @@
 void onRender(CSprite@ this)
 {
     CBlob@ blob = this.getBlob();
-	if(blob.get_s32("golemiteCount") > 0)
+	if(blob.get_s32("golemiteCount") > 0 && this.getBlob().get_s32("golemiteMax") > 0)
 	{
 		if(blob.getPlayer() !is null && blob.getPlayer() is getLocalPlayer())
 		{
