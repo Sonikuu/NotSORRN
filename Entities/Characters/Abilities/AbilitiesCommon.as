@@ -366,6 +366,42 @@ class CSelfDestruct : CAbilityBase
 		blob.SetLightColor(SColor(255, 252, 86, 10));
         blob.SetLightRadius(24.0f);
 	    blob.SetLight(true);
+
+		if(isClient())
+		{
+			CSprite@ s = blob.getSprite();
+			SColor[] oldColors = {
+				SColor(255, 230, 167, 149),
+				SColor(255, 207, 127, 74),
+				SColor(255, 132, 71, 21),
+				SColor(255, 85, 42, 17)
+			};
+			SColor[] newColors = {
+				SColor(255, 246, 105, 65),
+				SColor(255, 214, 95, 17),
+				SColor(255, 146, 61, 24),
+				SColor(255, 73, 21, 0)
+			};
+			ImageData@ bodyData = Texture::data(s.getTextureName());
+			CSpriteLayer@ head = s.getSpriteLayer("head");
+			if(head !is null)
+			{
+				if(!Texture::exists(head.getFilename()))
+            	{
+					if(!Texture::createFromFile(head.getFilename(), head.getFilename()))
+						print("oh this is a problem");
+           		}
+
+				ImageData@ headData = Texture::data(head.getFilename());
+				headData.remap(oldColors,newColors);
+				Texture::createFromData(head.getFilename() + "_remapped",headData);
+				head.SetTexture(head.getFilename() + "_remapped", head.getFrameWidth(),head.getFrameHeight());
+			}
+			bodyData.remap(oldColors,newColors);
+			Texture::createFromData(s.getTextureName() + "_remapped",bodyData);
+			s.SetTexture(s.getTextureName()+ "_remapped",s.getFrameWidth(),s.getFrameHeight());
+
+		}
 	}
 
     void onTick()
