@@ -44,6 +44,8 @@ f32 onHit(CBlob@ this, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitt
 		case CHitters::pure:
 		case CHitters::corrupt:
 			scale = 0.25f; break;
+		case CHitters::poison:
+			scale = 0.0f; break;
 		//case CHitters::yeet:
 			//scale = 75.0f; break;
 

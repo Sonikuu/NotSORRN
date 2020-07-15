@@ -20,7 +20,8 @@ array<CPlantGrowthData@> growthdatas = {
 	@CPlantGrowthData("tomato_plant", 400, 10, 4),
 	@CPlantGrowthData("cucumber_plant", 400, 11, 4),
 	@CPlantGrowthData("carrot_plant", 300, 12, 4),
-	@CPlantGrowthData("grain_plant", 300, 1, 4)		//Should happen before hardcoded impl?
+	@CPlantGrowthData("grain_plant", 300, 1, 4),		//Should happen before hardcoded impl?
+	@CPlantGrowthData("rosarybead_plant", 500, 13, 4)
 };
 
 CPlantGrowthData@ getGrowthData(string plantname)

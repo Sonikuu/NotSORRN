@@ -81,14 +81,15 @@ class CIngredientData
 
 array<CIngredientData@> ingredientdata =
 {
-	@CIngredientData("lettuce", 	"Lettuce",	2, 6, 0.25, 4, 900, 1, 1, 	SColor(255, 100, 155, 13),	Categories::Vegetable),
-	@CIngredientData("grain", 		"Wheat",	4, 9, 0.5, 	4, 900, 1.2, 1.2,	SColor(255, 196, 135, 58),	Categories::Grain),		//technially some generic grain, we'll treat it like wheat tho lel
-	@CIngredientData("tomato", 		"Tomato",	3, 6, 0.25, 2, 1800, 1, 1, 	SColor(255, 213, 84, 63),	Categories::Vegetable | Categories::Fruit), //its not both, of course, but eh
-	@CIngredientData("cucumber", 	"Cucumber",	4, 0, 0.25, 4, 900, 1.1, 1.1, SColor(255, 150, 200, 65),	Categories::Vegetable),	//we need stuff with more flavor lel
-	@CIngredientData("steak",	 	"Beef",		8, 0, 0.5, 	7, 450, 1.3, 1.3, SColor(255, 213, 84, 63),	Categories::Meat),
-	@CIngredientData("fishy",	 	"Fish",		5, 0, 0.5, 	4, 900, 1, 1.5, 	SColor(255, 44, 175, 222),	Categories::Meat | Categories::Fish),		//Change to a cooked fish or whatever eventually, maybe
-	@CIngredientData("carrot",	 	"Carrot",	6, 10, 0.25, 4, 900, 1.4, 1, 	SColor(255, 230, 110, 0),	Categories::Vegetable),
-	@CIngredientData("lantern",	 	"Lantern?",	0, 0, 0, 	4, 900, 1, 1, 	SColor(255, 240, 230, 30),	Categories::Cheese)	//Temporary cheese substitute
+	@CIngredientData("lettuce", 	"Lettuce",		2, 6, 0.25, 4, 900, 1, 1, 	SColor(255, 100, 155, 13),	Categories::Vegetable),
+	@CIngredientData("grain", 		"Wheat",		4, 9, 0.5, 	4, 900, 1.2, 1.2,	SColor(255, 196, 135, 58),	Categories::Grain),		//technially some generic grain, we'll treat it like wheat tho lel
+	@CIngredientData("tomato", 		"Tomato",		3, 6, 0.25, 2, 1800, 1, 1, 	SColor(255, 213, 84, 63),	Categories::Vegetable | Categories::Fruit), //its not both, of course, but eh
+	@CIngredientData("cucumber", 	"Cucumber",		4, 0, 0.25, 4, 900, 1.1, 1.1, SColor(255, 150, 200, 65),	Categories::Vegetable),	//we need stuff with more flavor lel
+	@CIngredientData("steak",	 	"Beef",			8, 0, 0.5, 	7, 450, 1.3, 1.3, SColor(255, 213, 84, 63),	Categories::Meat),
+	@CIngredientData("fishy",	 	"Fish",			5, 0, 0.5, 	4, 900, 1, 1.5, 	SColor(255, 44, 175, 222),	Categories::Meat | Categories::Fish),		//Change to a cooked fish or whatever eventually, maybe
+	@CIngredientData("carrot",	 	"Carrot",		6, 10, 0.25, 4, 900, 1.4, 1, 	SColor(255, 230, 110, 0),	Categories::Vegetable),
+	@CIngredientData("lantern",	 	"Lantern?",		0, 0, 0, 	4, 900, 1, 1, 	SColor(255, 240, 230, 30),	Categories::Cheese),	//Temporary cheese substitute
+	@CIngredientData("rosarybead", 	"Rosary Bead",	10, 11, -0.5, 15, 300, 1, 1, 	SColor(255, 150, 64, 43),	Categories::Vegetable)
 };
 
 CIngredientData@ getIngredientData(string input)
@@ -157,25 +158,31 @@ void makeFoodData(CBlob@ this)
 	{	
 		CSprite@ sprite = this.getSprite();
 		Vec2f spritesize(16, 16);
-		if(Texture::exists(texname) && false)
+		//Texname is the unique name for each type of food
+		//If it exists, we can just set it
+		if(Texture::exists(texname))
 		{
 			sprite.SetTexture(texname, 16, 16);
 			sprite.SetFrame(0);
 		}
 		else
 		{
-			
+			//Otherwise, make the sprite
+
+			//This part makes sure the ImageData for the base custom food sprite exists, so we can copy what we need from it	
 			if(!Texture::exists("CustomFood"))
 			{
 				if(!Texture::createFromFile("CustomFood", "CustomFood.png"))
 					print("oh this is a problem");
 			}
+			//Getting base image data
 			ImageData@ baseimage = Texture::data("CustomFood");
 			//if(!Texture::createBySize(texname, 32, 16))
 				//print("ohno");
+			//New image data
 			ImageData@ newimage = @ImageData(16, 16);
 			
-			
+			//First, clear image
 			for(int x = 0; x < 16; x++)
 			{
 				for(int y = 0; y < 16; y++)
@@ -184,21 +191,25 @@ void makeFoodData(CBlob@ this)
 				}
 			}
 			
-			
+			//Now, for each ingredient we add the pixels from the base image, properly tinted to match the ingredient
 			Vec2f startpos = Vec2f(0, 16 * recipe);
+			//First thing we copy is not tinted, usually outline and such
 			mergeOnto(newimage, baseimage, Vec2f_zero, startpos, startpos + spritesize);
 			for(int i = 0; i < ingredients.size(); i++)
 			{
 				mergeOntoColored(newimage, baseimage, Vec2f_zero, startpos + Vec2f((i + 1) * spritesize.x, 0), startpos + Vec2f((i + 1) * spritesize.x, 0) + spritesize, ingredients[i].color);
 			}
 
+			//Now, we actually create the texture from the new image data
 			Texture::createFromData(texname, newimage);
+			//And just set all the stuff we need to
 			sprite.SetTexture(texname, 16, 16);
 			sprite.SetFrame(0);
-			this.SetInventoryIcon("RecipeIcons.png", recipe, Vec2f(16, 16));
-			this.setInventoryName(recdata.recipename);
+			
 			//Code partially stolen from custom gun stuff woo
 		}
+		this.SetInventoryIcon("RecipeIcons.png", recipe, Vec2f(16, 16));
+		this.setInventoryName(recdata.recipename);
 	}
 
 	//Now, we do the stats of the food

@@ -35,10 +35,13 @@ void onInit(CBlob@ this)
 	this.set_u8("currrecipe", 255);
 	
 	AddIconToken("$add_fuel$", "FireFlash.png", Vec2f(32, 32), 0);
+	AddIconToken("$open_menu$", "RecipeIcons.png", Vec2f(16, 16), 0);
 	
 	this.set_TileType("background tile", CMap::tile_castle_back);
 
 	this.Tag("builder always hit");
+
+	this.inventoryButtonPos = Vec2f(-12, 0);
 }
 
 void onInit(CSprite@ this)
@@ -46,8 +49,26 @@ void onInit(CSprite@ this)
 	this.SetEmitSound("Inferno.ogg");
 	this.SetEmitSoundVolume(0.5);
 	this.SetEmitSoundPaused(true);
-}
 
+	{
+		CSpriteLayer@ itemlayer = this.addSpriteLayer("item0");
+		itemlayer.SetRelativeZ(1);
+		itemlayer.SetVisible(false);
+		itemlayer.SetOffset(Vec2f(20, -12));
+	}
+	{
+		CSpriteLayer@ itemlayer = this.addSpriteLayer("item1");
+		itemlayer.SetRelativeZ(1);
+		itemlayer.SetVisible(false);
+		itemlayer.SetOffset(Vec2f(12, -12));
+	}
+	{
+		CSpriteLayer@ itemlayer = this.addSpriteLayer("item2");
+		itemlayer.SetRelativeZ(1);
+		itemlayer.SetVisible(false);
+		itemlayer.SetOffset(Vec2f(4, -12));
+	}
+}
 
 void onTick(CSprite@ this)
 {
@@ -63,6 +84,44 @@ void onTick(CSprite@ this)
 		this.RewindEmitSound();
 		this.SetFrame(1);
 	}
+	//Dont look
+	string item0s = "";
+	string item1s = "";
+	int curritem = 0;
+	CInventory@ inv = blob.getInventory();
+	for (int i = 0; i < inv.getItemsCount() && curritem < 3; i++)
+	{
+		CBlob@ item = inv.getItem(i);
+		string lastitem = blob.get_string("lastitem" + curritem);
+		if(item !is null)
+		{
+			CSpriteLayer@ itemlayer = this.getSpriteLayer("item" + curritem);
+			if(itemlayer !is null && item.getConfig() != item0s && item.getConfig() != item1s)
+			{
+				itemlayer.SetVisible(true);
+				CSprite@ itemsprite = item.getSprite();
+				if(lastitem != item.getConfig())
+				{
+					itemlayer.ReloadSprite(itemsprite.getFilename(), itemsprite.getFrameWidth(), itemsprite.getFrameHeight());
+					blob.set_string("lastitem" + curritem, item.getConfig());
+				}
+				itemlayer.SetFrame(itemsprite.getFrame());
+				if(curritem == 0)
+					item0s = item.getConfig();
+				else if(curritem == 1)
+					item1s = item.getConfig();
+				curritem++;
+			}
+		}
+	}
+	if(curritem < 3)
+		{CSpriteLayer@ itemlayer = this.getSpriteLayer("item2"); if(itemlayer !is null) itemlayer.SetVisible(false);}
+	if(curritem < 2)
+		{CSpriteLayer@ itemlayer = this.getSpriteLayer("item1"); if(itemlayer !is null) itemlayer.SetVisible(false);}
+	if(curritem < 1)
+		{CSpriteLayer@ itemlayer = this.getSpriteLayer("item0"); if(itemlayer !is null) itemlayer.SetVisible(false);}
+
+	
 }
 
 void onTick(CBlob@ this)
@@ -193,6 +252,7 @@ void onTick(CBlob@ this)
 			{
 				food.set_string("ingredient" + i, this.get_string("selingredient" + i));
 			}
+			food.Init();
 		}
 	}
 }
@@ -207,14 +267,14 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 		{
 			CBitStream params;
 			params.write_u16(caller.getNetworkID());
-			caller.CreateGenericButton("$add_fuel$", Vec2f(0, 6), this, this.getCommandID("addfuel"), "Add Fuel: " + formatFloat(value, ""), params);
+			caller.CreateGenericButton("$add_fuel$", Vec2f(6, 0), this, this.getCommandID("addfuel"), "Add Fuel: " + formatFloat(value, ""), params);
 		}
 	}
 	else
 	{
 		CBitStream params;
 		params.write_u16(caller.getNetworkID());
-		caller.CreateGenericButton("$open_menu$", Vec2f(0, 6), this, this.getCommandID("recipemenu"), "Open Recipe Menu", params);
+		caller.CreateGenericButton("$open_menu$", Vec2f(6, 0), this, this.getCommandID("recipemenu"), "Open Recipe Menu", params);
 	}
 }
 

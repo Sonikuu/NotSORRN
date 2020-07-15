@@ -7,6 +7,7 @@ namespace CHitters
 		corrupt = 34,
 		pure,
 		bullet,
-		yeet
+		yeet,
+		poison
 	};
 }

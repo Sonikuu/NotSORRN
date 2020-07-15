@@ -303,9 +303,18 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 		{
 			BuildBlock b(0, "storage", "$storage$", "Storage");
 			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 200);
-			AddRequirement(b.reqs, "blob", "mat_wood", "Gold", 100);
+			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 100);
 			b.buildOnGround = true;
 			b.size.Set(40, 24);
+			blocks[0].push_back(b);
+		}
+		{
+			BuildBlock b(0, "kitchen", "$kitchen$", "Kitchen\nProduce special food items");
+			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 200);
+			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 100);
+			AddRequirement(b.reqs, "blob", "mat_component", "Mechanical Components", 8);
+			b.buildOnGround = true;
+			b.size.Set(48, 32);
 			blocks[0].push_back(b);
 		}
 		{

@@ -174,7 +174,7 @@ class CStatusUnholy : CStatusBase
 {
 	void onTick(CBlob@ this)
 	{
-		float movemult = this.get_u16("fxunholypower") / 10.0 + 1;
+		float movemult = this.get_u16("fxunholypower") / 15.0 + 1;
 		RunnerMoveVars@ moveVars;
 		if (!this.get("moveVars", @moveVars))
 		{
@@ -197,8 +197,8 @@ class CStatusUnholy : CStatusBase
 	string getHoverText(CBlob@ this, bool algo)
 	{
 		if(algo)
-			return "Multiply movement speed by $GREEN$((power / 10) + 1)$GREEN$";
-		return "Multiply movement speed by $GREEN$" + formatFloat(this.get_u16("fxunholypower") / 10.0 + 1, "", 0, 1) + "$GREEN$";
+			return "Multiply movement speed by $GREEN$((power / 15) + 1)$GREEN$";
+		return "Multiply movement speed by $GREEN$" + formatFloat(this.get_u16("fxunholypower") / 15.0 + 1, "", 0, 1) + "$GREEN$";
 	}
 }
 
@@ -401,7 +401,7 @@ class CStatusSpeed : CStatusBase
 {
 	void onTick(CBlob@ this)
 	{
-		float movemult = this.get_u16("fxspeedpower") / 7.5 + 1;
+		float movemult = this.get_u16("fxspeedpower") / 10.0 + 1;
 		RunnerMoveVars@ moveVars;
 		if (!this.get("moveVars", @moveVars))
 		{
@@ -424,8 +424,8 @@ class CStatusSpeed : CStatusBase
 	string getHoverText(CBlob@ this, bool algo)
 	{
 		if(algo)
-			return "Multiply walking speed by $GREEN$((power / 7.5) + 1)$GREEN$";
-		return "Multiply walking speed by $GREEN$" + formatFloat(this.get_u16("fxspeedpower") / 7.5 + 1, "", 0, 1) + "$GREEN$";
+			return "Multiply walking speed by $GREEN$((power / 10.0) + 1)$GREEN$";
+		return "Multiply walking speed by $GREEN$" + formatFloat(this.get_u16("fxspeedpower") / 10.0 + 1, "", 0, 1) + "$GREEN$";
 	}
 }
 
@@ -471,7 +471,38 @@ class CStatusLeap : CStatusBase
 	}
 }
 
+class CStatusPoison : CStatusBase
+{
+	void onTick(CBlob@ this)
+	{
+		if(getGameTime() % 15 == 0)
+			this.server_Hit(this, this.getPosition(), Vec2f_zero, this.get_u16("fxpoisonpower") * 0.01, 38, true);//38 is poison (CHitters.as)
 
+		if((getGameTime() % 10 == 0) && isClient())
+		{
+			CParticle@ p = makeGibParticle("Poison.png", this.getPosition() + Vec2f(XORRandom(16) - 8, XORRandom(16) - 8), Vec2f(XORRandom(10) - 5, XORRandom(10) - 10) / 10.0, 0, XORRandom(4), Vec2f(8, 8), 0, 0, "");
+			p.gravity = Vec2f(0, 0);
+			p.scale = 0.5;
+		}
+	}
+	string getFxName()
+	{
+		return "fxpoison";
+	}
+	void renderIcon(Vec2f pos, CBlob@ this)
+	{
+		GUI::DrawIcon("EffectIcons.png", 11, Vec2f(16, 16), pos);
+		GUI::DrawTextCentered("" + this.get_u16("fxpoisontime") / 30, pos + Vec2f(16, 32), SColor(255, 50, 255, 50));
+		GUI::DrawTextCentered("" + this.get_u16("fxpoisonpower"), pos + Vec2f(16, -8), SColor(255, 50, 255, 50));
+	}
+	//Implement the rest later
+	string getHoverText(CBlob@ this, bool algo)
+	{
+		if(algo)
+			return "Lose $RED$(power * 0.01)$RED$HP every half-second";
+		return "Lose $RED$" + formatFloat(this.get_u16("fxpoisonpower") * 0.01, "", 0, 1) + "$RED$HP every half-second";
+	}
+}
 
 
 
@@ -499,7 +530,8 @@ array<IStatusEffect@> effectlist = {
 	cast<IStatusEffect@>(@CStatusLightFall()),		//7
 	cast<IStatusEffect@>(@CStatusGhostLike()),		//8
 	cast<IStatusEffect@>(@CStatusSpeed()),			//9
-	cast<IStatusEffect@>(@CStatusLeap())			//10
+	cast<IStatusEffect@>(@CStatusLeap()),			//10
+	cast<IStatusEffect@>(@CStatusPoison())			//11
 };
 
 Vec2f getEffectIconCenter(int i)
