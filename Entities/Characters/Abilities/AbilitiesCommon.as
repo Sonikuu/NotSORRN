@@ -967,7 +967,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	int columns = 5;
 	int yItemSpacing = 4;
 	bool menuOpen = false;
-	bool newAbility = false;//note abilities are added right away so this is basically true by default
+	bool newAbility = false;//note abilities are added right away so this could be true by default
 	s32 heldItem = -1;
 
 	u32[] list = {
