@@ -27,21 +27,18 @@ class CAbilityBase : IAbility
 	void onDie(){}
 	void onInit(){}
 	string name = "CABilityBase";
-    string getBorder(){return border;}
-    string textureName;
-    string border = "Border.png";
-    string description = "Description not added";
     CBlob@ blob;
 
-    string getTextureName() {return textureName;}
-    string getDescription(){return description;}
+    string getTextureName() {error("Attempted to get texture on CABilityBase. Returning \"\""); return "";}
+    string getDescription(){error("Attempted to get description on CABilityBase. Returning \"\""); return "";}
+    string getBorder(){error("Attempted to get border on CABilityBase. Returning \"\""); return "";}
+
     CBlob@ getBlob() {return blob;}
 	string getName(){return name;}
 
 
-    CAbilityBase(string _textureName, CBlob@ _blob)
+    CAbilityBase(CBlob@ _blob)
     {
-        textureName = _textureName;
         @blob = _blob;
     }
 
@@ -82,28 +79,28 @@ class CAbilityEmpty : CAbilityBase
 	{
 		return "Empty";
 	}
+	string getBorder() override
+	{
+		return "Border.png";
+	}
 }
 
 class CToggleableAbillityBase : CAbilityBase
 {
-    CToggleableAbillityBase()
-    {
-        border = "BorderRed.png";
-    }
     bool activated = false;
     void activate() override
     {
         activated = !activated;
-
-        border = activated ? "BorderGreen" : "BorderRed";
     }
+
+	string getBorder() override {return activated ? "BorderGreen" : "BorderRed";}
 }
 
 class CPoint : CAbilityBase
 {
-    CPoint(string textureName, CBlob@ blob)
+    CPoint(CBlob@ blob)
     {
-        super(textureName,blob);
+        super(blob);
 
         blob.addCommandID("CPoint_timeSync");
         blob.addCommandID("CPoint_tposSync");
@@ -132,6 +129,15 @@ class CPoint : CAbilityBase
 		return "Point";
 	}
 
+	string getTextureName() override
+	{
+		return "abilityPoint.png";
+	}
+
+	string getBorder() override
+	{
+		return "Border.png";
+	}
 
     void activate() override
     {
@@ -165,9 +171,9 @@ class CConsume : CAbilityBase
 
     int stomachItems = 0;
     int stomachMax = 10;
-    CConsume(string _textureName, CBlob@ _blob)
+    CConsume(CBlob@ _blob)
     {
-        super(_textureName,_blob);
+        super(_blob);
         blob.addCommandID("CONSUME_held_item");
     }
     string getName() override
@@ -177,6 +183,14 @@ class CConsume : CAbilityBase
 	string getDescription() override
 	{
 		return "Eats currently held item if you aren't full";
+	}
+	string getTextureName() override
+	{
+		return "abilityConsume.png";
+	}
+	string getBorder() override
+	{
+		return "Border.png";
 	}
 
     void activate() override
@@ -346,9 +360,9 @@ class CSelfDestruct : CAbilityBase
 	f32 instability = 0;
 	bool cheaterMode = false;
 
-    CSelfDestruct(string textureName, CBlob@ blob)
+    CSelfDestruct(CBlob@ blob)
     {
-        super(textureName,blob);
+        super(blob);
 
 		blob.addCommandID("SelfDestruct_Activate");
     }
@@ -424,6 +438,14 @@ class CSelfDestruct : CAbilityBase
 	{
 		return "Self Destruct";
 	}
+	string getTextureName() override
+	{
+		return "abilitySelfDestruct.png";
+	}
+	string getBorder() override
+	{
+		return "Border.png";
+	}
 
     void activate() override
     {
@@ -452,9 +474,9 @@ class CSelfDestruct : CAbilityBase
 
 class CAbsorb : CAbilityBase
 {
-	CAbsorb(string _textureName, CBlob@ _blob)
+	CAbsorb(CBlob@ _blob)
 	{
-		super(_textureName, _blob);
+		super(_blob);
 
 		blob.addCommandID("Absorb_activate");
 	}
@@ -472,6 +494,14 @@ class CAbsorb : CAbilityBase
 	string getName()
 	{
 		return "Absorb";
+	}
+	string getTextureName() override
+	{
+		return "abilityAbsorb.png";
+	}
+	string getBorder() override
+	{
+		return "Border.png";
 	}
 
 	void onCommand(u8 cmd, CBitStream@ params)
@@ -513,9 +543,9 @@ class CAbsorb : CAbilityBase
 
 class COvertake : CAbilityBase
 {
-	COvertake(string _textureName, CBlob@ _blob)
+	COvertake(CBlob@ _blob)
 	{
-		super(_textureName,_blob);
+		super(_blob);
 
 		blob.addCommandID("Overtake_overtake");
 	}
@@ -582,6 +612,14 @@ class COvertake : CAbilityBase
 
 	string getName(){return "Overtake";}
 	string getDescription(){return "Attempt to control a nearby creature or object";}
+	string getTextureName() override
+	{
+		return "abilityOvertake.png";
+	}
+	string getBorder() override
+	{
+		return "Border.png";
+	}
 
 	void activate() override
 	{
@@ -657,15 +695,23 @@ class COvertake : CAbilityBase
 
 class CSynthesizeBoulder : CAbilityBase
 {
-	CSynthesizeBoulder(string _textureName, CBlob@ _blob)
+	CSynthesizeBoulder(CBlob@ _blob)
 	{
-		super(_textureName,_blob);
+		super(_blob);
 
 		blob.addCommandID("SynthesizeBoulder_activate");
 	}
 
 	string getName() override {return "Synthesize Boulder";}
 	string getDescription()override {return "Solidifys $RED$100$RED$ golemites into a boulder";}
+	string getTextureName() override
+	{
+		return "abilitySynthesizeBoulder.png";
+	}
+	string getBorder() override
+	{
+		return "Border.png";
+	}
 
 	void activate() override
 	{
@@ -707,13 +753,13 @@ class CAbilityMasterList
 		@this.blob = _blob;
 	//order here matters, needs relate to the enum
 		IAbility@[] _abilities = {
-			CAbilityEmpty(),
-			CPoint("abilityPoint.png",blob),
-			CConsume("abilityConsume.png",blob),
-			CSelfDestruct("abilitySelfDestruct",blob),
-			CAbsorb("abilityAbsorb.png",blob),
-			COvertake("abilityOvertake.png",blob),
-			CSynthesizeBoulder("abilitySynthesizeBoulder.png",blob)
+			CAbilityEmpty	(),
+			CPoint				(blob),
+			CConsume			(blob),
+			CSelfDestruct		(blob),
+			CAbsorb				(blob),
+			COvertake			(blob),
+			CSynthesizeBoulder	(blob)
 		};
 		abilities = _abilities;//I can't figure out how to do an array litteral outside of right when you create a var so I just copy it into the main one
 	}
