@@ -71,7 +71,7 @@ class CAbilityEmpty : CAbilityBase
 	}
 	void activate() override
 	{
-		//I know this part may be hard to under stand, a lot is going on here but I think you can work through it if you try
+		//I know this part may be hard to understand, a lot is going on here but I think you can work through it if you try
 	}
 
     string getDescription() override
