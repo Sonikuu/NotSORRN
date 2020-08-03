@@ -54,11 +54,11 @@ class CAbilityBase : IAbility
 
     void onCommand( u8 cmd, CBitStream @params ){}
 
-	void addToMyChat(string msg)
+	void addToMyChat(string msg, SColor color = SColor(255,60,60,255))
     {
         if(blob.isMyPlayer())
         {
-            client_AddToChat(msg, SColor(255,60,60,255));
+            client_AddToChat(msg, color);
         }
     }
 }
@@ -312,14 +312,6 @@ class CConsume : CAbilityBase
         if(held !is null)
         {
             blob.getSprite().PlaySound(held.get_string("eat sound"));
-        }
-    }
-
-    void addToMyChat(string msg)
-    {
-        if(blob.isMyPlayer())
-        {
-            client_AddToChat(msg, SColor(255,60,60,255));
         }
     }
 
