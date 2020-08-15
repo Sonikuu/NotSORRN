@@ -1,4 +1,4 @@
-#include "AlchemyCommon"
+#include "NodeCommon.as"
 
 void onInit(CBlob@ this)
 {

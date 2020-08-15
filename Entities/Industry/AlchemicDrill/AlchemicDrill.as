@@ -4,7 +4,7 @@
 #include "BuilderHittable.as";
 #include "ParticleSparks.as";
 #include "MaterialCommon.as";
-#include "AlchemyCommon.as";
+#include "NodeCommon.as";
 #include "KnockedCommon.as";
 
 const f32 speed_thresh = 2.4f;

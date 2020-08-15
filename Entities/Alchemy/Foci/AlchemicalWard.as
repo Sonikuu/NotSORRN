@@ -1,4 +1,4 @@
-#include "AlchemyCommon.as";
+#include "NodeCommon.as";
 
 const float wardrange = 64;
 //64 = 8 tiles

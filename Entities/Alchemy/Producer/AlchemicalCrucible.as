@@ -1,4 +1,4 @@
-#include "AlchemyCommon.as";
+#include "NodeCommon.as";
 #include "FuelCommon.as";
 
 class CMeltableItem
@@ -206,7 +206,7 @@ void onRender(CSprite@ this)
 	if(controls is null || blob is null)
 		return;
 	GUI::SetFont("snes");
-	CAlchemyTankController@ controller = getTankController(blob);
+	CNodeController@ controller = getNodeController(blob);
 	for (uint i = 0; i < controller.tanks.length; i++)
 	{
 		Vec2f fuelpos = (Vec2f(0, 12) * camera.targetDistance * 2 + blob.getScreenPos());

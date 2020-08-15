@@ -1,6 +1,6 @@
 //Alchemy stuff
 
-#include "ElementalCore.as";
+/*#include "ElementalCore.as";
 
 class CAlchemyTank
 {
@@ -342,5 +342,5 @@ SColor getAverageElementColor(CAlchemyTank@ tank)
 		output.set(255, output.getRed() + elecol.getRed() * ratio, output.getGreen() + elecol.getGreen() * ratio, output.getBlue() + elecol.getBlue() * ratio);
 	}
 	return output;
-}
+}*/
 

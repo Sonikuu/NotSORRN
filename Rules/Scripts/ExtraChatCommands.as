@@ -1,6 +1,6 @@
 #include "CommandChatCommon.as"
 #include "ElementalCore.as"
-#include "AlchemyCommon.as"
+#include "NodeCommon.as"
 
 class AdminPixie : CommandBase
 {
@@ -88,6 +88,36 @@ class Vial :CommandBase
 
 }
 
+class Kit : CommandBase
+{
+	void Setup(string[]@ tokens) override
+    {
+        if(names[0] == 0)
+        {
+			names[0] = "kit".getHash();
+		}
+	}
+
+	bool CommandCode(CRules@ this, string[]@ tokens, CPlayer@ player, CBlob@ blob, Vec2f pos, int team, CPlayer@ target_player, CBlob@ target_blob) override
+    {
+		// yteet
+		{CBlob@ mats = server_CreateBlob("mat_stone", blob.getTeamNum(), pos);}
+        {CBlob@ mats = server_CreateBlob("mat_stone", blob.getTeamNum(), pos);}
+        {CBlob@ mats = server_CreateBlob("mat_wood", blob.getTeamNum(), pos);}
+        {CBlob@ mats = server_CreateBlob("mat_wood", blob.getTeamNum(), pos);}
+		return true;
+	}
+
+	bool canUseCommand(CRules@ rules, string[]@ tokens, CPlayer@ player, CBlob@ blob)
+	{
+		string name = getSecurity().getPlayerSeclev(player).getName();
+		return (name == "Super Admin");
+	}
+
+
+}
+
+
 void onInit(CRules@ this)
 {
     if(isServer())
@@ -97,5 +127,6 @@ void onInit(CRules@ this)
         if(commands is null){error("COMMANDS WAS NULL ADMINPIXIE COMMAND NOT ADDED!!! Try adjusting mod order"); return;}
         commands.push_back(AdminPixie());
 		commands.push_back(Vial());
+        commands.push_back(Kit());
     }
 }

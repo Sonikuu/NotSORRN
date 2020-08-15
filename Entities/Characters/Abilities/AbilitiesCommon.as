@@ -1,5 +1,5 @@
 #include "Hitters.as"
-#include "AlchemyCommon.as"
+#include "NodeCommon.as"
 #include "ElementalCore.as"
 #include "ExplosionCommon.as"
 #include "Hitters.as"

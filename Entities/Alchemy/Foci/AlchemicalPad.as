@@ -1,4 +1,4 @@
-#include "AlchemyCommon.as";
+#include "NodeCommon.as";
 #include "RenderParticleCommon.as";
 
 void onInit(CBlob@ this)

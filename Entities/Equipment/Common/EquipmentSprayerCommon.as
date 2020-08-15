@@ -2,7 +2,7 @@
 #include "Hitters.as";
 #include "MaterialCommon.as";
 #include "ParticleSparks.as";
-#include "AlchemyCommon.as";
+#include "NodeCommon.as";
 
 const u32 sprayersyncbits = EquipmentBitStreams::Tu32;
 

@@ -1,13 +1,12 @@
 //Basic alchemy setup and ticking maybe?
 //Will also handle syncing to new players, since it wont be done automatically
 
-#include "AlchemyCommon.as";
-
-const float maxrange = 128;
+#include "NodeCommon.as";
 
 void onInit(CBlob@ this)
 {
-	addTankController(this);
+	//Note: Later on we should move all node init and tick stuff to a separate file, only not doing now cause im a lazy bum
+	addNodeController(this);
 	this.addCommandID("startconnect");
 	this.addCommandID("connect");
 	this.addCommandID("disconnect");
@@ -51,7 +50,7 @@ void onRender(CSprite@ this)
 	if(controls is null || blob is null)
 		return;
 	GUI::SetFont("snes");
-	CAlchemyTankController@ controller = getTankController(blob);
+	CNodeController@ controller = getNodeController(blob);
 	if(controller is null)
 		return;
 	for (uint i = 0; i < controller.tanks.length; i++)
@@ -69,7 +68,7 @@ void onTick(CSprite@ this)
 {
 	CBlob@ blob = this.getBlob();
 	
-	CAlchemyTankController@ controller = getTankController(blob);
+	CNodeController@ controller = getNodeController(blob);
 	if(controller is null)
 		return;
 	
@@ -140,7 +139,7 @@ void onTick(CSprite@ this)
 void onTick(CBlob@ this)
 {
 	manageConnectSys(this);
-	CAlchemyTankController@ controller = getTankController(this);
+	CNodeController@ controller = getNodeController(this);
 	
 	if(controller is null)
 		return;
@@ -183,7 +182,8 @@ void onTick(CBlob@ this)
 	for (uint i = 0; i < controller.tanks.length; i++)
 	{
 		//controller.tanks[i].lasttransfer = -1;
-		if(controller.tanks[i].connection !is null)
+		controller.tanks[i].update(0);
+		/*if(controller.tanks[i].connection !is null)
 		{
 			CBlob@ toblob = getBlobByNetworkID(controller.tanks[i].connectionid);
 			if(toblob is null)
@@ -228,7 +228,7 @@ void onTick(CBlob@ this)
 						transferSimple(controller.tanks[i], controller.tanks[i].connection, this.get_u16("transferrate"));
 				}
 			}
-		}
+		}*/
 	}
 }
 
@@ -236,7 +236,7 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
 	if((this.hasTag("building") && this.isAttached()) || (this.getTeamNum() != caller.getTeamNum() && !(this.getTeamNum() > 7 && caller.getTeamNum() > 7)))
 		return;
-	CAlchemyTankController@ controller = getTankController(this);
+	CNodeController@ controller = getNodeController(this);
 	
 	if(controller is null)
 		return;
@@ -423,7 +423,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 			CPlayer@ player = getPlayerByNetworkId(params.read_u16());
 			if(player !is null)
 			{
-				CAlchemyTankController@ controller = getTankController(this);
+				CNodeController@ controller = getNodeController(this);
 				if(controller is null)
 					return;
 				for (uint i = 0; i < controller.tanks.length; i++)
@@ -433,7 +433,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 						CBlob@ toblob = getBlobByNetworkID(controller.tanks[i].connectionid);
 						if(toblob !is null)
 						{
-							CAlchemyTankController@ targcontroll = getTankController(toblob);
+							CNodeController@ targcontroll = getNodeController(toblob);
 							CBitStream newparams;
 							newparams.write_u16(0xFFFF);//Shouldnt matter much
 							//What a mess
@@ -465,7 +465,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 		if(getNet().isClient())
 		{
 			//Not gonna check null for this one cause this kinda needs to happen
-			CAlchemyTankController@ controller = getTankController(this);
+			CNodeController@ controller = getNodeController(this);
 			u8 tankid = params.read_u8();
 			if(controller.tanks.length > tankid)
 			{
@@ -598,22 +598,6 @@ void updateSprite(CBlob@ blob, CBlob@ toblob, CAlchemyTank@ fromtank, CAlchemyTa
 	}
 }
 
-Vec2f getWorldTankPos(CBlob@ blob, CAlchemyTank@ tank)
-{
-	Vec2f offset = tank.offset;
-	Vec2f topos = blob.getPosition() + offset.RotateBy(blob.getAngleDegrees());
-		
-		
-	if(blob.get_bool("equipped"))
-	{
-		CBlob@ equipper = getBlobByNetworkID(blob.get_u16("equipper"));
-		if(equipper !is null)
-			topos = equipper.getPosition();
-	}
-	
-	return topos;
-}
-
 u16 fromtanknet = 0;
 u8 fromtankid = 0;
 
@@ -629,7 +613,7 @@ void manageConnectSys(CBlob@ this)
 		Vec2f mousepos = con.getMouseWorldPos();
 		u8 nearesttank = 0;
 		float nearestdist = 999;
-		CAlchemyTankController@ controller = getTankController(this);
+		CNodeController@ controller = getNodeController(this);
 
 	//	print("infdunc");
 	
@@ -667,7 +651,7 @@ void manageConnectSys(CBlob@ this)
 			CBlob@ fromblob = getBlobByNetworkID(fromtanknet);
 			if(fromblob !is null)
 			{
-				CAlchemyTankController@ fromcon = getTankController(fromblob);
+				CNodeController@ fromcon = getNodeController(fromblob);
 				if(fromcon !is null && fromcon.tanks.size() > fromtankid)
 				{
 					CAlchemyTank@ fromtank = @fromcon.tanks[fromtankid];
@@ -701,7 +685,7 @@ void connectSysRender(CBlob@ this)
 		//CBlob@ netblob = getBlobByNetworkID(fromtanknet);
 	//	if(netblob !is null)
 		{
-			CAlchemyTankController@ fromcontroller = getTankController(this);
+			CNodeController@ fromcontroller = getNodeController(this);
 
 			if(fromcontroller !is null && fromcontroller.tanks.size() > fromtankid)
 			{
@@ -713,7 +697,7 @@ void connectSysRender(CBlob@ this)
 				bool valid = false;
 				if(hovertank !is null && hovertank.isPointInside(mousepos))
 				{
-					CAlchemyTankController@ hovercon = getTankController(hovertank);
+					CNodeController@ hovercon = getNodeController(hovertank);
 					if(hovercon !is null && hoveredtankid < hovercon.tanks.size())
 					{
 						if(canAttachTank(fromtank, this, hovercon.tanks[hoveredtankid], hovertank))
@@ -751,7 +735,7 @@ void connectSysRender(CBlob@ this)
 	if(this.getNetworkID() == hoveredtanknet && local !is null && this.isPointInside(local.getAimPos()) && local.get_u8("wiringmode") == 1)
 	{
 		CCamera@ cam = getCamera();
-		CAlchemyTankController@ fromcontroller = getTankController(this);
+		CNodeController@ fromcontroller = getNodeController(this);
 		if(fromcontroller !is null && fromcontroller.tanks.size() > hoveredtankid && cam !is null)
 		{
 			CAlchemyTank@ fromtank = fromcontroller.tanks[hoveredtankid];

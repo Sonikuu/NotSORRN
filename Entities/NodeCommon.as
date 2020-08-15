@@ -1,8 +1,24 @@
-//Alchemy stuff
-
+//This is the basic class and functions to be used in alchemy, item routing, and logic
 #include "ElementalCore.as";
 
-class CAlchemyTank
+
+const float maxrange = 128;
+
+interface INodeCore
+{
+	bool isConnectable(INodeCore@);
+	void connectTo(INodeCore@);
+	void disconnectFrom(INodeCore@);
+
+	void update(int);//Int here is updatedepth i guess, primarly for how i want logic to recursively update up to a certain point
+					//Likely wont have any actual use beyond that hmmm
+	bool isSame(INodeCore@);	//Check if the node is the same type as your node yeet
+	void setState(bool);	//State is going to be strictly logic, and will however be in all other nodes as well
+	bool getState();		//Intent is to allow logic stuff to connect to any other node to control it
+							//THIS COMES MUCH LATER
+}
+
+class CAlchemyTank : INodeCore
 {
 	string name;
 	bool input;
@@ -19,6 +35,8 @@ class CAlchemyTank
 	bool unmixedstorage;
 	int maxelements;
 	u8 onlyele;
+	u8 tankid;
+	u16 thisnetid;
 	CAlchemyTank(string name, bool input, Vec2f offset)
 	{
 		this.name = name;
@@ -32,23 +50,126 @@ class CAlchemyTank
 		maxelements = 100;
 		unmixedstorage = false;
 		onlyele = 255;
+		tankid = 0;
+	}
+
+	bool isConnectable(INodeCore@ node)
+	{
+		if(node.isSame(@this) && /*Distance calc here and other stuff*/ true)
+			return true;
+		return false;
+	}
+
+	void connectTo(INodeCore@ node)
+	{
+		if(isConnectable(node))
+		{
+			@connection = cast<CAlchemyTank@>(node);
+		}
+	}
+
+
+	void disconnectFrom(INodeCore@ node)
+	{
+		if(cast<CAlchemyTank@>(node) is connection)
+		{
+			@connection = null;
+		}
+	}
+
+	void update(int recursionsleft)
+	{
+		if(connection !is null)
+		{
+			CBlob@ toblob = getBlobByNetworkID(connectionid);
+			CBlob@ thisblob = getBlobByNetworkID(thisnetid);
+			if(thisblob is null)
+				return; 
+			if(toblob is null)
+			{
+				if(isServer())
+				{
+					//Detach on death
+					CBitStream params;
+					params.write_u8(tankid);
+					thisblob.SendCommand(thisblob.getCommandID("disconnect"), params);
+				}
+			}
+			else
+			{
+				if((getWorldTankPos(thisblob, this) - getWorldTankPos(toblob, connection)).Length() > maxrange)
+				{
+					if(isServer())
+					{
+						//Detach out of range
+						CBitStream params;
+						params.write_u8(tankid);
+						thisblob.SendCommand(thisblob.getCommandID("disconnect"), params);
+					}
+				}
+				else if(toblob.isInInventory() || thisblob.isInInventory())
+				{
+					if(isServer())
+					{
+						//Detach if in inv
+						CBitStream params;
+						params.write_u8(tankid);
+						thisblob.SendCommand(thisblob.getCommandID("disconnect"), params);
+					}
+				}
+				else
+				{
+					if(connection.singleelement)
+						transferOnly(this, connection, thisblob.get_u16("transferrate"), firstId(connection));
+					else if(connection.onlyele < elementlist.length)
+						transferOnly(this, connection, thisblob.get_u16("transferrate"), connection.onlyele);
+					else
+						transferSimple(this, connection, thisblob.get_u16("transferrate"));
+				}
+			}
+		}
+		return;
+	}
+
+	bool isSame(INodeCore@ node)
+	{
+		if(cast<CAlchemyTank@>(node) !is null)
+			return true;
+		return false;
+	}	
+
+	void setState(bool)
+	{
+		//Uh, this too
+	}
+
+	bool getState()
+	{
+		return true;
+		//You know whats up
 	}
 	
 }
 
-class CAlchemyTankController
+class CNodeController
 {
 	array<CAlchemyTank@> tanks;
+	array<INodeCore@> nodes;//Backwards compat be like
+	u16 blobnetid;
 	
-	CAlchemyTankController()
+	CNodeController()
 	{
 		//actually dont have to do anything here
+		blobnetid = 0;
 	}
 	
 	CAlchemyTank@ addTank(string name, bool input, Vec2f offset)
 	{
 		CAlchemyTank newtank(name, input, offset);
+		newtank.tankid = tanks.size();
+		newtank.thisnetid = blobnetid;
 		tanks.push_back(@newtank);
+		nodes.push_back(@newtank);
 		return @newtank;
 	}
 	
@@ -91,23 +212,24 @@ class CAlchemyTankController
 	}
 }
 
-CAlchemyTankController@ getTankController(CBlob@ blob)
+CNodeController@ getNodeController(CBlob@ blob)
 {
-	CAlchemyTankController@ controller;
-	blob.get("tankcontroller", @controller);
+	CNodeController@ controller;
+	blob.get("nodecontroller", @controller);
 	return @controller;
 }
 
-void addTankController(CBlob@ blob)
+void addNodeController(CBlob@ blob)
 {
-	CAlchemyTankController controller();
-	blob.set("tankcontroller", @controller);
+	CNodeController controller();
+	controller.blobnetid = blob.getNetworkID();
+	blob.set("nodecontroller", @controller);
 }
 
 CAlchemyTank@ addTank(CBlob@ blob, string name, bool input, Vec2f offset)
 {
-	CAlchemyTankController@ controller;
-	blob.get("tankcontroller", @controller);
+	CNodeController@ controller;
+	blob.get("nodecontroller", @controller);
 	if(controller is null)
 		return null;
 	return @controller.addTank(name, input, offset);
@@ -115,8 +237,8 @@ CAlchemyTank@ addTank(CBlob@ blob, string name, bool input, Vec2f offset)
 
 CAlchemyTank@ getTank(CBlob@ blob, string name)
 {
-	CAlchemyTankController@ controller;
-	blob.get("tankcontroller", @controller);
+	CNodeController@ controller;
+	blob.get("nodecontroller", @controller);
 	if(controller is null)
 		return null;
 	return @controller.getTank(name);
@@ -124,8 +246,8 @@ CAlchemyTank@ getTank(CBlob@ blob, string name)
 
 CAlchemyTank@ getTank(CBlob@ blob, int id)
 {
-	CAlchemyTankController@ controller;
-	blob.get("tankcontroller", @controller);
+	CNodeController@ controller;
+	blob.get("nodecontroller", @controller);
 	if(controller is null)
 		return null;
 	return @controller.getTank(id);
@@ -133,8 +255,8 @@ CAlchemyTank@ getTank(CBlob@ blob, int id)
 
 u8 getTankID(CBlob@ blob, string name)
 {
-	CAlchemyTankController@ controller;
-	blob.get("tankcontroller", @controller);
+	CNodeController@ controller;
+	blob.get("nodecontroller", @controller);
 	if(controller is null)
 		return 255;
 	return controller.getTankID(name);
@@ -142,8 +264,8 @@ u8 getTankID(CBlob@ blob, string name)
 
 u8 getTankID(CBlob@ blob, CAlchemyTank@ tank)
 {
-	CAlchemyTankController@ controller;
-	blob.get("tankcontroller", @controller);
+	CNodeController@ controller;
+	blob.get("nodecontroller", @controller);
 	if(controller is null)
 		return 255;
 	return controller.getTankID(tank);
@@ -342,5 +464,21 @@ SColor getAverageElementColor(CAlchemyTank@ tank)
 		output.set(255, output.getRed() + elecol.getRed() * ratio, output.getGreen() + elecol.getGreen() * ratio, output.getBlue() + elecol.getBlue() * ratio);
 	}
 	return output;
+}
+
+Vec2f getWorldTankPos(CBlob@ blob, CAlchemyTank@ tank)
+{
+	Vec2f offset = tank.offset;
+	Vec2f topos = blob.getPosition() + offset.RotateBy(blob.getAngleDegrees());
+		
+		
+	if(blob.get_bool("equipped"))
+	{
+		CBlob@ equipper = getBlobByNetworkID(blob.get_u16("equipper"));
+		if(equipper !is null)
+			topos = equipper.getPosition();
+	}
+	
+	return topos;
 }
 
