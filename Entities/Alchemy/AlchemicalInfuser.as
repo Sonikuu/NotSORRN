@@ -166,6 +166,26 @@ array<CAlchemyInfuse@> infuserecipes =
 	10,//item amount
 	10,//output amount
 	90//processing time
+	),
+
+	@CAlchemyInfuse(
+	"yeet",//input element
+	"ammopack",//input item
+	"yeetammopack",//output item
+	50,//element amount
+	1,//item amount
+	1,//output amount
+	150//processing time
+	),
+
+	@CAlchemyInfuse(
+	"holy",//input element
+	"ammopack",//input item
+	"holyammopack",//output item
+	50,//element amount
+	1,//item amount
+	1,//output amount
+	150//processing time
 	)
 };
 

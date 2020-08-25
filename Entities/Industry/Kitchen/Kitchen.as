@@ -201,11 +201,32 @@ void onTick(CBlob@ this)
 				reqcount.push_back(1);
 			}
 		} 
+		
 
 		//For our hardcoded ingredients
 		for(int i = 0; i < recipedata.ingredientspecific.size(); i++)
 		{
 			string thisreq = recipedata.ingredientspecific[i];
+			int reqpos = reqname.find(thisreq);
+			if(reqpos >= 0)
+			{
+				reqcount[reqpos]++;
+			}
+			else
+			{
+				reqname.push_back(thisreq);
+				reqcount.push_back(1);
+			}
+		} 
+
+		//And then the optional ingredients, if selected
+		for(int i = 0; i < recipedata.optionals.size(); i++)
+		{
+			string thisreq = this.get_string("selingredient" + (i + recipedata.ingredientlist.size()));
+			if(thisreq == "")
+				continue;
+			if(getIngredientData(thisreq) is null || getIngredientData(thisreq).typedata & recipedata.optionals[i] == 0)
+				canmake = false;
 			int reqpos = reqname.find(thisreq);
 			if(reqpos >= 0)
 			{
@@ -251,6 +272,10 @@ void onTick(CBlob@ this)
 			for(int i = 0; i < recipedata.ingredientlist.size(); i++)
 			{
 				food.set_string("ingredient" + i, this.get_string("selingredient" + i));
+			}
+			for(int i = 0; i < recipedata.optionals.size(); i++)
+			{
+				food.set_string("ingredient" + (i + recipedata.ingredientlist.size()), this.get_string("selingredient" + (i + recipedata.ingredientlist.size())));
 			}
 			food.Init();
 		}
@@ -350,6 +375,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 	//Gotta get recipe first ofc
 	if(currentrecipe < recipelist.size())
 	{
+		const float rowsdist = 100; //80 default
 		CRecipeData@ recipedata = @recipelist[currentrecipe];
 		CInventory@ inv = this.getInventory();
 		//Now, lets get all valid recipe items from storage
@@ -368,7 +394,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 		//Okay, now that thats done
 		//Lets make the gui for each ingredient selector
 		//ugh
-		int totalsize = recipedata.ingredientlist.size() + recipedata.ingredientspecific.size();
+		int totalsize = recipedata.ingredientlist.size() + recipedata.ingredientspecific.size() + recipedata.optionals.size();
 		for(int i = 0; i < recipedata.ingredientlist.size(); i++)
 		{
 			//First, we get the valid ingredients for this ingredient space in particular
@@ -382,7 +408,26 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 
 			//Now we make menu
 			//And then add each ingredient to list
-			CGridMenu@ seling = CreateGridMenu(screenmid + Vec2f(0, (i + 0.5 - float(totalsize) / 2.0) * 80), this, Vec2f(Maths::Max(valids.size(), 1), 1), "Select Ingredient");
+			CGridMenu@ seling = CreateGridMenu(screenmid + Vec2f(0, (i + 0.5 - float(totalsize) / 2.0) * rowsdist), this, Vec2f(Maths::Max(valids.size(), 1), 1), "Select Ingredient");
+
+			//Real quick, lets make a little text box for stats display :)
+			CGridMenu@ textboi = CreateGridMenu(screenmid + Vec2f(getScreenWidth() / 2 - 128, (i + 0.5 - float(totalsize) / 2.0) * rowsdist), this, Vec2f(5, 2), "Stats");
+			textboi.SetCaptionEnabled(false);
+			CIngredientData@ ingdata = getIngredientData(this.get_string("selingredient" + i));
+			if(ingdata !is null)
+			{
+				textboi.AddTextButton(ingdata.friendlyname + 
+				"\nEffect: " + ingdata.effect + 
+				"\nHealing: " + ingdata.healing +
+				"\nBase Power: " + ingdata.basepower + 
+				" Base Duration: " + ingdata.baseduration + 
+				"\nFlavor: " + ingdata.flavor, Vec2f(5, 2));
+			}
+			else
+			{
+				//hmm
+			}
+			//-------------------TXT
 			for(int j = 0; j < valids.size(); j++)
 			{
 				CBlob@ datblob = inv.getItem(valids[j]);
@@ -401,9 +446,69 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 			}
 		} 
 
+		for(int i = 0; i < recipedata.optionals.size(); i++)
+		{
+			//First, we get the valid ingredients for this ingredient space in particular
+			//So we can size the grid menu correctly
+			array<string> valids;
+			for(int j = 0; j < storedingredients.size(); j++)
+			{
+				if(recipedata.optionals[i] & getIngredientData(storedingredients[j]).typedata != 0)
+					valids.push_back(storedingredients[j]);
+			}
+
+			//Now we make menu
+			//And then add each ingredient to list
+			CGridMenu@ seling = CreateGridMenu(screenmid + Vec2f(0, (i + recipedata.ingredientlist.size() + 0.5 - float(totalsize) / 2.0) * rowsdist), this, Vec2f(Maths::Max(valids.size() + 1, 1), 1), "Select Ingredient");
+
+			//Real quick, lets make a little text box for stats display :)
+			CGridMenu@ textboi = CreateGridMenu(screenmid + Vec2f(getScreenWidth() / 2 - 128, ((i + recipedata.ingredientlist.size()) + 0.5 - float(totalsize) / 2.0) * rowsdist), this, Vec2f(5, 2), "Stats");
+			textboi.SetCaptionEnabled(false);
+			CIngredientData@ ingdata = getIngredientData(this.get_string("selingredient" + (i + recipedata.ingredientlist.size())));
+			if(ingdata !is null)
+			{
+				textboi.AddTextButton(ingdata.friendlyname + 
+				"\nEffect: " + ingdata.effect + 
+				"\nHealing: " + ingdata.healing +
+				"\nBase Power: " + ingdata.basepower + 
+				" Base Duration: " + ingdata.baseduration + 
+				"\nFlavor: " + ingdata.flavor, Vec2f(5, 2));
+			}
+			else
+			{
+				//hmm
+			}
+			//-------------------TXT
+			{
+				CBitStream params;
+				params.write_u16(caller.getNetworkID());
+				params.write_u8(i + recipedata.ingredientlist.size());	//Ing slot
+				params.write_string(""); //The ingredient to select
+				CGridButton@ butt = seling.AddButton("WiringIcons.png", 0, Vec2f(16, 16), "Deselect", this.getCommandID("selingredient"), Vec2f(1, 1), params);
+				if(this.get_string("selingredient" + (i + recipedata.ingredientlist.size())) == "")
+					butt.SetSelected(1);
+			}
+			for(int j = 0; j < valids.size(); j++)
+			{
+				CBlob@ datblob = inv.getItem(valids[j]);
+				if(datblob !is null)
+				{
+					CBitStream params;
+					params.write_u16(caller.getNetworkID());
+					params.write_u8(i + recipedata.ingredientlist.size());	//Ing slot
+					params.write_string(valids[j]); //The ingredient to select
+					CGridButton@ butt = seling.AddButton(datblob.inventoryIconName, datblob.inventoryIconFrame, datblob.inventoryFrameDimension, datblob.getInventoryName(), this.getCommandID("selingredient"), Vec2f(1, 1), params);
+					if(this.get_string("selingredient" + (i + recipedata.ingredientlist.size())) == valids[j])
+					{
+						butt.SetSelected(1);
+					}
+				}
+			}
+		} 
+
 		for(int i = 0; i < recipedata.ingredientspecific.size(); i++)
 		{
-			CGridMenu@ seling = CreateGridMenu(screenmid + Vec2f(0, ((i + recipedata.ingredientlist.size()) + 0.5 - float(totalsize) / 2.0) * 80), this, Vec2f(1, 1), "Required Ingredient");
+			CGridMenu@ seling = CreateGridMenu(screenmid + Vec2f(0, (i + recipedata.ingredientlist.size() + recipedata.optionals.size() + 0.5 - float(totalsize) / 2.0) * rowsdist), this, Vec2f(1, 1), "Required Ingredient");
 			CIngredientData@ specdata = getIngredientData(recipedata.ingredientspecific[i]);
 			CBitStream params;
 			CGridButton@ butt = seling.AddButton(specdata.friendlyname + ".png", 0, Vec2f(8, 8), specdata.friendlyname, this.getCommandID("selingredient"), Vec2f(1, 1), params);

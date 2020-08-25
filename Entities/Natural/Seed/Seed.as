@@ -18,7 +18,8 @@ const string[] seed_sprites =
 	"Entities/Natural/Farming/Tomato/Tomato.png",	//Tomato 10
 	"Entities/Natural/Farming/Cucumber/Cucumber.png",	// 11
 	"Entities/Natural/Farming/Carrot/Carrot.png",	// 12
-	"Entities/Natural/Farming/RosaryBead/RosaryBead.png" // 13
+	"Entities/Natural/Farming/RosaryBead/RosaryBead.png", // 13
+	"Entities/Natural/Farming/Pineapple/Pineapple.png"	//14
 };
 
 // names of seeds
@@ -37,7 +38,8 @@ const string[] seed_names =
 	"Tomato Seed",
 	"Cucumber Seed",
 	"Carrot Seed",
-	"Rosary Bead Seed"
+	"Rosary Bead Seed",
+	"Pineapple Seed"
 };
 
 const u32 OPT_TICK = 31;

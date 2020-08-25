@@ -13,14 +13,14 @@ void onInit(CBlob@ this)
 
 	this.Tag("builder always hit");
 	
-	this.set_u8("growth max", 20);
+	this.set_u8("growth max", 40);
 	this.set_u8(growth_time, 75);
 	
 	array<CPlantLoot@>@ loot;
 	this.get("plantloot", @loot);
 	if(loot !is null)
 	{
-		loot.push_back(@CPlantLoot("lettuce", 1, 1));
+		loot.push_back(@CPlantLoot("pineapple", 1, 1));
 		//loot.push_back(@CPlantLoot("lantern", 0.5, 1));
 	}
 

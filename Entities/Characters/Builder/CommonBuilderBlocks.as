@@ -316,6 +316,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			b.buildOnGround = true;
 			b.size.Set(48, 32);
 			blocks[0].push_back(b);
+			AddIconToken("$kitchen$", "Kitchen.png", Vec2f(48, 32), 0);
 		}
 		{
 			BuildBlock b(409, "marble_block", "$marble_block$", "Marble Block\nMore durable than stone");
@@ -476,6 +477,24 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			b.size.Set(16, 32);
 			blocks[1].push_back(b);
 			AddIconToken("$alchemyheater$", "AlchemyHeater.png", Vec2f(16, 32), 0);
+		}
+		{
+			BuildBlock b(0, "alchemymixedstorage", "$alchemymixedstorage$", "Alchemical Mixed Storage\nStores up to 25,000 total essence");
+			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 750);
+			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 100);
+			b.buildOnGround = false;
+			b.size.Set(32, 32);
+			blocks[1].push_back(b);
+			AddIconToken("$alchemymixedstorage$", "AlchemyMixedStorage.png", Vec2f(32, 32), 0);
+		}
+		{
+			BuildBlock b(0, "alchemycompartment", "$alchemycompartment$", "Alchemical Comparment\nStores up to 2,000 of each essence");
+			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 200);
+			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 650);
+			b.buildOnGround = false;
+			b.size.Set(32, 32);
+			blocks[1].push_back(b);
+			AddIconToken("$alchemycompartment$", "AlchemyCompartment.png", Vec2f(32, 32), 0);
 		}
 		if(sv_test)
 		{

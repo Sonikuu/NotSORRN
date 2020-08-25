@@ -89,7 +89,8 @@ array<CIngredientData@> ingredientdata =
 	@CIngredientData("fishy",	 	"Fish",			5, 0, 0.5, 	4, 900, 1, 1.5, 	SColor(255, 44, 175, 222),	Categories::Meat | Categories::Fish),		//Change to a cooked fish or whatever eventually, maybe
 	@CIngredientData("carrot",	 	"Carrot",		6, 10, 0.25, 4, 900, 1.4, 1, 	SColor(255, 230, 110, 0),	Categories::Vegetable),
 	@CIngredientData("lantern",	 	"Lantern?",		0, 0, 0, 	4, 900, 1, 1, 	SColor(255, 240, 230, 30),	Categories::Cheese),	//Temporary cheese substitute
-	@CIngredientData("rosarybead", 	"Rosary Bead",	10, 11, -0.5, 15, 300, 1, 1, 	SColor(255, 150, 64, 43),	Categories::Vegetable)
+	@CIngredientData("rosarybead", 	"Rosary Bead",	10, 11, -0.5, 15, 300, 1, 1, 	SColor(255, 150, 64, 43),	Categories::Vegetable),
+	@CIngredientData("pineapple", 	"Pineapple",	7, 9, 0.5, 10, 300, 1.5, 1.3, 	SColor(255, 213, 204, 74),	Categories::Fruit | Categories::Vegetable)
 };
 
 CIngredientData@ getIngredientData(string input)
@@ -108,6 +109,7 @@ class CRecipeData
 	string recipename;
 	array<u8> ingredientlist;
 	array<string> ingredientspecific;
+	array<u8> optionals;
 	CRecipeData(string recipename)
 	{
 		this.recipename = recipename;
@@ -124,14 +126,20 @@ class CRecipeData
 		ingredientspecific.push_back(ingredient);
 		return @this;
 	}
+
+	CRecipeData@ addOptional(u8 ingredient)
+	{
+		optionals.push_back(ingredient);
+		return @this;
+	}
 }
 
 array<CRecipeData@> recipelist = 
 {
-	@CRecipeData("Burger").addIngredient(Categories::Grain).addIngredient(Categories::Meat).addIngredient(Categories::Vegetable),
-	@CRecipeData("Salad").addIngredient(Categories::Vegetable).addIngredient(Categories::Vegetable).addIngredient(Categories::Vegetable),
-	@CRecipeData("Pizza").addIngredient(Categories::Grain).addIngredient(Categories::Cheese).addSpecific("tomato"),
-	@CRecipeData("Pancakes").addIngredient(Categories::Grain).addIngredient(Categories::Grain).addIngredient(Categories::Grain)
+	@CRecipeData("Burger").addIngredient(Categories::Grain).addIngredient(Categories::Meat).addIngredient(Categories::Vegetable).addOptional(Categories::Cheese),
+	@CRecipeData("Salad").addIngredient(Categories::Vegetable).addIngredient(Categories::Vegetable).addIngredient(Categories::Vegetable).addOptional(Categories::Fruit | Categories::Meat),
+	@CRecipeData("Pizza").addIngredient(Categories::Grain).addIngredient(Categories::Cheese).addSpecific("tomato").addOptional(Categories::Fruit | Categories::Meat),
+	@CRecipeData("Pancakes").addIngredient(Categories::Grain).addIngredient(Categories::Grain).addIngredient(Categories::Grain).addOptional(Categories::Fruit)
 };
 
 void makeFoodData(CBlob@ this)
@@ -151,6 +159,22 @@ void makeFoodData(CBlob@ this)
 	{
 		ingredients.push_back(@getIngredientData(this.get_string("ingredient" + i)));
 		texname += getIngredientData(this.get_string("ingredient" + i)).id;
+	}
+
+	//Optionals yeet
+	for(int i = 0; i < recdata.optionals.size(); i++)
+	{
+		string ing = this.get_string("ingredient" + (i + recdata.ingredientlist.size()));
+		if(ing != "")
+		{
+			ingredients.push_back(@getIngredientData(ing));
+			texname += getIngredientData(ing).id;
+		}
+		else
+		{
+			ingredients.push_back(null);//uhhhhhhhhhhhh tomnato
+			texname += "x";
+		}
 	}
 
 	//This part makes the custom sprite we use
@@ -197,7 +221,8 @@ void makeFoodData(CBlob@ this)
 			mergeOnto(newimage, baseimage, Vec2f_zero, startpos, startpos + spritesize);
 			for(int i = 0; i < ingredients.size(); i++)
 			{
-				mergeOntoColored(newimage, baseimage, Vec2f_zero, startpos + Vec2f((i + 1) * spritesize.x, 0), startpos + Vec2f((i + 1) * spritesize.x, 0) + spritesize, ingredients[i].color);
+				if(ingredients[i] !is null)
+					mergeOntoColored(newimage, baseimage, Vec2f_zero, startpos + Vec2f((i + 1) * spritesize.x, 0), startpos + Vec2f((i + 1) * spritesize.x, 0) + spritesize, ingredients[i].color);
 			}
 
 			//Now, we actually create the texture from the new image data
@@ -209,7 +234,32 @@ void makeFoodData(CBlob@ this)
 			//Code partially stolen from custom gun stuff woo
 		}
 		this.SetInventoryIcon("RecipeIcons.png", recipe, Vec2f(16, 16));
-		this.setInventoryName(recdata.recipename);
+		string name = "";
+		for(int i = 0; i < recdata.ingredientlist.size(); i++)
+		{
+			if(i == recdata.ingredientlist.size() - 1)
+			{
+				if(i == 0)
+					name += getIngredientData(this.get_string("ingredient" + i)).friendlyname + " ";
+				else
+					name += "and " + getIngredientData(this.get_string("ingredient" + i)).friendlyname + " ";
+			}
+			else
+			{
+				if(recdata.ingredientlist.size() > 2)
+					name += getIngredientData(this.get_string("ingredient" + i)).friendlyname + ", ";
+				else
+					name += getIngredientData(this.get_string("ingredient" + i)).friendlyname + " ";
+			}
+		}
+		name += recdata.recipename;
+		
+		if(this.get_string("ingredient" + (recdata.ingredientlist.size())) != "")
+		{
+			name += " with " + getIngredientData(this.get_string("ingredient" + (recdata.ingredientlist.size()))).friendlyname;
+		}
+
+		this.setInventoryName(name);
 	}
 
 	//Now, we do the stats of the food
@@ -224,7 +274,7 @@ void makeFoodData(CBlob@ this)
 
 	for(int i = 0; i < ingredients.size(); i++)
 	{
-		if(ingredients[i].flavor > highestflavor)
+		if(ingredients[i] !is null && ingredients[i].flavor > highestflavor)
 		{
 			flavorid = i;
 			highestflavor = ingredients[i].flavor;
@@ -235,7 +285,7 @@ void makeFoodData(CBlob@ this)
 	float foodduration = ingredients[flavorid].baseduration;
 	for(int i = 0; i < ingredients.size(); i++)
 	{
-		if(i != flavorid)
+		if(i != flavorid && ingredients[i] !is null)
 		{
 			foodpower *= ingredients[i].powermod;
 			foodduration *= ingredients[i].durationmod;
