@@ -488,7 +488,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			AddIconToken("$alchemymixedstorage$", "AlchemyMixedStorage.png", Vec2f(32, 32), 0);
 		}
 		{
-			BuildBlock b(0, "alchemycompartment", "$alchemycompartment$", "Alchemical Comparment\nStores up to 2,000 of each essence");
+			BuildBlock b(0, "alchemycompartment", "$alchemycompartment$", "Alchemical Compartment\nStores up to 2,000 of each essence");
 			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 200);
 			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 650);
 			b.buildOnGround = false;

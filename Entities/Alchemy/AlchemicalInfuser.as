@@ -273,10 +273,11 @@ void onTick(CBlob@ this)
 	//CAlchemyTank@ output = getTank(this, "output");
 	
 	//Lots of loops in here, might need to optimize
-	CBlob@ item = this.getInventory().getItem(0);
+	//CBlob@ item = this.getInventory().getItem(0);
+	CInventory@ inv = this.getInventory();
 	
 	CSprite@ sprite = this.getSprite();
-	if(input !is null && item !is null)
+	if(input !is null && inv !is null)
 	{
 		for(int i = 0; i < input.storage.elements.length; i++)
 		{
@@ -284,45 +285,74 @@ void onTick(CBlob@ this)
 			{
 				for(int j = 0; j < infuserecipes.length; j++)
 				{
-					if((elementlist[i].name == infuserecipes[j].element || infuserecipes[j].element == "any") && item.getConfig() == infuserecipes[j].item &&
-						input.storage.elements[i] >= infuserecipes[j].elementquant && item.getQuantity() >= infuserecipes[j].itemquant)
+					for(int k = 0; k < inv.getItemsCount(); k++)
 					{
-						this.Tag("active");
-						this.add_u16("processtime", 1);
-						//Doing the thing
-						if(this.get_u16("processtime") >= infuserecipes[j].proctime)
+						CBlob@ invitem = inv.getItem(k);
+						if(invitem.getConfig() == infuserecipes[j].item && inv.getCount(invitem.getConfig()) >= infuserecipes[j].itemquant)
 						{
-							this.set_u16("processtime", 0);
-							input.storage.elements[i] -= infuserecipes[j].elementquant;
-								if(sprite !is null)
-							sprite.PlaySound("ProduceSound.ogg", 1, 1);
-							if(isServer())
+							if((elementlist[i].name == infuserecipes[j].element || infuserecipes[j].element == "any") &&
+							input.storage.elements[i] >= infuserecipes[j].elementquant)
 							{
-								if(item.getQuantity() <= infuserecipes[j].itemquant)
-									item.server_Die();
-								else
-									item.server_SetQuantity(item.getQuantity() - infuserecipes[j].itemquant);
-									
-								if(infuserecipes[j].output.find("tree") >= 0)
+								this.Tag("active");
+								this.add_u16("processtime", 1);
+								//Doing the thing
+								if(this.get_u16("processtime") >= infuserecipes[j].proctime)
 								{
-									server_MakeSeed(this.getPosition(), infuserecipes[j].output);
+									this.set_u16("processtime", 0);
+									input.storage.elements[i] -= infuserecipes[j].elementquant;
+										if(sprite !is null)
+									sprite.PlaySound("ProduceSound.ogg", 1, 1);
+									if(isServer())
+									{
+										int reqc = infuserecipes[j].itemquant;
+										int index = 0;
+										while(reqc > 0)
+										{
+											CBlob@ item = inv.getItem(index);
+											if(item !is null && item.getName() == invitem.getConfig())
+											{
+												if(item.getQuantity() < reqc)
+												{
+													reqc -= item.getQuantity();
+													item.server_Die();
+												}
+												else
+												{
+													item.server_SetQuantity(item.getQuantity() - reqc);
+													reqc = 0;
+												}
+											}
+											index++;
+											if(index > inv.getItemsCount())
+											{
+												print("This shouldnt ever print - AlchemicalInfuser.as");
+												break;
+											}
+										}
+
+			
+										if(infuserecipes[j].output.find("tree") >= 0)
+										{
+											server_MakeSeed(this.getPosition(), infuserecipes[j].output);
+										}
+										else if(infuserecipes[j].output.find("mat_") >= 0)
+										{
+											CBlob@ output = server_CreateBlobNoInit(infuserecipes[j].output);
+											output.Tag("custom quantity");
+											output.setPosition(this.getPosition());
+											output.server_SetQuantity(infuserecipes[j].outputquant);
+											output.Init();
+										}
+										else
+										{
+											CBlob@ output = server_CreateBlob(infuserecipes[j].output, this.getTeamNum(), this.getPosition());
+											output.server_SetQuantity(infuserecipes[j].outputquant);
+										}
+									}
 								}
-								else if(infuserecipes[j].output.find("mat_") >= 0)
-								{
-									CBlob@ output = server_CreateBlobNoInit(infuserecipes[j].output);
-									output.Tag("custom quantity");
-									output.setPosition(this.getPosition());
-									output.server_SetQuantity(infuserecipes[j].outputquant);
-									output.Init();
-								}
-								else
-								{
-									CBlob@ output = server_CreateBlob(infuserecipes[j].output, this.getTeamNum(), this.getPosition());
-									output.server_SetQuantity(infuserecipes[j].outputquant);
-								}
+								return;
 							}
 						}
-						return;
 					}
 				}
 			}
