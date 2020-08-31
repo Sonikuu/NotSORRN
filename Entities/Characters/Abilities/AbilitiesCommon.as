@@ -644,7 +644,7 @@ class COvertake : CAbilityBase
 
 					CAbilityManager@ manager;
 					b.get("AbilityManager",@manager);
-					manager.abilityMenu.addAbility(EAbilities::Overtake);
+					manager.abilityMenu.addAbility(EAbilities::Overtake,false);
 
 					CAbilityManager@ gmanager;
 					blob.get("AbilityManager",@gmanager);
