@@ -4,6 +4,7 @@
 #include "ExplosionCommon.as"
 #include "Hitters.as"
 #include "FxHookCommon.as"
+#include "Utilities"
 
 interface IAbility
 {
@@ -678,16 +679,7 @@ class COvertake : CAbilityBase
 				blob.get("AbilityManager",@manager);
 				manager.abilityMenu.removeAbilityByName("Overtake");
 
-				blob.setKeyPressed(key_action1,false);//amazing I know
-				blob.setKeyPressed(key_action2,false);
-				blob.setKeyPressed(key_action3,false);
-				blob.setKeyPressed(key_left,false);
-				blob.setKeyPressed(key_right,false);
-				blob.setKeyPressed(key_up,false);
-				blob.setKeyPressed(key_down,false);
-				blob.setKeyPressed(key_crouch,false);
-				blob.setKeyPressed(key_jump,false);
-
+				setAllKeysPressed(blob,false);
 			}
 		}
 	}
