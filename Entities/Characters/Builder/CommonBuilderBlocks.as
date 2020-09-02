@@ -506,6 +506,15 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 		}
 		BuildBlock[] page_2;
 		blocks.push_back(page_2);
+		{
+			BuildBlock b(0, "switch", "$switch$", "Logic Switch\nToggles between on and off");
+			// AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 750);
+			// AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 100);
+			b.buildOnGround = false;
+			b.size.Set(8, 8);
+			blocks[2].push_back(b);
+			AddIconToken("$switch$", "Switch.png", Vec2f(8, 8), 0);
+		}
 		BuildBlock[] page_3;
 		blocks.push_back(page_3);
 	}
