@@ -13,6 +13,7 @@ void onInit(CBlob@ this)
 	this.Tag("dont deactivate");
 	this.Tag("fire source");
 	this.Tag("ignore_arrow");
+	this.Tag("place norotate");
 
 	this.getCurrentScript().runFlags |= Script::tick_inwater;
 	this.getCurrentScript().tickFrequency = 24;
