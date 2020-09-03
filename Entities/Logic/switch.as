@@ -5,6 +5,8 @@ void onInit(CBlob@ this)
 	this.Tag("builder always hit");
 	this.addCommandID("toggle");
 
+	this.getShape().getConsts().waterPasses = true;//let water flow over
+
 	this.SetLightRadius(8);
 	this.SetLightColor(SColor(255,100,0,0));
 }
