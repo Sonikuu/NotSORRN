@@ -51,11 +51,12 @@ class CAlchemyTank : INodeCore
 		unmixedstorage = false;
 		onlyele = 255;
 		tankid = 0;
+		dynamicconnection = false;
 	}
 
 	bool isConnectable(INodeCore@ node)
 	{
-		if(node.isSame(@this) && /*Distance calc here and other stuff*/ true)
+		if(node.isSame(@this) && cast<INodeCore@>(this) !is node)
 			return true;
 		return false;
 	}
@@ -64,7 +65,7 @@ class CAlchemyTank : INodeCore
 	{
 		if(isConnectable(node))
 		{
-			@connection = cast<CAlchemyTank@>(node);
+			@connection = cast<CAlchemyTank@>(node); 
 		}
 	}
 

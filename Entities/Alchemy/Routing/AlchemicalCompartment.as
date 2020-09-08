@@ -3,8 +3,8 @@
 void onInit(CBlob@ this)
 {	
 	//Setup tanks
-	CAlchemyTank@ input = addTank(this, "Input", true, Vec2f(0, -12));
-	CAlchemyTank@ output = addTank(this, "Output", false, Vec2f(0, 12));
+	CAlchemyTank@ input = addTank(this, "Input", true, Vec2f(0, -13));
+	CAlchemyTank@ output = addTank(this, "Output", false, Vec2f(0, 13));
 	
 	input.maxelements = 10;
 	input.unmixedstorage = true;
