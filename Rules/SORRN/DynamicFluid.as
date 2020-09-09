@@ -125,12 +125,12 @@ void onTick(CRules@ this)
 						if(!map.isTileSolid(Vec2f(x + 1, y) * 8) && x + 1 < waterdata.size() && !waterdata[x + 1][y].f /*&& XORRandom(2) == 0*/)
 						{
 							s8 diff = bw.d - waterdata[x + 1][y].d;//This is an s8 cause it makes things a little easier, no judgies
-							diff = Maths::Min(diff, bw.d - bw.u);
 							
 							if(diff > 0)
 							{
+								diff = Maths::Min(diff, bw.d - bw.u);
 								mdt = true;
-								if(XORRandom(2) == 0 || Maths::Ceil(diff) != 1)
+								if((XORRandom(2) == 0 || Maths::Ceil(diff) != 1) && diff > 0)
 								{
 									if(!map.isTileSolid(Vec2f(x - 1, y) * 8) && x - 1 >= 0 && !waterdata[x - 1][y].f && waterdata[x][y].d - waterdata[x - 1][y].d > 0)
 										diff = Maths::Ceil(diff / 3.0);
@@ -167,8 +167,10 @@ void onTick(CRules@ this)
 							diff = Maths::Min(diff, bw.d - bw.u);
 							if(diff > 0)
 							{
+								diff = Maths::Min(diff, bw.d - bw.u);
 								mdt = true;
 								//if(XORRandom(2) == 0 || Maths::Ceil(diff / 2.0) != 1)
+								if(diff > 0)
 								{
 									bw.f = false;
 									bw.d -= Maths::Ceil(diff / 2.0);

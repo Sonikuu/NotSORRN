@@ -505,9 +505,9 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			AddIconToken("$alchemycheatmachine$", "AlchemyCheatMachine.png", Vec2f(16, 16), 0);
 		}
 		BuildBlock[] page_2;
+		blocks.push_back(page_2);
 		if(getRules().get_bool("is_test"))
 		{
-			blocks.push_back(page_2);
 			{
 				BuildBlock b(0, "switch", "$switch$", "Logic Switch\nToggles between on and off");
 				// AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 750);
