@@ -1,4 +1,4 @@
-
+#include "NodeCommon.as"
 
 void onInit(CBlob@ this)
 {
