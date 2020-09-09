@@ -88,9 +88,11 @@ array<CIngredientData@> ingredientdata =
 	@CIngredientData("steak",	 	"Beef",			8, 0, 0.5, 	7, 450, 1.3, 1.3, SColor(255, 213, 84, 63),	Categories::Meat),
 	@CIngredientData("fishy",	 	"Fish",			5, 0, 0.5, 	4, 900, 1, 1.5, 	SColor(255, 44, 175, 222),	Categories::Meat | Categories::Fish),		//Change to a cooked fish or whatever eventually, maybe
 	@CIngredientData("carrot",	 	"Carrot",		6, 10, 0.25, 4, 900, 1.4, 1, 	SColor(255, 230, 110, 0),	Categories::Vegetable),
-	@CIngredientData("lantern",	 	"Lantern?",		0, 0, 0, 	4, 900, 1, 1, 	SColor(255, 240, 230, 30),	Categories::Cheese),	//Temporary cheese substitute
+	//@CIngredientData("lantern",	 	"Lantern?",		0, 0, 0, 	4, 900, 1, 1, 	SColor(255, 240, 230, 30),	Categories::Cheese),	//Temporary cheese substitute
 	@CIngredientData("rosarybead", 	"Rosary Bead",	10, 11, -0.5, 15, 300, 1, 1, 	SColor(255, 150, 64, 43),	Categories::Vegetable),
-	@CIngredientData("pineapple", 	"Pineapple",	7, 9, 0.5, 10, 300, 1.5, 1.3, 	SColor(255, 213, 204, 74),	Categories::Fruit | Categories::Vegetable)
+	@CIngredientData("pineapple", 	"Pineapple",	7, 9, 0.5, 10, 300, 1.5, 1.3, 	SColor(255, 213, 204, 74),	Categories::Fruit | Categories::Vegetable),
+	@CIngredientData("cheddar",	 	"Cheddar Cheese",5, 6, 0.5, 2, 1800, 1.1, 1.4, 	SColor(255, 240, 230, 30),	Categories::Cheese),
+	@CIngredientData("swiss",	 	"Swiss Cheese",	6, 7, 0.5, 1, 2700, 1.5, 1.2, 	SColor(255, 237, 203, 142),	Categories::Cheese)
 };
 
 CIngredientData@ getIngredientData(string input)

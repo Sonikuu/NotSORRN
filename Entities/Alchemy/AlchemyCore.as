@@ -127,7 +127,7 @@ void onTick(CSprite@ this)
 			blob.set_s16("transfercache" + i, ltid);
 		}
 		
-		if(controller.tanks[i].connection !is null && (controller.tanks[i].dynamicconnection || controller.tanks[i].connection.dynamicconnection))
+		if(controller.tanks[i].connection !is null && (controller.tanks[i].dynamicconnection))
 		{
 			CBlob@ toblob = getBlobByNetworkID(controller.tanks[i].connectionid);
 			if(toblob !is null)
@@ -371,11 +371,11 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 					{
 						CAlchemyTank@ interm = @fromtank;
 						@fromtank = @totank;
-						@totank = @interm;
+						@totank = @interm; 
 					}
 					if(fromtank.connection !is totank)
 					{
-						@fromtank.connection = @totank;
+						fromtank.connectTo(totank);
 						fromtank.connectionid = isequipcmd ? connecttank.getNetworkID() : this.getNetworkID();
 						fromtank.dynamicconnection = totank.dynamictank || fromtank.dynamictank;
 						
