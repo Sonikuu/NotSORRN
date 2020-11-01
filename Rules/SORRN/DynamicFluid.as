@@ -82,7 +82,7 @@ void onTick(CRules@ this)
 			if(bw.b && bw.a)//If water exists there basically
 			{
 				bool mdt = false; //mdt = moved dis tick
-				if(bw.u == bw.d)
+				if(bw.u >= bw.d)
 				{
 					bw.u = 0;
 					continue;
@@ -130,6 +130,7 @@ void onTick(CRules@ this)
 							{
 								diff = Maths::Min(diff, bw.d - bw.u);
 								mdt = true;
+								
 								if((XORRandom(2) == 0 || Maths::Ceil(diff) != 1) && diff > 0)
 								{
 									if(!map.isTileSolid(Vec2f(x - 1, y) * 8) && x - 1 >= 0 && !waterdata[x - 1][y].f && waterdata[x][y].d - waterdata[x - 1][y].d > 0)
@@ -146,6 +147,8 @@ void onTick(CRules@ this)
 									waterdata[x + 1][y].d += diff;
 									waterdata[x + 1][y].b = true;
 									waterdata[x + 1][y].u += diff;
+									if(diff == 1)
+										waterdata[x + 1][y].u = 15;
 									if(waterdata[x + 1][y].d >= 15)
 										waterdata[x + 1][y].f = true;
 									
@@ -164,7 +167,7 @@ void onTick(CRules@ this)
 						if(!map.isTileSolid(Vec2f(x - 1, y) * 8) && x - 1 >= 0 && !waterdata[x - 1][y].f /*&& XORRandom(2) == 0*/)
 						{
 							s8 diff = bw.d - waterdata[x - 1][y].d;
-							diff = Maths::Min(diff, bw.d - bw.u);
+							//diff = Maths::Min(diff, bw.d - bw.u);
 							if(diff > 0)
 							{
 								diff = Maths::Min(diff, bw.d - bw.u);
@@ -178,8 +181,12 @@ void onTick(CRules@ this)
 										bw.b = false;
 									else if(bw.d > 15)
 										print("ssssss");
+									if(x + 1 < waterdata.size())
+										if(waterdata[x + 1][y].d == bw.d)
+											waterdata[x + 1][y].u = 15;
 									waterdata[x - 1][y].d += Maths::Ceil(diff / 2.0);
 									waterdata[x - 1][y].b = true;
+
 									if(waterdata[x - 1][y].d >= 15)
 										waterdata[x - 1][y].f = true;
 
