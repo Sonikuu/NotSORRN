@@ -5,6 +5,7 @@
 #include "ParticleSparks.as";
 #include "MaterialCommon.as";
 #include "AlchemyCommon.as";
+#include "TreeCommon.as";
 
 const f32 speed_thresh = 2.4f;
 const f32 speed_hard_thresh = 2.6f;
@@ -182,7 +183,24 @@ void onTick(CBlob@ this)
 							f32 attack_dam = 0.5f;
 							HitInfo@ hi = hitInfos[i];
 							bool hit_constructed = false;
-							if (hi.blob !is null) // blob
+
+							bool skipThisBlob = false;
+							if(hi !is null && hi.blob !is null)
+							{
+								string name = hi.blob.getConfig();
+								if(name == "tree_pine" || name == "tree_bushy" || name == "tree_life")
+								{
+									TreeVars@ vars;
+									hi.blob.get("TreeVars",@vars);
+
+									if(vars !is null && vars.height >= vars.max_height)
+									{
+										skipThisBlob = true;
+									}
+								}
+							}
+
+							if (hi.blob !is null && !skipThisBlob) // blob
 							{
 								//detect
 								const bool is_ground = hi.blob.hasTag("blocks sword") && !hi.blob.isAttached() && hi.blob.isCollidable();
