@@ -162,7 +162,7 @@ class CPoint : CAbilityBase
     void onCommand( u8 cmd, CBitStream@ params)
     {
         if(cmd == blob.getCommandID("CPoint_timeSync")){ _time = params.read_u32();}
-        else if(cmd == blob.getCommandID("CPoint_tposSync")){ _tpos = params.read_Vec2f();}
+        else if(cmd == blob.getCommandID("CPoint_tposSync")){ _tpos = params.read_Vec2f(); Sound::Play("Point.ogg", tpos,1);}
     }
 }
 
