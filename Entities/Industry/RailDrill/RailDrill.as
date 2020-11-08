@@ -193,38 +193,45 @@ void onTick(CBlob@ this)
 									TreeVars@ vars;
 									hi.blob.get("TreeVars",@vars);
 
-									if(vars !is null && vars.height >= vars.max_height)
+									if(vars !is null && vars.height < vars.max_height)
 									{
 										skipThisBlob = true;
 									}
 								}
+								else if(name == "seed")
+								{
+									skipThisBlob = true;
+								}
 							}
 
-							if (hi.blob !is null && !skipThisBlob) // blob
+							if (hi.blob !is null) // blob
 							{
-								//detect
-								const bool is_ground = hi.blob.hasTag("blocks sword") && !hi.blob.isAttached() && hi.blob.isCollidable();
-								if (is_ground)
+								if(!skipThisBlob)
 								{
-									hit_ground = true;
-								}
+									//detect
+									const bool is_ground = hi.blob.hasTag("blocks sword") && !hi.blob.isAttached() && hi.blob.isCollidable();
+									if (is_ground)
+									{
+										hit_ground = true;
+									}
 
-								if (hi.blob.getTeamNum() == this.getTeamNum() ||
-								        hit_ground && !is_ground)
-								{
-									continue;
-								}
+									if (hi.blob.getTeamNum() == this.getTeamNum() ||
+											hit_ground && !is_ground)
+									{
+										continue;
+									}
 
-								//
-								hitsomething = true;
-								if (getNet().isServer())
-								{
-									if(hi.blob.hasTag("flesh"))
-										attack_dam *= 0.5;
-									this.server_Hit(hi.blob, hi.hitpos, attackVel, attack_dam, Hitters::drill);
+									//
+									hitsomething = true;
+									if (getNet().isServer())
+									{
+										if(hi.blob.hasTag("flesh"))
+											attack_dam *= 0.5;
+										this.server_Hit(hi.blob, hi.hitpos, attackVel, attack_dam, Hitters::drill);
 
-									// Yield half
-									Material::fromBlob(this, hi.blob, attack_dam);
+										// Yield half
+										Material::fromBlob(this, hi.blob, attack_dam);
+									}
 								}
 							}
 							else // map
