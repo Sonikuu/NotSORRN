@@ -514,6 +514,18 @@ float wardOrder(float radius, int power, CBlob@ ward)
 
 		activated = orderEffect(map, pos) || activated;
 	}
+	CBlob@[] blobs;
+	map.getBlobsInRadius(ward.getPosition(), radius, @blobs);
+
+	for(int i = 0; i < blobs.size(); i++)
+	{
+		CBlob@ b = blobs[i];
+		if(b.getName() == "wooden_door" || b.getName() == "stone_door")
+		{
+			b.server_Heal(power/5);
+		}
+	}
+
 	if(activated)
 		return 1;
 	return 0.1;
