@@ -65,6 +65,12 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 		return;
     }
 
+	CBlob@[] souls;
+	getBlobsByTag("soul of " + player.getUsername(),@souls);
+	for(int i = 0; i < souls.size(); i++){
+		souls[i].server_Die();
+	}
+
 	CBlob@[] blobs;
 	getBlobsByTag(player.getUsername() + "'s soulless",@blobs);
 	if(blobs.size() > 0)
@@ -72,6 +78,7 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 		if(!blobs[0].hasTag("dead") && blobs[0].getPlayer() is null)
 		{
 			blobs[0].server_SetPlayer(player);
+			blobs[0].server_SetActive(true);
 			player.server_setTeamNum(blobs[0].getTeamNum());
 		}
 		else
@@ -260,7 +267,13 @@ void onPlayerLeave( CRules@ this, CPlayer@ player )
 	if(blob !is null)
 	{
 		blob.Tag(player.getUsername() + "'s soulless");
-		blob.set_bool("soulless",true);
+		blob.server_SetActive(false);
+		CBlob@ n = server_CreateBlobNoInit("soul");
+
+		n.set_string("owner", player.getUsername());
+		n.Tag("soul of " + player.getUsername());
+		n.setPosition(blob.getPosition());
+
 		blob.server_SetPlayer(null);
 	}
 }
