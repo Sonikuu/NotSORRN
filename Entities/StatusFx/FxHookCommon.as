@@ -324,13 +324,16 @@ class CStatusLightFall : CStatusBase
 		if((getGameTime() % 15 == 0 || (this.getVelocity().Length() >= 4 && getGameTime() % 2 == 0)) && isClient())
 		{
 			CParticle@ p = makeGibParticle("LightFall.png", this.getPosition() + Vec2f(XORRandom(16) - 8, XORRandom(16) - 8), Vec2f(XORRandom(10) - 5, XORRandom(10) - 5) / 10.0 + this.getVelocity() / 2, 0, XORRandom(4), Vec2f(8, 8), 0.1, 0, "");
-			p.fadeout = true;
-			p.gravity = Vec2f(0, 0.03 + XORRandom(30) / 1000.0);
-			p.damping = 0.98;
-			p.rotation = Vec2f(XORRandom(100) - 50, XORRandom(100) - 50) / 50.0;
-			p.diesoncollide = true;
-			p.scale = 1;
-			p.freerotationscale = 0.5;
+			if(p !is null)
+			{
+				p.fadeout = true;
+				p.gravity = Vec2f(0, 0.03 + XORRandom(30) / 1000.0);
+				p.damping = 0.98;
+				p.rotation = Vec2f(XORRandom(100) - 50, XORRandom(100) - 50) / 50.0;
+				p.diesoncollide = true;
+				p.scale = 1;
+				p.freerotationscale = 0.5;
+			}
 		}
 			
 	}

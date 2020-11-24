@@ -33,113 +33,137 @@ bool onMapTileCollapse(CMap@ map, u32 offset)
 
 TileType server_onTileHit(CMap@ this, f32 damage, u32 index, TileType oldTileType)
 {
+	string hitsfx = "dig_stone" + (XORRandom(3) + 1);
 	TileType output = oldTileType;
 	//CORRUPT HANDLER
 	if(oldTileType >= CCTiles::tile_cor1 && oldTileType < CCTiles::tile_cor1 + cor_variation)
 	{
 		output = CCTiles::tile_cord1;//FIRST HIT ON A TILE
+		hitsfx = "dig_dirt" + (XORRandom(3) + 1);
 	}
 	else if(oldTileType >= CCTiles::tile_cord1 && oldTileType < CCTiles::tile_cord1 + cor_damaged)
 	{
 		if(oldTileType == CCTiles::tile_cord3)//WHEN TILE FINALLY BREAKS
 		{
 			output = 0;
+			hitsfx = "destroy_dirt";
 		}
 		else//DAMAGING TILE
 		{
 			output += 1;
+			hitsfx = "dig_dirt" + (XORRandom(3) + 1);
 		}
 	}
 	//PURE
 	else if(oldTileType >= CCTiles::tile_pur1 && oldTileType < CCTiles::tile_pur1 + pur_variation)
 	{
 		output = 0;
+		hitsfx = "destroy_dirt";
 	}
 	//MARBLE
 	else if(oldTileType >= CCTiles::tile_mar && oldTileType < CCTiles::tile_mard1)
 	{
 		output = CCTiles::tile_mard1;
+		hitsfx = "PickStone" + (XORRandom(3) + 1);
 	}
 	else if(oldTileType >= CCTiles::tile_mard1 && oldTileType < CCTiles::tile_mard1 + mar_damaged)
 	{
 		if(oldTileType == CCTiles::tile_mard7)//WHEN TILE FINALLY BREAKS
 		{
 			output = 0;
+			hitsfx = "destroy_wall";
 		}
 		else//DAMAGING TILE
 		{
 			output += 1;
+			hitsfx = "PickStone" + (XORRandom(3) + 1);
 		}
 	}
 	//MARBLE BACK
 	else if(oldTileType >= CCTiles::tile_mar_back && oldTileType < CCTiles::tile_mar_backd1)
 	{
 		output = CCTiles::tile_mar_backd1;
+		hitsfx = "PickStone" + (XORRandom(3) + 1);
 	}
 	else if(oldTileType >= CCTiles::tile_mar_backd1 && oldTileType <= CCTiles::tile_mar_backd5)
 	{
 		if(oldTileType == CCTiles::tile_mar_backd5)//WHEN TILE FINALLY BREAKS
 		{
 			output = 0;
+			hitsfx = "destroy_wall";
 		}
 		else//DAMAGING TILE
 		{
 			output += 1;
+			hitsfx = "PickStone" + (XORRandom(3) + 1);
 		}
 	}
 	//BASALT
 	else if(oldTileType >= CCTiles::tile_bas && oldTileType < CCTiles::tile_basd1)
 	{
 		output = CCTiles::tile_basd1;
+		hitsfx = "PickStone" + (XORRandom(3) + 1);
 	}
 	else if(oldTileType >= CCTiles::tile_basd1 && oldTileType < CCTiles::tile_basd1 + bas_damaged)
 	{
 		if(oldTileType == CCTiles::tile_basd7)//WHEN TILE FINALLY BREAKS
 		{
 			output = 0;
+			hitsfx = "destroy_wall";
 		}
 		else//DAMAGING TILE
 		{
 			output += 1;
+			hitsfx = "PickStone" + (XORRandom(3) + 1);
 		}
 	}
 	//BASALT BACKGROUND
 	else if(oldTileType >= CCTiles::tile_bas_back && oldTileType < CCTiles::tile_bas_backd1)
 	{
 		output = CCTiles::tile_bas_backd1;
+		hitsfx = "PickStone" + (XORRandom(3) + 1);
 	}
 	else if(oldTileType >= CCTiles::tile_bas_backd1 && oldTileType < CCTiles::tile_bas_backd1 + bas_back_damaged)
 	{
 		if(oldTileType == CCTiles::tile_bas_backd5)//WHEN TILE FINALLY BREAKS
 		{
 			output = 0;
+			hitsfx = "destroy_wall";
 		}
 		else//DAMAGING TILE
 		{
 			output += 1;
+			hitsfx = "PickStone" + (XORRandom(3) + 1);
 		}
 	}
 	//TRACK
 	else if(oldTileType >= CCTiles::tile_track && oldTileType < CCTiles::tile_track + track_variation)
 	{
 		output = 0;
+		hitsfx = "metal_stone";
 	}
 	//GOLD
 	else if(oldTileType >= CCTiles::tile_gold && oldTileType < CCTiles::tile_goldd1)
 	{
 		output = CCTiles::tile_goldd1;
+		hitsfx = "dig_gold" + (XORRandom(3) + 1);
 	}
 	else if(oldTileType >= CCTiles::tile_goldd1 && oldTileType < CCTiles::tile_goldd1 + gold_damaged)
 	{
 		if(oldTileType == CCTiles::tile_goldd7)//WHEN TILE FINALLY BREAKS
 		{
 			output = 0;
+			 hitsfx = "destroy_gold";
 		}
 		else//DAMAGING TILE
 		{
 			output += 1;
+			 hitsfx = "dig_gold" + (XORRandom(3) + 1);
 		}
 	}
+	hitsfx += ".ogg";
+	if(oldTileType > 256)
+		Sound::Play(hitsfx, Vec2f(index % this.tilemapwidth, index / this.tilemapheight) * 8, 7.0);
 	return output;
 }
 
@@ -177,6 +201,7 @@ void onSetTile(CMap@ map, u32 index, TileType tile_new, TileType tile_old)
 	}
 	else
 	{
+		string buildsfx = "";
 		if(tile_new >= CCTiles::tile_cor1 && tile_new < CCTiles::tile_cor1 + cor_variation + cor_damaged)
 		{
 			map.SetTileSupport(index, 1);
@@ -187,6 +212,7 @@ void onSetTile(CMap@ map, u32 index, TileType tile_new, TileType tile_old)
 		}
 		else if(tile_new >= CCTiles::tile_pur1 && tile_new < CCTiles::tile_pur1 + pur_variation)
 		{
+			
 			map.SetTileSupport(index, 1);
 			map.RemoveTileFlag(index, 0xFFFF);
 			map.AddTileFlag(index, Tile::SOLID | Tile::COLLISION);
@@ -195,10 +221,16 @@ void onSetTile(CMap@ map, u32 index, TileType tile_new, TileType tile_old)
 		}
 		else if(tile_new >= CCTiles::tile_mar && tile_new <= CCTiles::tile_goldd7)
 		{
+			if(tile_new == CCTiles::tile_mar || tile_new == CCTiles::tile_bas || tile_new == CCTiles::tile_bas_back || tile_new == CCTiles::tile_mar_back)
+				buildsfx = "build_wall2";
 			HandleCustomTile(map, index, tile_new);
 			map.SetTileSupport(index, 8);
 		}
 			//YEET
+		buildsfx += ".ogg";
+		if(buildsfx != ".ogg")
+			Sound::Play(buildsfx, Vec2f(index % map.tilemapwidth, index / map.tilemapheight) * 8, 7.0);
+
 		updateAllNeighbors(index, map);
 	}
 	
