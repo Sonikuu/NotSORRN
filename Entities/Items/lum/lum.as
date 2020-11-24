@@ -38,7 +38,10 @@ f32 distanceToGround(Vec2f pos)
 
 void onInit(CSprite@ this)
 {
-    this.addSpriteLayer("lum","lum.png",8,8).setRenderStyle(RenderStyle::Style::additive);
+    this.addSpriteLayer("lum","lum.png",64,64).setRenderStyle(RenderStyle::Style::light);
+	CSpriteLayer@ l = this.getSpriteLayer("lum");
+	//this.ScaleBy(Vec2f(1.0 / 256.0, 1.0 / 256.0));
+	l.ScaleBy(Vec2f(1.0 / 8.0, 1.0 / 8.0));
     //need to use sprite layer to tint :v
 }
 
@@ -80,6 +83,32 @@ void onTick(CSprite@ this)
     lum.SetColor(color);
 
     this.getBlob().SetLightColor(color);
+	
+	if(XORRandom(30) == 0)
+	{
+		CBlob@ blob = this.getBlob();
+		//CParticle@ p = makeGibParticle("lum.png", blob.getPosition() + Vec2f(XORRandom(8) - 4, XORRandom(8) - 4), Vec2f(XORRandom(10) - 10, XORRandom(10) - 10) / 30.0 + blob.getVelocity() / 2, 0, 0, Vec2f(64, 64), 0.1, 0, "");
+		CParticle@ p = ParticleAnimated("lum", blob.getPosition() + Vec2f(XORRandom(8) - 4, XORRandom(8) - 4), Vec2f(XORRandom(10) - 5, XORRandom(10) - 10) / 60.0 + blob.getVelocity() / 2, 0, 1.0 / 16.0, 0, 0, Vec2f(64, 64), 0, -0.002, true);
+		if(p !is null)
+		{
+			//p.deadeffect = 1;
+			p.rotates = false;
+			//p.fadeout = true;
+			p.diesonanimate = true;
+			//p.gravity = Vec2f(0, -0.01);
+			p.damping = 0.98;
+			//p.rotation = Vec2f(XORRandom(100) - 50, XORRandom(100) - 50) / 50.0;
+			p.diesoncollide = true;
+			//p.scale = 1.0 / 8.0;
+			p.growth = -0.0002;
+			//p.framestep = 1;
+			p.alivetime = 1;
+			p.timeout = 1;
+			//p.emiteffect = 0;
+			//p.freerotationscale = 0.5;
+			p.setRenderStyle(RenderStyle::light);
+		}
+	}
 }
 bool doesCollideWithBlob( CBlob@ this, CBlob@ blob )
 {
