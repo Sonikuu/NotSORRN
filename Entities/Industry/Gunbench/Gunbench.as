@@ -12,6 +12,7 @@ void onInit(CBlob@ this)
 	this.getShape().getConsts().mapCollisions = false;
 
 	this.Tag("can settle"); //for DieOnCollapse to prevent 2 second life :)
+	this.Tag("builder always hit");
 
 	InitWorkshop(this);
 	

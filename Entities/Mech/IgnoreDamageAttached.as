@@ -9,7 +9,7 @@ f32 onHit( CBlob@ this, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hit
 			AttachmentPoint@ ap = aps[i];
 			CBlob@ blob = ap.getOccupied();
 
-			if (blob !is null && !ap.socket && ap.name != "PICKUP")
+			if (blob !is null && !ap.socket && ap.name != "PICKUP" && blob.getConfig().find("mech") >= 0)
 			{
 				damage = 0;
 			}  

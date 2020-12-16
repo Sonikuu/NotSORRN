@@ -6,6 +6,7 @@
 #include "LoaderColors.as";
 #include "LoaderUtilities.as";
 #include "CustomBlocks.as";
+#include "DynamicFluidCommon.as";
 
 enum WAROffset
 {
@@ -54,6 +55,11 @@ class PNGLoader
 		{
 			SetupMap(image.getWidth(), image.getHeight());
 			SetupBackgrounds();
+
+			array<array<CWaterTile>>@ waterdata = @array<array<CWaterTile>>(map.tilemapwidth, array<CWaterTile>(map.tilemapheight, CWaterTile()));
+			array<bool>@ activelayers = @array<bool>(map.tilemapheight, false);
+			map.set("waterdata", @waterdata);
+			map.set("activelayers", @activelayers);
 
 			while(image.nextPixel())
 			{
@@ -217,9 +223,38 @@ class PNGLoader
 			// Water
 			case map_colors::water_air:
 				map.server_setFloodWaterOffset(offset, true);
+				/*{
+					array<array<CWaterTile>>@ waterdata;
+					array<bool>@ activelayers;
+
+					map.get("waterdata", @waterdata);
+					map.get("activelayers", @activelayers);
+					
+					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].d = 15;
+					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].f = true;
+					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].a = true;
+					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].b = true;
+					activelayers[offset / map.tilemapwidth] = true;
+				}*/
 			break;
 			case map_colors::water_backdirt:
 				map.server_setFloodWaterOffset(offset, true);
+
+				/*{
+					array<array<CWaterTile>>@ waterdata;
+					array<bool>@ activelayers;
+
+					map.get("waterdata", @waterdata);
+					map.get("activelayers", @activelayers);
+
+					
+					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].d = 15;
+					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].f = true;
+					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].a = true;
+					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].b = true;
+					activelayers[offset / map.tilemapwidth] = true;
+				}*/
+
 				map.SetTile(offset, CMap::tile_ground_back);
 			break;
 
