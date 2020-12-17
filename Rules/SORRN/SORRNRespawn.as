@@ -264,7 +264,7 @@ void addRespawnQueue(CRules@ this, CPlayer@ player)
 void onPlayerLeave( CRules@ this, CPlayer@ player )
 {
 	CBlob@ blob = player.getBlob();
-	if(blob !is null)
+	if(blob !is null && isServer())
 	{
 		blob.Tag(player.getUsername() + "'s soulless");
 		blob.server_SetActive(false);

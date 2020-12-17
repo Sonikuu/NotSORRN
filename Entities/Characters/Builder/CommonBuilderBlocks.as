@@ -295,6 +295,15 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			AddIconToken("$decorbench$", "DecorBench.png", Vec2f(16, 16), 7);
 		}
 		{
+			BuildBlock b(0, "bed", "$bed$", "A place to rest");
+			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 150);
+			b.buildOnGround = true;
+			b.size.Set(24, 16);
+			b.temporaryBlob = false;
+			blocks[0].push_back(b);
+			AddIconToken("$bed$", "Bed.png", Vec2f(24, 16), 0);
+		}
+		{
 			BuildBlock b(0, "fireplace", "$fireplace$", "Fireplace");
 			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 80);
 			b.buildOnGround = true;

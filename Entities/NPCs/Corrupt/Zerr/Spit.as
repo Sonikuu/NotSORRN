@@ -5,6 +5,7 @@ void onInit(CBlob@ this)
 {
 	CShape@ shape = this.getShape();
 	shape.SetGravityScale(0.4);
+	this.Tag("spawn_protect");
 }
 
 

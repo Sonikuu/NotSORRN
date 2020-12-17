@@ -102,6 +102,10 @@ void InitTrader(CBlob@ this)
 		ShopItem@ s = addShopItem(this, "Swiss Cheese", "$swiss$", "swiss", "Swiss Cheese", false);
 		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 20);
 	}
+	{
+		ShopItem@ s = addShopItem(this, "Bella", "$doggo$", "doggo", "A good girl", false);
+		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 200);
+	}
 }
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params)

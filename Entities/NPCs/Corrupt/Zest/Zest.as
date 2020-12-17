@@ -21,7 +21,7 @@ void onTick(CBlob@ this)
 	{
 		CMap@ map = getMap();
 		CBlob@[] blobs;
-		map.getBlobsInRadius(this.getPosition(), 256, @blobs);
+		map.getBlobsInRadius(this.getPosition(), 512, @blobs);
 		int zerrcount = 0;
 		bool dospawn = true;
 		for(int i = 0; i < blobs.size(); i++)

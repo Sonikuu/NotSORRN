@@ -6,16 +6,19 @@ const float maxrange = 128;
 
 interface INodeCore
 {
-	bool isConnectable(INodeCore@);
-	void connectTo(INodeCore@);
-	void disconnectFrom(INodeCore@);
+	bool isConnectable(INodeCore@, CBlob@, CBlob@);
+	void connectTo(INodeCore@, CBlob@, CBlob@);
+	void disconnectFrom(INodeCore@, CBlob@, CBlob@);
 
-	void update(int);//Int here is updatedepth i guess, primarly for how i want logic to recursively update up to a certain point
+	void update(CBlob@, int);//Int here is updatedepth i guess, primarly for how i want logic to recursively update up to a certain point
 					//Likely wont have any actual use beyond that hmmm
 	bool isSame(INodeCore@);	//Check if the node is the same type as your node yeet
 	void setState(bool);	//State is going to be strictly logic, and will however be in all other nodes as well
 	bool getState();		//Intent is to allow logic stuff to connect to any other node to control it
 							//THIS COMES MUCH LATER
+	Vec2f getWorldPosition(CBlob@);
+	bool isInput();
+	string getName();
 }
 
 class CAlchemyTank : INodeCore
@@ -54,23 +57,26 @@ class CAlchemyTank : INodeCore
 		dynamicconnection = false;
 	}
 
-	bool isConnectable(INodeCore@ node)
+	bool isConnectable(INodeCore@ output, CBlob@ blob, CBlob@ toblob)
 	{
-		if(node.isSame(@this) && cast<INodeCore@>(this) !is node)
+		CBlob@ inputblob = @toblob;
+		CBlob@ outputblob = @blob;
+
+		return (this !is cast<CAlchemyTank>(output) && output.isInput() && !this.input && inputblob !is outputblob && (output.getWorldPosition(inputblob) - getWorldPosition(outputblob)).Length() < maxrange && isSame(output));
 			return true;
 		return false;
 	}
 
-	void connectTo(INodeCore@ node)
+	void connectTo(INodeCore@ node, CBlob@ blob, CBlob@ toblob)
 	{
-		if(isConnectable(node))
+		if(isConnectable(node, blob, toblob))
 		{
 			@connection = cast<CAlchemyTank@>(node); 
 		}
 	}
 
 
-	void disconnectFrom(INodeCore@ node)
+	void disconnectFrom(INodeCore@ node, CBlob@ blob, CBlob@ toblob)
 	{
 		if(cast<CAlchemyTank@>(node) is connection)
 		{
@@ -78,13 +84,13 @@ class CAlchemyTank : INodeCore
 		}
 	}
 
-	void update(int recursionsleft)
+	void update(CBlob@ blob, int recursionsleft)
 	{
 		if(connection !is null)
 		{
 			CBlob@ toblob = getBlobByNetworkID(connectionid);
 			CBlob@ thisblob = getBlobByNetworkID(thisnetid);
-			if(thisblob is null)
+			if(blob is null)
 				return; 
 			if(toblob is null)
 			{
@@ -93,39 +99,39 @@ class CAlchemyTank : INodeCore
 					//Detach on death
 					CBitStream params;
 					params.write_u8(tankid);
-					thisblob.SendCommand(thisblob.getCommandID("disconnect"), params);
+					blob.SendCommand(blob.getCommandID("disconnect"), params);
 				}
 			}
 			else
 			{
-				if((getWorldTankPos(thisblob, this) - getWorldTankPos(toblob, connection)).Length() > maxrange)
+				if((getWorldPosition(blob) - connection.getWorldPosition(toblob)).Length() > maxrange)
 				{
 					if(isServer())
 					{
 						//Detach out of range
 						CBitStream params;
 						params.write_u8(tankid);
-						thisblob.SendCommand(thisblob.getCommandID("disconnect"), params);
+						blob.SendCommand(blob.getCommandID("disconnect"), params);
 					}
 				}
-				else if(toblob.isInInventory() || thisblob.isInInventory())
+				else if(toblob.isInInventory() || blob.isInInventory())
 				{
 					if(isServer())
 					{
 						//Detach if in inv
 						CBitStream params;
 						params.write_u8(tankid);
-						thisblob.SendCommand(thisblob.getCommandID("disconnect"), params);
+						blob.SendCommand(blob.getCommandID("disconnect"), params);
 					}
 				}
 				else
 				{
 					if(connection.singleelement)
-						transferOnly(this, connection, thisblob.get_u16("transferrate"), firstId(connection));
+						transferOnly(this, connection, blob.get_u16("transferrate"), firstId(connection));
 					else if(connection.onlyele < elementlist.length)
-						transferOnly(this, connection, thisblob.get_u16("transferrate"), connection.onlyele);
+						transferOnly(this, connection, blob.get_u16("transferrate"), connection.onlyele);
 					else
-						transferSimple(this, connection, thisblob.get_u16("transferrate"));
+						transferSimple(this, connection, blob.get_u16("transferrate"));
 				}
 			}
 		}
@@ -149,7 +155,29 @@ class CAlchemyTank : INodeCore
 		return true;
 		//You know whats up
 	}
-	
+
+	Vec2f getWorldPosition(CBlob@ blob)
+	{
+		Vec2f topos = blob.getPosition() + offset.RotateBy(blob.getAngleDegrees());
+			
+			
+		if(blob.get_bool("equipped"))
+		{
+			CBlob@ equipper = getBlobByNetworkID(blob.get_u16("equipper"));
+			if(equipper !is null)
+				topos = equipper.getPosition();
+		}
+		
+		return topos;
+	}
+	bool isInput()
+	{
+		return input;
+	}
+	string getName()
+	{
+		return name;
+	}
 }
 
 class CNodeController

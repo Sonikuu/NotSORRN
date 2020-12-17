@@ -182,7 +182,7 @@ void onTick(CBlob@ this)
 	for (uint i = 0; i < controller.tanks.length; i++)
 	{
 		//controller.tanks[i].lasttransfer = -1;
-		controller.tanks[i].update(0);
+		controller.tanks[i].update(this, 0);
 		/*if(controller.tanks[i].connection !is null)
 		{
 			CBlob@ toblob = getBlobByNetworkID(controller.tanks[i].connectionid);
@@ -375,7 +375,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 					}
 					if(fromtank.connection !is totank)
 					{
-						fromtank.connectTo(totank);
+						fromtank.connectTo(totank, this, connecttank);
 						fromtank.connectionid = isequipcmd ? connecttank.getNetworkID() : this.getNetworkID();
 						fromtank.dynamicconnection = totank.dynamictank || fromtank.dynamictank;
 						
@@ -608,7 +608,7 @@ void manageConnectSys(CBlob@ this)
 {
 	CBlob@ local = getLocalPlayerBlob();
 	CControls@ con = getControls();
-	if(local !is null && con !is null && this.isPointInside(con.getMouseWorldPos()) && local.get_u8("wiringmode") == 1)
+	if(local !is null && con !is null && this.isPointInside(con.getMouseWorldPos()) && local.get_u8("wiringmode") != 0)
 	{
 		Vec2f mousepos = con.getMouseWorldPos();
 		u8 nearesttank = 0;
@@ -620,9 +620,9 @@ void manageConnectSys(CBlob@ this)
 		if(controller is null)
 			return;
 			
-		for (uint i = 0; i < controller.tanks.size(); i++)
+		for (uint i = 0; i < controller.nodes.size(); i++)
 		{
-			Vec2f thistankpos = getWorldTankPos(this, controller.tanks[i]);
+			Vec2f thistankpos =  controller.nodes[i].getWorldPosition(this);
 			if((thistankpos - mousepos).Length() < nearestdist)
 			{
 				nearesttank = i;
@@ -631,8 +631,8 @@ void manageConnectSys(CBlob@ this)
 		}
 		hoveredtanknet = this.getNetworkID();
 		hoveredtankid = nearesttank;
-		CAlchemyTank@ seltank = @controller.tanks[nearesttank];
-		if(local.isKeyJustPressed(key_action1) && !seltank.input)
+		INodeCore@ seltank = @controller.nodes[nearesttank];
+		if(local.isKeyJustPressed(key_action1) && !seltank.isInput())
 		{
 			
 			fromtankid = nearesttank;
@@ -652,10 +652,10 @@ void manageConnectSys(CBlob@ this)
 			if(fromblob !is null)
 			{
 				CNodeController@ fromcon = getNodeController(fromblob);
-				if(fromcon !is null && fromcon.tanks.size() > fromtankid)
+				if(fromcon !is null && fromcon.nodes.size() > fromtankid)
 				{
-					CAlchemyTank@ fromtank = @fromcon.tanks[fromtankid];
-					if(canAttachTank(fromtank, fromblob, seltank, this))
+					INodeCore@ fromtank = @fromcon.nodes[fromtankid];
+					if(fromtank.isConnectable(seltank, fromblob, this))
 					{
 						CBitStream params;
 						params.write_u16(hoveredtanknet);
@@ -687,28 +687,28 @@ void connectSysRender(CBlob@ this)
 		{
 			CNodeController@ fromcontroller = getNodeController(this);
 
-			if(fromcontroller !is null && fromcontroller.tanks.size() > fromtankid)
+			if(fromcontroller !is null && fromcontroller.nodes.size() > fromtankid)
 			{
 				array<Vertex> vertlist;
 
-				CAlchemyTank@ fromtank = fromcontroller.tanks[fromtankid];
+				INodeCore@ fromtank = fromcontroller.nodes[fromtankid];
 
 				CBlob@ hovertank = getBlobByNetworkID(hoveredtanknet);
 				bool valid = false;
 				if(hovertank !is null && hovertank.isPointInside(mousepos))
 				{
 					CNodeController@ hovercon = getNodeController(hovertank);
-					if(hovercon !is null && hoveredtankid < hovercon.tanks.size())
+					if(hovercon !is null && hoveredtankid < hovercon.nodes.size())
 					{
-						if(canAttachTank(fromtank, this, hovercon.tanks[hoveredtankid], hovertank))
+						if(fromtank.isConnectable(hovercon.nodes[hoveredtankid], this, hovertank))
 						{
 							valid = true;
-							mousepos = getWorldTankPos(hovertank, hovercon.tanks[hoveredtankid]);
+							mousepos = hovercon.nodes[hoveredtankid].getWorldPosition(hovertank);
 						}
 					}
 				}
 
-				Vec2f startpos = getWorldTankPos(this, fromtank);
+				Vec2f startpos = fromtank.getWorldPosition(this);
 				Vec2f endvec = mousepos;
 				if((startpos - endvec).Length() > maxrange)
 				{
@@ -732,17 +732,17 @@ void connectSysRender(CBlob@ this)
 	}
 
 	//Drawing circle and node name
-	if(this.getNetworkID() == hoveredtanknet && local !is null && this.isPointInside(local.getAimPos()) && local.get_u8("wiringmode") == 1)
+	if(this.getNetworkID() == hoveredtanknet && local !is null && this.isPointInside(local.getAimPos()) && local.get_u8("wiringmode") != 0)
 	{
 		CCamera@ cam = getCamera();
 		CNodeController@ fromcontroller = getNodeController(this);
-		if(fromcontroller !is null && fromcontroller.tanks.size() > hoveredtankid && cam !is null)
+		if(fromcontroller !is null && fromcontroller.nodes.size() > hoveredtankid && cam !is null)
 		{
-			CAlchemyTank@ fromtank = fromcontroller.tanks[hoveredtankid];
-			Vec2f drawpos = (getWorldTankPos(this, fromtank) - this.getPosition()) / 0.5 * cam.targetDistance + this.getInterpolatedScreenPos();
+			INodeCore@ fromtank = fromcontroller.nodes[hoveredtankid];
+			Vec2f drawpos = (fromtank.getWorldPosition(this) - this.getPosition()) / 0.5 * cam.targetDistance + this.getInterpolatedScreenPos();
 			GUI::DrawCircle(drawpos, 8, SColor(255, 255, 255, 255));
 			GUI::SetFont("menu");
-			GUI::DrawTextCentered(fromtank.name, drawpos - Vec2f(0, 32), SColor(255, 255, 255, 255));
+			GUI::DrawTextCentered(fromtank.getName(), drawpos - Vec2f(0, 32), SColor(255, 255, 255, 255));
 		}
 	}
 }
