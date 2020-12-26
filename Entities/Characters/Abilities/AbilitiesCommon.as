@@ -553,7 +553,8 @@ class COvertake : CAbilityBase
 
 	string[] overtakeables =
 	{
-		"builder"
+		"builder",
+		"golem"
 	};
 
 	CBlob@ getNearbyOvertakable()
