@@ -991,6 +991,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		if(activateNewAbility)
 		{
 			newAbility = true;
+			Sound::Play("NewAbility.ogg");
 		}
 	}
 
