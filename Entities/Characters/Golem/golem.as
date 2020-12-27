@@ -1,10 +1,14 @@
+#include "golemparticles.as"
+
 
 void onInit(CBlob@ this){
 	this.set_f32("jumpPower", 0);
+		this.getSprite().SetEmitSound("GolemCharge.ogg");
+	doParticleInit(this);
 }
 
 const f32 speed = 0.5;
-const f32 chargeTime = 15;
+const f32 chargeTime = 30;
 
 void onTick(CBlob@ this){
 
@@ -26,15 +30,19 @@ void onTick(CBlob@ this){
 		}
 
 		if(this.isKeyPressed(key_up) || this.isKeyPressed(key_down)){
+			this.getSprite().SetEmitSoundPaused(this.get_f32("jumpPower") >= chargeTime);
+			doParticlesPassive(this);
 			this.set_f32("jumpPower",Maths::Clamp(this.get_f32("jumpPower") + 1,0, chargeTime));
 		}
 
 		if(this.isKeyJustReleased(key_up) && (airTime < 3)){
 			this.setVelocity(this.getVelocity() + Vec2f(0,-10 * (this.get_f32("jumpPower")/chargeTime)));
+			this.getSprite().SetEmitSoundPaused(true);
 		}
 
 		if(!this.isKeyPressed(key_up)){
 			this.set_f32("jumpPower",0);
+			this.getSprite().RewindEmitSound();
 		}
 	}
 }
