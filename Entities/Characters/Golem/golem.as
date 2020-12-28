@@ -57,4 +57,25 @@ void onTick(CSprite@ this){
 	} else {
 		this.SetAnimation("default");
 	}
+
+
+	if(!b.get_bool("onGroundLastTick") && b.isOnGround() && b.get_Vec2f("lastVelocity").y > 4){
+		//ShakeScreen(Maths::Clamp(150.0f * b.getVelocity().y/4,0,300), 30, b.getPosition());
+		this.PlaySound("StoneFall1.ogg",2);
+		MakeDustParticle(b.getPosition(),"dust" + (XORRandom(2) == 1 ? "2" : "") + ".png");
+	}
+
+	b.set_Vec2f("lastVelocity",b.getVelocity());
+	b.set_bool("onGroundLastTick",b.isOnGround());	
+}
+
+void MakeDustParticle(Vec2f pos, string file)
+{
+	CParticle@ temp = ParticleAnimated(file, pos - Vec2f(0, 8), Vec2f(0, 0), 0.0f, 1.0f, 3, 0.0f, false);
+
+	if (temp !is null)
+	{
+		temp.width = 8;
+		temp.height = 8;
+	}
 }
