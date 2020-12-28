@@ -39,7 +39,7 @@ void onTick(CBlob@ this){
 	}
 
 	if(this.isKeyJustReleased(key_up)){
-		this.setVelocity(Vec2f(this.getVelocity().x, (inWater ? -20 : -10) * (this.get_f32("jumpPower")/chargeTime) ));
+		this.setVelocity(Vec2f(this.getVelocity().x, this.get_f32("jumpPower") < 5 ? this.getVelocity().y : 0 +  (inWater ? -20 : -10) * (this.get_f32("jumpPower")/chargeTime) ));
 		this.getSprite().SetEmitSoundPaused(true);
 	}
 
