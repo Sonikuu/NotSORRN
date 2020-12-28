@@ -89,3 +89,12 @@ bool canBePickedUp( CBlob@ this, CBlob@ byBlob ){
 	return this.getPlayer() is null &&
 	((this.getTeamNum() > 7 && byBlob.getTeamNum() > 7) || this.getTeamNum() == byBlob.getTeamNum());
 }
+
+f32 onHit( CBlob@ this, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitterBlob, u8 customData ){
+	this.getSprite().PlaySound("rock_hit.ogg");
+
+	return damage;
+}
+void onDie(CBlob@ this){
+	this.getSprite().Gib();
+}
