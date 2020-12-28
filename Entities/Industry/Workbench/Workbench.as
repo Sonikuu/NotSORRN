@@ -236,6 +236,15 @@ void InitWorkshop(CBlob@ this)
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 100);
 		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 250);
 	}
+		{
+		ShopItem@ s = addShopItem(this,  "Golem", "$golem$", "golem", "A mechanical divice that might be able to be controled", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 100);
+		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 250);
+		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 25);
+		AddRequirement(s.requirements, "blob", "mat_purifiedgold", "Purified Gold", 2);
+
+		AddIconToken("$golem$", "golem.png", Vec2f(16, 16), 0);
+	}
 }
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
