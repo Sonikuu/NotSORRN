@@ -1,6 +1,7 @@
 
 void onInit(CBlob@ this){
     this.setInventoryName(this.get_string("owner") + "'s soul");
+    this.addCommandID("snuff");
 
     this.getShape().SetStatic(true);
 }
@@ -15,17 +16,20 @@ bool doesCollideWithBlob( CBlob@ this, CBlob@ blob ){
     return false;
 }
 void GetButtonsFor( CBlob@ this, CBlob@ caller ){
-    CButton@ b = caller.CreateGenericButton(9, Vec2f_zero,this, @onButtonPress, "Snuff out "+this.get_string("charname")+"'s soul...");
+    CButton@ b = caller.CreateGenericButton(9, Vec2f_zero,this, this.getCommandID("snuff"), "Snuff out "+this.get_string("charname")+"'s soul...");
 }
 
-void onButtonPress(CBlob@ this, CBlob@ caller){
-    this.server_Die();
-    CBlob@ b = getBlobByNetworkID(this.get_u16("owner_netid"));
-    if(b is null){return;}
+void onCommand(CBlob@ this, u8 cmd, CBitStream@ params){
+    if(cmd == this.getCommandID("snuff"))
+    {
+        this.server_Die();
+        CBlob@ b = getBlobByNetworkID(this.get_u16("owner_netid"));
+        if(b is null){return;}
 
-    b.server_SetActive(true);
+        b.server_SetActive(true);
 
-    b.getSprite().PlaySound("man_scream.ogg", 1, 1);
+        b.getSprite().PlaySound("man_scream.ogg", 1, 1);
 
-    b.server_Die();
+        b.server_Die();
+    }
 }
