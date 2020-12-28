@@ -84,3 +84,8 @@ void MakeDustParticle(Vec2f pos, string file)
 		temp.height = 8;
 	}
 }
+
+bool canBePickedUp( CBlob@ this, CBlob@ byBlob ){
+	return this.getPlayer() is null &&
+	((this.getTeamNum() > 7 && byBlob.getTeamNum() > 7) || this.getTeamNum() == byBlob.getTeamNum());
+}
