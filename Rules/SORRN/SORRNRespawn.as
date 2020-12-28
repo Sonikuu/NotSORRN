@@ -271,6 +271,8 @@ void onPlayerLeave( CRules@ this, CPlayer@ player )
 		CBlob@ n = server_CreateBlobNoInit("soul");
 
 		n.set_string("owner", player.getUsername());
+		n.set_string("charname", player.getCharacterName());
+		n.set_u16("owner_netid", blob.getNetworkID());
 		n.Tag("soul of " + player.getUsername());
 		n.setPosition(blob.getPosition());
 
