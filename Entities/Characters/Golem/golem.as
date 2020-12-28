@@ -52,7 +52,10 @@ void onTick(CBlob@ this){
 void onTick(CSprite@ this){
 	CBlob@ b = this.getBlob();
 
-	if(b.get_f32("jumpPower") >= chargeTime){
+	if(b.getPlayer() is null){
+		this.SetAnimation("soulless");
+	}
+	else if(b.get_f32("jumpPower") >= chargeTime){
 		this.SetAnimation("charged");
 	} else {
 		this.SetAnimation("default");
