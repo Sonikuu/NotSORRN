@@ -20,6 +20,7 @@ interface IAbility
     string getBorder();
     string getDescription();
 	string getName();
+	bool isEnabled();
 }
 
 class CAbilityBase : IAbility
@@ -59,6 +60,10 @@ class CAbilityBase : IAbility
             client_AddToChat(msg, color);
         }
     }
+	
+	bool isEnabled(){
+		return true;
+	}
 }
 
 class CAbilityEmpty : CAbilityBase
@@ -725,6 +730,50 @@ class CSynthesizeBoulder : CAbilityBase
 	}
 }
 
+class CGolemiteRepair : CAbilityBase
+{
+	CGolemiteRepair(CBlob@ _blob)
+	{
+		super(_blob);
+		blob.addCommandID("GolemiteRepair_activate");
+	}
+
+	string getName() override {return "Golemite Repair";}
+	string getDescription()override {return "Replaces damged body parts with stone cost: $RED$25$RED$ ";}
+	string getTextureName() override
+	{
+		return "abilityStoneRepair.png";
+	}
+	string getBorder() override
+	{
+		return "Border.png";
+	}
+
+	void activate() override
+	{
+		blob.SendCommand(blob.getCommandID("GolemiteRepair_activate"));
+	}
+
+	void onCommand(u8 cmd, CBitStream@ params)
+	{
+		if(cmd == blob.getCommandID("GolemiteRepair_activate"))
+		{
+			if(isServer())
+			{
+				blob.server_Heal(0.25);
+
+				blob.add_s32("golemiteCount",-25);
+				blob.Sync("golemiteCount",true);
+			}
+
+		}
+	}
+
+	bool isEnabled() {
+		return blob.get_s32("golemiteCount") > 25;
+	}
+}
+
 enum EAbilities
 {
 	Empty = 0,
@@ -733,7 +782,8 @@ enum EAbilities
 	SelfDestruct = 3,
 	Absorb = 4,
 	Overtake = 5,
-	SynthesizeBoulder = 6
+	SynthesizeBoulder = 6,
+	GolemiteRepair = 7
 }
 
 class CAbilityMasterList
@@ -752,7 +802,8 @@ class CAbilityMasterList
 			CSelfDestruct		(blob),
 			CAbsorb				(blob),
 			COvertake			(blob),
-			CSynthesizeBoulder	(blob)
+			CSynthesizeBoulder	(blob),
+			CGolemiteRepair(blob)
 		};
 		abilities = _abilities;//I can't figure out how to do an array litteral outside of right when you create a var so I just copy it into the main one
 	}
@@ -883,8 +934,14 @@ class CAbilityBar
 			}
 			if(controls.isKeyJustPressed(KEY_KEY_B))
 			{
-				activateSelectedAbility();
-				getRules().set_bool("activated_once",true);
+				if(getSelectedAbility().isEnabled())
+				{
+					activateSelectedAbility();
+					getRules().set_bool("activated_once",true);
+				} else 
+				{
+					blob.getSprite().PlaySound("NoAmmo.ogg",0.5);
+				}
 			}
 
 			if(controls.isKeyPressed(KEY_LSHIFT))
@@ -924,13 +981,18 @@ class CAbilityBar
 			{
 				Vec2f drawPos = getSlotPosition(i);
 
-				if(isSlotHovered(i))
+				if(getAbility(i).isEnabled())
 				{
-					GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale,SColor(127,255,255,255));
-				}
-				else
-				{
-					GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale);
+					if(isSlotHovered(i))
+					{
+						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale,SColor(127,255,255,255));
+					}
+					else
+					{
+						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale);
+					}
+				} else {
+					GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale,SColor(255,127,127,127));
 				}
 			}
 
