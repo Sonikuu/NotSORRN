@@ -524,6 +524,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 		}
 		BuildBlock[] page_2;
 		blocks.push_back(page_2);
+		//Maybe logic and items can share a page? have a long divider between the two sections, dunno
 		if(getRules().get_bool("is_test"))
 		{
 			{
@@ -535,6 +536,24 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 				blocks[2].push_back(b);
 				AddIconToken("$switch$", "Switch.png", Vec2f(8, 8), 0);
 			}
+		}
+		{
+			BuildBlock b(0, "itemrelay", "$itemrelay$", "Item Relay\nAll items received by this will automatically and instantly be moved to the next connected structure");
+			AddRequirement(b.reqs, "blob", "mat_component", "Components", 2);
+			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 25);
+			b.buildOnGround = false;
+			b.size.Set(8, 8);
+			blocks[2].push_back(b);
+			AddIconToken("$itemrelay$", "ItemRelay.png", Vec2f(8, 8), 0);
+		}
+		{
+			BuildBlock b(0, "itemunloader", "$itemunloader$", "Item Unloader\nWill automatically connect to any nearby track objects that have an inventory, and unload them");
+			AddRequirement(b.reqs, "blob", "mat_component", "Components", 4);
+			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 100);
+			b.buildOnGround = false;
+			b.size.Set(16, 16);
+			blocks[2].push_back(b);
+			AddIconToken("$itemunloader$", "ItemUnloader.png", Vec2f(16, 16), 0);
 		}
 		BuildBlock[] page_3;
 		blocks.push_back(page_3);

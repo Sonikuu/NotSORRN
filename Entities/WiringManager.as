@@ -43,7 +43,7 @@ void onTick(CBlob@ this)
 			menu.entries.clear();
 			menu.option_notice = "Select Wiring";
 			//CInventory@ inv = this.getInventory();
-			for (uint i = 0; i < 2; i++)
+			for (uint i = 0; i < 3; i++)
 			{
 				{
 					IconWheelMenuEntry entry("wiring" + i);

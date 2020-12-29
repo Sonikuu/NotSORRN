@@ -200,10 +200,17 @@ void InitWorkshop(CBlob@ this)
 		AddIconToken("$raildrill$", "RailDrill.png", Vec2f(32, 16), 0);
 	}
 	{
-		ShopItem@ s = addShopItem(this,  "Mechanical Components", "$mat_component0$", "mat_component-1", "A crude component made from stone", false);
+		ShopItem@ s = addShopItem(this,  "Item Sucker", "$itemsucker$", "itemsucker", "Will automatically pick up any materials nearby\nRides tracks", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 100);
+		AddRequirement(s.requirements, "blob", "mat_component", "Components", 4);
+		
+		AddIconToken("$itemsucker$", "ItemSucker.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Mechanical Components", "$mat_component$", "mat_component-1", "A crude component made from stone", false);
 		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 25);
 		
-		AddIconToken("$mat_component0$", "MaterialComponents.png", Vec2f(16, 16), 0);
+		AddIconToken("$mat_component$", "MaterialComponents.png", Vec2f(16, 16), 0);
 	}
 	{
 		ShopItem@ s = addShopItem(this,  "Mechanical Components", "$mat_component1$", "mat_component-4", "Metallic components for machinery", false);
@@ -236,8 +243,13 @@ void InitWorkshop(CBlob@ this)
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 100);
 		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 250);
 	}
-		{
-		ShopItem@ s = addShopItem(this,  "Golem", "$golem$", "golem", "A mechanical divice that might be able to be controled", false);
+	{
+		ShopItem@ s = addShopItem(this,  "Bomb", "$mat_bombs$", "mat_bombs", "It's a bomb", false);
+		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 25);
+		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 25);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Golem", "$golem$", "golem", "A mechanical device that might be able to be controled", false);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 100);
 		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 250);
 		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 25);

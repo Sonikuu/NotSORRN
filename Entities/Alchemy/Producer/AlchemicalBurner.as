@@ -22,6 +22,8 @@ void onRender(CSprite@ this)
 void onInit(CBlob@ this)
 {	
 	addTank(this, "Output", false, Vec2f(0, -12));
+	CItemIO@ fuelin = @addItemIO(this, "Fuel Input", true, Vec2f(0, 12));
+	@fuelin.insertfunc = @fuelInsertionFunc;
 	this.addCommandID("addfuel");
 	//this.addCommandID("meltitem");
 	

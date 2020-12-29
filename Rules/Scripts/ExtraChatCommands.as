@@ -66,6 +66,8 @@ class Vial :CommandBase
 		if(blob is null)
 			return true;
 		int id = -1;
+		if(tokens.size() < 2)
+			return true;
 		id = elementIdFromName(tokens[1]);
 
 		if(id <= -1)

@@ -1,4 +1,5 @@
 #include "FuelCommon.as";
+#include "NodeCommon.as";
 
 class CBurnableItem
 {
@@ -105,6 +106,12 @@ void onInit(CBlob@ this)
 {	
 	this.addCommandID("addfuel");
 	//this.addCommandID("meltitem");
+	CItemIO@ input = @addItemIO(this, "Input", true, Vec2f(0, 0));
+	CItemIO@ output = @addItemIO(this, "Output", false, Vec2f(0, 0));
+	output.onlymovetagged = true;
+
+	CItemIO@ fuelin = @addItemIO(this, "Fuel Input", true, Vec2f(0, 8));
+	@fuelin.insertfunc = @fuelInsertionFunc;
 	
 	this.set_f32("fuel", 0);
 	this.set_u16("burnprogress", 0);
@@ -164,7 +171,13 @@ void onTick(CBlob@ this)
 							invitem.server_Die();
 						CBlob@ newblob = server_CreateBlob(burnable.output, this.getTeamNum(), this.getPosition());
 						newblob.server_SetQuantity(burnable.outputquant);
+						newblob.Tag("outputblob");
 						this.add_u16("burnprogress", -burnable.burntime);
+						CItemIO@ output = getItemIO(this, "Output");
+						if(output !is null && output.connection !is null)
+						{
+							this.server_PutInInventory(newblob);
+						}
 					}
 					
 					return;

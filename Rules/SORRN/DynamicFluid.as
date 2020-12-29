@@ -20,19 +20,19 @@ void onRestart(CRules@ this)
 		array<array<CWaterTile>>@ waterdata;
 		array<bool>@ activelayers;
 
-		//this.get("waterdata", @waterdata);
-		//this.get("activelayers", @activelayers);
+		map.get("waterdata", @waterdata);
+		map.get("activelayers", @activelayers);
 
-		/*if(waterdata is null || waterdata.size() != map.tilemapwidth || waterdata[0].size() != map.tilemapheight)
+		if(waterdata is null || waterdata.size() != map.tilemapwidth || waterdata[0].size() != map.tilemapheight)
 		{
 			@waterdata = @array<array<CWaterTile>>(map.tilemapwidth, array<CWaterTile>(map.tilemapheight, CWaterTile()));
 			@activelayers = @array<bool>(map.tilemapheight, false);
-		}*/
+		}
 	
 		map.AddScript("DynamicFluid.as");
 		
-		//map.set("waterdata", @waterdata);
-		//map.set("activelayers", @activelayers);
+		map.set("waterdata", @waterdata);
+		map.set("activelayers", @activelayers);
 	}
 }
 
@@ -79,7 +79,7 @@ void onTick(CRules@ this)
 
 	if(!isServer())
 	{
-		if(con !is null)
+		if(con !is null && waterdata !is null)
 		{
 			if(con.isKeyPressed(KEY_KEY_K))
 			{

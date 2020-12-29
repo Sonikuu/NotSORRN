@@ -135,6 +135,7 @@ void onTick(CBlob@ this)
 
 		this.getShape().SetRotationsAllowed(false);
 		this.setAngularVelocity(0);
+		this.getShape().getConsts().mapCollisions = false;
 
 		//if (holder.getName() == required_class || sv_gamemode == "TDM")
 		{		
@@ -272,6 +273,7 @@ void onTick(CBlob@ this)
 	{
 		this.getShape().SetRotationsAllowed(true);
 		this.set_bool(buzz_prop, false);
+		this.getShape().getConsts().mapCollisions = true;
 	}
 }
 
