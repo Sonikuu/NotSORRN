@@ -29,8 +29,6 @@ const f32 max_heatbar_view_range = 65;
 
 const bool show_heatbar_when_idle = false;
 
-const string required_class = "builder";
-
 void onInit(CSprite@ this)
 {
 	CSpriteLayer@ heat = this.addSpriteLayer("heat", this.getFilename(), 32, 16);
@@ -202,8 +200,6 @@ void onTick(CBlob@ this)
 			sprite.PlaySound("DrillOverheat.ogg");
 		}
 
-		if (holder.getName() == required_class || sv_gamemode == "TDM")
-		{
 			if (!holder.isKeyPressed(key_action1) || isKnocked(holder))
 			{
 				this.set_bool(buzz_prop, false);
@@ -390,18 +386,6 @@ void onTick(CBlob@ this)
 					}
 				}
 			}
-		}
-		else
-		{
-			if (isClient() &&
-			        holder.isMyPlayer())
-			{
-				if (holder.isKeyJustPressed(key_action1))
-				{
-					Sound::Play("NoAmmo.ogg");
-				}
-			}
-		}
 		this.set_u8(heat_prop, heat);
 	}
 	else
@@ -479,8 +463,6 @@ void onRender(CSprite@ this)
 
 	CBlob@ holderBlob = holder.getBlob();
 	if (holderBlob is null){return;}
-
-	if (holderBlob.getName() != required_class && sv_gamemode != "TDM"){return;}
 	
 	Vec2f mousePos = getControls().getMouseWorldPos();
 	Vec2f blobPos = blob.getPosition();
