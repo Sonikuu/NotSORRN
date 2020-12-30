@@ -4,7 +4,6 @@
 void onInit(CBlob@ this){
 	this.set_f32("jumpPower", 0);
 		this.getSprite().SetEmitSound("GolemCharge.ogg");
-	doParticleInit(this);
 }
 
 const f32 speed = 0.5;
@@ -41,6 +40,7 @@ void onTick(CBlob@ this){
 	if(this.isKeyJustReleased(key_up)){
 		this.setVelocity(Vec2f(this.getVelocity().x, this.get_f32("jumpPower") < 5 ? this.getVelocity().y : 0 +  (inWater ? -20 : -10) * (this.get_f32("jumpPower")/chargeTime) ));
 		this.getSprite().SetEmitSoundPaused(true);
+		doParticlesJump(this);
 	}
 
 	if(!this.isKeyPressed(key_up)){
@@ -96,4 +96,53 @@ f32 onHit( CBlob@ this, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hit
 }
 void onDie(CBlob@ this){
 	this.getSprite().Gib();
+}
+
+void doParticlesPassive(CBlob@ this){
+	if(getGameTime() %2 != 0){
+		return;
+	}
+
+	Vec2f particlePos = this.getPosition() + Vec2f(XORRandom(8) - 4, XORRandom(8) - 4) * 2;
+	Vec2f thisPos = this.getPosition();
+	Vec2f norm = (particlePos - thisPos);
+	norm.Normalize();
+
+
+	CParticle@ p = ParticleAnimated("lum.png",particlePos, Vec2f(XORRandom(10) - 5 * norm.x, XORRandom(10) - 10 *norm.y) / 60.0, 0, 1.0 / 16.0, 0, 0, Vec2f(64, 64), 1, -0.002, true);
+
+	if(p !is null)
+	{
+		p.damping = 0.98;
+		p.animated = 40;
+		p.growth = -0.0005;
+		p.colour = SColor(255,255,255,255);
+
+		p.setRenderStyle(RenderStyle::light);
+
+	}
+}
+
+void doParticlesJump(CBlob@ this){
+	f32 jumpPower = this.get_f32("jumpPower");
+	f32 pCharged = jumpPower/chargeTime;
+
+	for(int i = 0; i < (pCharged * 10); i++ ){
+		Vec2f particlePos = this.getPosition() + Vec2f(XORRandom(8) - 4, XORRandom(8) - 4) * 2;
+
+		CParticle@ p = ParticleAnimated("lum.png",particlePos, Vec2f(0,XORRandom(3) + 3), 0, 1.0 / 16.0, 0, 0, Vec2f(64, 64), 1, -0.002, true);
+
+		if(p !is null)
+		{
+			p.fastcollision = true;
+			p.diesoncollide = true;
+			p.damping = 0.98;
+			p.animated = 40;
+			p.growth = -0.0005;
+			p.colour = SColor(255,255,255,255);
+
+			p.setRenderStyle(RenderStyle::light);
+
+		}
+	}
 }
