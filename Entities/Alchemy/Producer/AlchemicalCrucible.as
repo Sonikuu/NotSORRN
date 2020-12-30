@@ -192,6 +192,10 @@ void onInit(CBlob@ this)
 	
 	//Setup tanks
 	addTank(this, "Output", false, Vec2f(0, -12));
+	addItemIO(this, "Input", true, Vec2f(0, 0));
+
+	CItemIO@ fuelin = @addItemIO(this, "Fuel Input", true, Vec2f(0, 12));
+	@fuelin.insertfunc = @fuelInsertionFunc;
 	
 	AddIconToken("$add_fuel$", "FireFlash.png", Vec2f(32, 32), 0);
 	

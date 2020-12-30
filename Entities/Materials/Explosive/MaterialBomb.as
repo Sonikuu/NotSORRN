@@ -19,10 +19,11 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 			@holder = @this.getTouchingByIndex(0);
 		}*/
 		CBlob@ newbomb = server_CreateBlob("bomb", this.getTeamNum(), this.getPosition());
+		this.server_Die();
 		if(holder !is null)
 		{
 			holder.server_Pickup(newbomb);
 		}
-		this.server_Die();
+		
 	}
 }

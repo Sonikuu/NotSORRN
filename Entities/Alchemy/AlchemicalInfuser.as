@@ -195,6 +195,10 @@ void onInit(CBlob@ this)
 	CAlchemyTank@ input = addTank(this, "Input", true, Vec2f(0, -8));
 	input.singleelement = true;
 	input.maxelements = 1000;
+
+	CItemIO@ iinput = @addItemIO(this, "Input", true, Vec2f(0, 0));
+	CItemIO@ output = @addItemIO(this, "Output", false, Vec2f(0, 0));
+	output.onlymovetagged = true;
 	//addTank(this, "inputr", true, Vec2f(4, -4));
 	//addTank(this, "output", false, Vec2f(0, 4));
 	this.set_u16("processtime", 0);
@@ -330,14 +334,14 @@ void onTick(CBlob@ this)
 											}
 										}
 
-			
+										CBlob@ output = null;
 										if(infuserecipes[j].output.find("tree") >= 0)
 										{
-											server_MakeSeed(this.getPosition(), infuserecipes[j].output);
+											@output = server_MakeSeed(this.getPosition(), infuserecipes[j].output);
 										}
 										else if(infuserecipes[j].output.find("mat_") >= 0)
 										{
-											CBlob@ output = server_CreateBlobNoInit(infuserecipes[j].output);
+											@output = server_CreateBlobNoInit(infuserecipes[j].output);
 											output.Tag("custom quantity");
 											output.setPosition(this.getPosition());
 											output.server_SetQuantity(infuserecipes[j].outputquant);
@@ -345,8 +349,14 @@ void onTick(CBlob@ this)
 										}
 										else
 										{
-											CBlob@ output = server_CreateBlob(infuserecipes[j].output, this.getTeamNum(), this.getPosition());
+											@output = server_CreateBlob(infuserecipes[j].output, this.getTeamNum(), this.getPosition());
 											output.server_SetQuantity(infuserecipes[j].outputquant);
+										}
+										CItemIO@ outputio = getItemIO(this, "Output");
+										if(outputio !is null && outputio.connection !is null)
+										{
+											this.server_PutInInventory(output);
+											output.Tag("outputblob");
 										}
 									}
 								}
