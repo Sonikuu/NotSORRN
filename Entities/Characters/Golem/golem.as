@@ -64,7 +64,6 @@ void onTick(CSprite@ this){
 
 	if(!b.get_bool("onGroundLastTick") && b.isOnGround() && b.get_Vec2f("lastVelocity").y > 4){
 		f32 shakeValue = Maths::Clamp(150.0f * (b.get_Vec2f("lastVelocity").y/16.0f),0,300);
-		print(shakeValue + '');
 		ShakeScreen(shakeValue, 30, b.getPosition());
 		this.PlaySound("StoneFall1.ogg",2);
 		MakeDustParticle(b.getPosition(),"dust" + (XORRandom(2) == 1 ? "2" : "") + ".png");
