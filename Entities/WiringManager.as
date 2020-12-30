@@ -118,7 +118,7 @@ void onCreateInventoryMenu(CBlob@ this, CBlob@ forBlob, CGridMenu @gridmenu)
 		{
 			CBitStream params;
 			params.write_u8(2);
-            CGridButton@ button = menu.AddButton("$item_wire$", "Coming Soon :tm:", this.getCommandID("setwiringmode"), params);
+            CGridButton@ button = menu.AddButton("$item_wire$", "Item Pipe", this.getCommandID("setwiringmode"), params);
 			if(this.get_u8("wiringmode") == 2)
 				button.SetSelected(1);
         }
