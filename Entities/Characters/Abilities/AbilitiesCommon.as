@@ -319,13 +319,17 @@ class CConsume : CAbilityBase
 					blob.set_s32("golemiteCount",500);
 					manager.abilityMenu.addAbility(EAbilities::Overtake);
 				}
-                else if(itemName == "nothing") {addToMyChat("You prepare to take a big bite but then chop down on nothing\nYou can't eat nothing");}
+                else if(itemName == "nothing") {blob.getSprite().PlaySound("NoAmmo.ogg",0.5);}
                 if(stomachItems > stomachItemsBefore){nomSound(held);}
             }
             else{addToMyChat("You don't think you can eat anymore for a while");}
 
         }
     }
+
+	bool isEnabled() override{
+		return blob.getCarriedBlob() !is null;
+	}
 
     void nomSound(CBlob@ held)
     {
