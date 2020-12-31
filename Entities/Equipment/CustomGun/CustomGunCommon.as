@@ -156,6 +156,29 @@ class CGunPart
 	}
 }
 
+class CGunRequirements
+{
+	array<string> materials;
+	array<int> amt;
+	bool hidden;
+	CGunRequirements()
+	{
+		hidden = false;
+	}
+
+	CGunRequirements addRequirement(string material, int amount)
+	{
+		materials.push_back(material);
+		amt.push_back(amount);
+		return this;
+	}
+	CGunRequirements setHidden(bool hidden)
+	{
+		this.hidden = hidden;
+		return this;
+	}
+}
+
 array<array<CGunPart>> gunparts = {
 //CORES
 {
@@ -207,6 +230,27 @@ array<array<CGunPart>> gunparts = {
 	CGunPart(true, 1, 1, 1, 1, 1, 1, 1, 		1, 1, "Piercing").setBlobPiercing(2).setTracerColor(SColor(255, 0, 200, 200)).setTileDamageChance(2).setAmmotype("piercingammopack"),//PIERCING
 	CGunPart(true, 0.5, 1, 1, 1, 1, 1, 1, 		1, 1, "Explosive").setTracerColor(SColor(255, 255, 200, 100)).setAmmotype("explosiveammopack").setBlobFx(@explosiveBlobHit).setTileFx(@explosiveTileHit)//EXPLOSIVE
 }
+};
+
+array<array<CGunRequirements>> gunreqs = {
+
+	{
+		CGunRequirements().addRequirement("mat_metal", 2),//PISTOL
+		CGunRequirements().addRequirement("mat_metal", 4),//ASSUALT RIFLE
+		CGunRequirements().addRequirement("mat_metal", 3),//SOMETHING, UZI MAYBE
+		CGunRequirements().addRequirement("mat_metal", 5).addRequirement("somethingcool", 1).setHidden(true),//CHARGE RIFLE
+		CGunRequirements().addRequirement("mat_metal", 5),//SHOTGUN
+		CGunRequirements().addRequirement("mat_metal", 5),//SNIPER RIFLE
+		CGunRequirements().addRequirement("mat_metal", 6).addRequirement("unstablecore", 1)//GATLING
+	},
+	{
+		CGunRequirements().addRequirement("mat_metal", 1),//SHORT
+		CGunRequirements().addRequirement("mat_metal", 2),//LONG
+		CGunRequirements().addRequirement("mat_metal", 2),//SPLIT LUL
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("accelerationplate", 1),//ACCELERATED
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("unstablecore", 1),//UNSTABLE?
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("natureheart", 1)//GUIDED
+	}
 };
 
 void buildGun(CBlob@ this)
