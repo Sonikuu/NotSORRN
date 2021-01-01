@@ -104,6 +104,37 @@ void onTick(CRules@ this)
 			corruptTick(nexttile, map);
 		}
 	}
+
+	//Random trader ship spawning
+	CBlob@ ship = getBlobByName("tradership");
+	if(ship is null && false)//Temp disabled
+	{
+
+		int xpos = XORRandom(map.tilemapwidth - 20) + 10;
+		bool validspawn = true;
+		for(int x = xpos - 8; x < xpos + 8; x++)//5 is clearance width
+		{
+			for(int y = 0; y < 10; y++)//10 here is the clearance we require to spawn
+			{
+				if(map.isTileSolid(Vec2f(x, y) * 8))
+				{
+					validspawn = false;
+					break;
+				}
+			}
+			if(!validspawn)
+				break;
+		}
+		if(validspawn)
+		{
+			print("Found valid spawning area");
+			CBlob@ ship = server_CreateBlob("tradership", 254, Vec2f(xpos, 1) * 8);
+			ship.setVelocity(Vec2f(0, 1));
+			//Do spawn
+		}
+		else
+		print("invalid");
+	}
 }
 
 void onRender(CRules@ this)
