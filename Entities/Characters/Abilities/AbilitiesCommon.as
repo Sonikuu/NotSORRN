@@ -79,7 +79,7 @@ class CAbilityEmpty : CAbilityBase
 
     string getDescription() override
     {
-        return "Does absolutely nothing";
+        return "Does absolutely nothing... or does it? Yeah nothing.";
     }
 	string getName() override
 	{
