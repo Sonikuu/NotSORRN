@@ -999,7 +999,7 @@ class CAbilityBar
 					GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale,SColor(255,127,127,127));
 				}
 			}
-
+			GUI::SetFont("snes");
 			GUI::DrawIcon(getSelectedAbility().getBorder(),0,borderDimentions,getSlotPosition(selectedSlot) + borderOffset,fDrawScale);
 			GUI::DrawRectangle(getNameDrawStartPos(),getNameDrawEndPos());
 			GUI::DrawTextCentered(getSelectedAbility().getName(), (getNameDrawStartPos() + getNameDrawEndPos())/2, SColor(255,0,0,0));
