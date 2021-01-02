@@ -221,6 +221,7 @@ class CConsume : CAbilityBase
     {
         if(cmd == blob.getCommandID("CONSUME_held_item"))
         {   
+			bool eatFail = false;
             CAbilityManager@ manager;
             blob.get("AbilityManager",@manager);
 
@@ -319,11 +320,14 @@ class CConsume : CAbilityBase
 					blob.set_s32("golemiteCount",500);
 					manager.abilityMenu.addAbility(EAbilities::Overtake);
 				}
-                else if(itemName == "nothing") {blob.getSprite().PlaySound("NoAmmo.ogg",0.5);}
+                else{eatFail = true;}
                 if(stomachItems > stomachItemsBefore){nomSound(held);}
             }
-            else{addToMyChat("You don't think you can eat anymore for a while");}
+            else{addToMyChat("You don't think you can eat anymore for a while"); eatFail = true;}
 
+			if(eatFail){
+				blob.getSprite().PlaySound("NoAmmo.ogg",0.5);
+			}
         }
     }
 
