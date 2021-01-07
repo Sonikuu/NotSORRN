@@ -84,27 +84,12 @@ CBurnableItem@ getBurnable(string input)
 
 void onRender(CSprite@ this)
 {
-	//Change to look gud when possible
-	//oh no, ive gone and reused this code without making it look good
-	//big rip
-	CBlob@ blob = this.getBlob();
-	CControls@ controls = getControls();
-	CCamera@ camera = getCamera();
-	if(controls is null || blob is null)
-		return;
-	GUI::SetFont("snes");
-	
-	Vec2f fuelpos = (Vec2f(0, 12) * camera.targetDistance * 2 + blob.getScreenPos());
-	if((fuelpos - controls.getMouseScreenPos()).Length() < 24)
-	{
-		GUI::DrawText("Fuel", Vec2f(0, 0) + fuelpos, SColor(255, 125, 125, 125));
-		GUI::DrawText(formatInt(blob.get_f32("fuel"), ""), Vec2f(0, 20) + fuelpos, SColor(255, 255, 255, 255));
-	}
+	FuelOnRender(this);
 }
 
 void onInit(CBlob@ this)
 {	
-	this.addCommandID("addfuel");
+	fuelInit(this);
 	//this.addCommandID("meltitem");
 	CItemIO@ input = @addItemIO(this, "Input", true, Vec2f(0, 0));
 	CItemIO@ output = @addItemIO(this, "Output", false, Vec2f(0, 0));
@@ -113,7 +98,6 @@ void onInit(CBlob@ this)
 	CItemIO@ fuelin = @addItemIO(this, "Fuel Input", true, Vec2f(0, 8));
 	@fuelin.insertfunc = @fuelInsertionFunc;
 	
-	this.set_f32("fuel", 0);
 	this.set_u16("burnprogress", 0);
 	
 	AddIconToken("$add_fuel$", "FireFlash.png", Vec2f(32, 32), 0);
@@ -162,7 +146,7 @@ void onTick(CBlob@ this)
 				if(burnable !is null && invitem.getQuantity() >= burnable.inputquant)
 				{
 					this.add_u16("burnprogress", 1);
-					this.add_f32("fuel", -1);		
+					addToFuelVallue(this,-1,true);		
 					this.set_bool("active", true);
 					if(this.get_u16("burnprogress") >= burnable.burntime && getNet().isServer())
 					{
@@ -190,37 +174,10 @@ void onTick(CBlob@ this)
 
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
-	CBlob@ helditem = caller.getCarriedBlob();
-	if(helditem !is null)
-	{
-		float value = getFuelValue(helditem);
-		if(value > 0.0)
-		{
-			CBitStream params;
-			params.write_u16(caller.getNetworkID());
-			caller.CreateGenericButton("$add_fuel$", Vec2f(0, 6), this, this.getCommandID("addfuel"), "Add Fuel: " + formatFloat(value, ""), params);
-		}
-	}
+	generateFuelButtons(this,caller);
 }
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 {
-	if(this.getCommandID("addfuel") == cmd)
-	{
-		CBlob@ caller = getBlobByNetworkID(params.read_u16());
-		if(caller !is null)
-		{
-			//Checking if fuel again just in case
-			CBlob@ helditem = caller.getCarriedBlob();
-			if(helditem !is null)
-			{
-				float value = getFuelValue(helditem);
-				if(value > 0.0)
-				{
-					this.add_f32("fuel", value);
-					helditem.server_Die();
-				}
-			}
-		}
-	}
+	handleFuelCommands(this,cmd,params);
 }

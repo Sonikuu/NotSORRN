@@ -1,4 +1,6 @@
 // Lantern script
+#include "FuelCommon.as"
+
 
 void onInit(CBlob@ this)
 {
