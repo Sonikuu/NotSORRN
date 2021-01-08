@@ -126,18 +126,29 @@ void generateFuelButtons(CBlob@ this, CBlob@ caller){
 
 
 void FuelOnRender(CSprite@ this){
-	//Change to look gud when possible
+	// //Change to look gud when possible
 	CBlob@ blob = this.getBlob();
 	CControls@ controls = getControls();
 	CCamera@ camera = getCamera();
 	if(controls is null || blob is null)
 		return;
-	GUI::SetFont("snes");
+
+
+	Vec2f pos = controls.getInterpMouseScreenPos() + Vec2f(8,8);
+	
+	f32 s = 1.5;
 	
 	Vec2f fuelpos = (Vec2f(0, 12) * camera.targetDistance * 2 + blob.getScreenPos());
-	if((fuelpos - controls.getMouseScreenPos()).Length() < 24)
+	if((fuelpos - controls.getMouseScreenPos()).Length() < 48)
 	{
-		GUI::DrawText("Fuel", Vec2f(0, 0) + fuelpos, SColor(255, 125, 125, 125));
-		GUI::DrawText(formatInt(blob.get_f32("fuel"), ""), Vec2f(0, 20) + fuelpos, SColor(255, 255, 255, 255));
+		for(f32 i = 0; i < 16; i++){
+			GUI::DrawIcon("FuelIcon-grey.png", i, Vec2f(16,1), pos + Vec2f(0,i * s), 1,1, SColor(255, 255,255,255));
+		}
+
+		for(f32 i = 0; i < 16 * Maths::Min(1,blob.get_f32("fuel")/1000); i++){
+			GUI::DrawIcon("FuelIcon.png", i, Vec2f(16,1), pos + Vec2f(0,i * s), 1,1, SColor(255, 255,255,255));
+		}
 	}
+
+
 }
