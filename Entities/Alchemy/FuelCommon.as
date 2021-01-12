@@ -78,6 +78,7 @@ bool fuelInsertionFunc(CBlob@ toblob, CBlob@ fuel)
 void fuelInit(CBlob@ this){
 	this.addCommandID("addfuel");
 	this.set_f32("fuel", 0);
+	this.set_f32("maxFuel", 1000);
 	AddIconToken("$add_fuel$", "FireFlash.png", Vec2f(32, 32), 0);
 }
 
@@ -134,20 +135,29 @@ void FuelOnRender(CSprite@ this){
 		return;
 
 
-	Vec2f pos = controls.getInterpMouseScreenPos() + Vec2f(8,8);
+
+	f32 maxFuel = blob.get_f32("maxFuel");
+
+	GUI::SetFont("snes");
 	
 	f32 s = 1.5;
 	
 	Vec2f fuelpos = (Vec2f(0, 12) * camera.targetDistance * 2 + blob.getScreenPos());
+
+	Vec2f textLR = fuelpos + Vec2f(48*2.1,0);
+
+	Vec2f pos = Vec2f(textLR.x, (fuelpos.y + textLR.y)/2 - (8*s));
 	if((fuelpos - controls.getMouseScreenPos()).Length() < 48)
 	{
 		for(f32 i = 0; i < 16; i++){
 			GUI::DrawIcon("FuelIcon-grey.png", i, Vec2f(16,1), pos + Vec2f(0,i * s), 1,1, SColor(255, 255,255,255));
 		}
 
-		for(f32 i = 0; i < 16 * Maths::Min(1,blob.get_f32("fuel")/1000); i++){
+		for(f32 i = 0; i < 16 * Maths::Min(1,blob.get_f32("fuel")/maxFuel); i++){
 			GUI::DrawIcon("FuelIcon.png", i, Vec2f(16,1), pos + Vec2f(0,i * s), 1,1, SColor(255, 255,255,255));
 		}
+		int p = (blob.get_f32("fuel")/maxFuel * 100);
+		GUI::DrawText("Fuel%: " + p, fuelpos + Vec2f(48,0), textLR, SColor(255,0,0,0),true,true, true);
 	}
 
 

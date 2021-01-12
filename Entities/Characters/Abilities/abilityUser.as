@@ -8,6 +8,13 @@ void onInit(CBlob@ this)
 
     this.set("AbilityManager",manager);
 }
+void onReload( CBlob@ this ){ //fixes builder erroring on rebuild. Will reset abilities and etc but should be good enough for testing /shrug
+        CAbilityManager manager = CAbilityManager(this);
+    manager.onInit();
+
+
+    this.set("AbilityManager",manager);
+}
 
 void onTick(CBlob@ this)
 {
