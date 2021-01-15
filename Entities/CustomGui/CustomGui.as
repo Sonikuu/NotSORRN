@@ -80,7 +80,9 @@ void onRender(CSprite@ this)
 	int smoothFactor = 10;
 	for(int i = smoothFactor; i > 0; i--){
 		int a = i * 1;
-		GUI::DrawIcon("PixelWhite.png",0, Vec2f(1,1), hpPos + Vec2f(a,0), 16 - a , (64 - smoothFactor + a) * ph, SColor(255,127 - (i * 10),0,0));
+
+		SColor color = colorLerp(SColor(255,127 - (i * 10),0,0),SColor(255,0,200 - (i * 10),0),ph);
+		GUI::DrawIcon("PixelWhite.png",0, Vec2f(1,1), hpPos + Vec2f(a,0), 16 - a , (64 - smoothFactor + a) * ph, color);
 	}
 	GUI::DrawIcon("HealthBar.png", 0, Vec2f(16,64), hpPos,kagScale);
 
