@@ -2,6 +2,7 @@
 
 void onTick(CSprite@ this){
 	CBlob@ blob = this.getBlob();
+	if(!blob.isMyPlayer()){return;}
 	CPlayer@ p = blob.getPlayer();
 	if(p is null){ return;}
 
