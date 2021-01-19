@@ -35,9 +35,7 @@ void onTick(CSprite@ this){
 	Vec2f end = d + w;
 
 
-	if(blob.isKeyJustReleased(keys::key_action1) &&
-	mp.x > d.x && mp.x < end.x &&
-	mp.y > d.y && mp.y < end.y	){
+	if(blob.isKeyJustReleased(keys::key_action1) && mouseOnButton(d,end)){
 		CBitStream params;
 		params.write_netid(p.getNetworkID());
 
@@ -52,10 +50,17 @@ void onRender(CSprite@ this){
 	Vec2f s = Vec2f(getScreenWidth(),getScreenHeight());
 	Vec2f w = Vec2f(128,32);
 	Vec2f d = Vec2f(s.x - w.x,w.y);
+	Vec2f end = d + w;
 	
 	//GUI::DrawPane(d,d + w);
 	GUI::SetFont("MENU");
-	GUI::DrawIcon("TeamManagement.png", 0, w,d,0.5, this.getBlob().getTeamNum());
+	GUI::DrawIcon("TeamManagement.png", 0, w,d,0.5,0.5, this.getBlob().getTeamNum(),mouseOnButton(d,end) ? SColor(255,127,127,127) : color_white);
 
 
+}
+
+bool mouseOnButton(Vec2f start, Vec2f end){
+	Vec2f mp = getControls().getMouseScreenPos();
+	return mp.x > start.x && mp.x < end.x &&
+	mp.y > start.y && mp.y < end.y;
 }
