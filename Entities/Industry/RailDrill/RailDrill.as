@@ -16,6 +16,8 @@ const string required_class = "builder";
 
 const f32 consume_amount = 0.2;
 
+u16[] dontDestroy = {31,63,94,103,203,405,418,437,462};
+
 void onInit(CSprite@ this)
 {
 	this.SetEmitSound("/Drill.ogg");
@@ -34,6 +36,13 @@ void onTick(CSprite@ this)
 	else if (this.isAnimationEnded())
 	{
 		this.SetAnimation("default");
+	}
+
+	if(blob.hasTag("sponge")){
+		CSpriteLayer@ layer =  this.getSpriteLayer("sponge");
+		if(layer is null){
+			this.addSpriteLayer ("sponge","sponge",16,8);
+		}
 	}
 }
 
@@ -65,6 +74,7 @@ void makeSteamPuff(CBlob@ this, const f32 velocity = 1.0f, const int smallpartic
 void onInit(CBlob@ this)
 {
 	this.addCommandID("rotatethis");
+	this.addCommandID("spongify");
 	AddIconToken("$rotate_butt$", "TechnologyIcons.png", Vec2f(16, 16), 12);
 	
 	this.set_u32("hittime", 0);
@@ -78,6 +88,12 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 	CBitStream params;
 	params.write_u16(caller.getNetworkID());
 	caller.CreateGenericButton("$rotate_butt$", Vec2f(0, 0), this, this.getCommandID("rotatethis"), "Set Rotation", params);
+
+	CBlob@ carried = caller.getCarriedBlob();
+	if(carried !is null && carried.getName() == "sponge" && !this.hasTag("sponge"))
+	{
+		caller.CreateGenericButton(11,Vec2f(0,8),this,this.getCommandID("spongify"), "Attach sponge?",params);
+	}
 }
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
@@ -88,6 +104,22 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 		if (!params.saferead_u16(callerID))
 			return;
 		this.set_u16("rotaterid", callerID);
+	} else if (cmd == this.getCommandID("spongify")){
+		u16 callerID;
+		if(!params.saferead_u16(callerID))
+			return;
+		
+		CBlob@ caller = getBlobByNetworkID(callerID);
+		if(caller is null){
+			print('caller null');
+			return;
+		}
+		CBlob@ held = caller.getCarriedBlob();
+		if(held is null){
+			return;
+		}
+		held.server_Die();
+		this.Tag("sponge");
 	}
 }
 
@@ -244,10 +276,13 @@ void onTick(CBlob@ this)
 								hitsomething = true;
 								if (getNet().isServer())
 								{
-									map.server_DestroyTile(hi.hitpos, 1.0f, this);
-									//map.server_DestroyTile(hi.hitpos, 1.0f, this);
+									if(!this.hasTag("sponge") || dontDestroy.find(map.getTile(hi.hitpos).type) < 0)
+									{
+										map.server_DestroyTile(hi.hitpos, 1.0f, this);
+										//map.server_DestroyTile(hi.hitpos, 1.0f, this);
 
-									Material::fromTile(this, tile, 1.0f);
+										Material::fromTile(this, tile, 1.0f);
+									}
 								}
 
 								if (getNet().isClient())
