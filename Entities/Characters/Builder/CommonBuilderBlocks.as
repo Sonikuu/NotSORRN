@@ -455,6 +455,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			BuildBlock b(0, "alchemypump", "$alchemypump$", "Alchemical Pump\nCreates aqua essence from water below it");
 			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 100);
 			AddRequirement(b.reqs, "blob", "mat_metal", "Alchemic Metal Sheet", 8);
+			AddRequirement(b.reqs, "blob", "mat_component", "Mechanical Components", 8);
 			b.buildOnGround = true;
 			b.size.Set(32, 32);
 			blocks[1].push_back(b);
