@@ -1,4 +1,3 @@
-#include "golemparticles.as"
 
 
 void onInit(CBlob@ this){
