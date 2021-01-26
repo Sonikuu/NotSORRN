@@ -4,6 +4,6 @@ void onInit( CRules@ this )
 	file.loadFile("../Cache/servername.cfg");
 	if(file.exists("name"))
 	{
-		sv_name = file.read_string("name") + " Now with mysterious golems!";
+		sv_name = file.read_string("name") + " The Mysterious return!";
 	}
 }
