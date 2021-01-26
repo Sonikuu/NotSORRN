@@ -5,6 +5,7 @@ void onRender(CSprite@ this)
 	//inventory
 	CBlob@ blob = this.getBlob();
 	CInventory@ inv = blob.getInventory();
+	if(blob.getPlayer() !is getLocalPlayer()){return;}
 
 	CBlob@[] blobs;
 
