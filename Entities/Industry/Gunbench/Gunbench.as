@@ -93,8 +93,17 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 		u8 part = params.read_u8();
 		if(cat == 6)
 		{
-			if(isServer)
+			if(isServer && caller !is null)
 			{
+				CInventory@ inv = caller.getInventory();
+				for(int i = 0; i < 5; i++)
+				{
+					CGunRequirements@ tr = @(gunreqs[i][this.get_u8("selpart" + i)]);
+					for(int j = 0; j < tr.materials.size(); j++)
+					{
+						inv.server_RemoveItems(tr.materials[j], tr.amt[j]);
+					}
+				}
 				CBlob@ targetblob = server_CreateBlobNoInit("customgun");
 				targetblob.setPosition(this.getPosition());
 				targetblob.server_setTeamNum(this.getTeamNum());
@@ -117,19 +126,169 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 	}
 }
 
+void onRender(CSprite@ this)
+{
+	CBlob@ blob = this.getBlob();
+	CGridMenu@ activemenu = getGridMenuByName("Part");
+	CBlob@ caller = getLocalPlayerBlob();
+
+	if(activemenu !is null)
+	{
+		//------------Building Req list-----------
+		CInventory@ inv = caller.getInventory();
+		array<array<bool>> reqcache;
+
+		array<string> totalreqs;
+		array<int> totalamt;
+		for(int i = 0; i < gunreqs.size(); i++)
+		{
+			reqcache.push_back(array<bool>());
+			for(int j = 0; j < gunreqs[i].size(); j++)
+			{
+				CGunRequirements@ tr = @(gunreqs[i][j]);
+				bool canmake = true;
+				
+				for(int e = 0; e < tr.materials.size(); e++)
+				{
+					if(blob.get_u8("selpart" + i) == j)
+					{
+						int findpos = totalreqs.find(tr.materials[e]);
+						if(findpos >= 0)
+						{	
+							totalamt[findpos] += tr.amt[e];
+						}
+						else
+						{
+							totalreqs.push_back(tr.materials[e]);
+							totalamt.push_back(tr.amt[e]);
+						}
+					}
+
+					if(inv.getCount(tr.materials[e]) < tr.amt[e])
+					{
+						canmake = false;
+						break;
+					}
+				}
+				reqcache[i].push_back(canmake);
+			}
+		}
+		//-------------------------------------------------------------
+		const int padding = 32;
+		GUI::DrawPane(Vec2f(getScreenWidth() - 312 + padding, getScreenHeight() / 4 - (totalreqs.size()) * padding * 0.5 - 12 + padding),
+		 Vec2f(getScreenWidth() - 36, getScreenHeight() / 4 + (totalreqs.size()) * padding * 0.5 + 12 + padding));
+		for(int i = 0; i < totalreqs.size(); i++)
+		{
+			GUI::SetFont("menu");
+			bool hasmats = inv.getCount(totalreqs[i]) >= totalamt[i];
+			Vec2f pos = Vec2f(getScreenWidth() - 300, (getScreenHeight() / 4 - totalreqs.size() * padding * 0.5) + padding * (i + 1));
+			GUI::DrawIconByName("$" + totalreqs[i] + "$", pos + Vec2f(padding, 0));
+			GUI::DrawText((hasmats ? "" : "$RED$") + totalamt[i] + " " + totalreqs[i] + (hasmats ? "" : "$RED$"), 
+			pos + Vec2f(padding * 2, 0), 
+			Vec2f(getScreenWidth() - 50, pos.y),
+			SColor(255, 255, 255, 255),
+			true, true, false);
+		}
+		//Title and stats rendering
+		{
+			u8 coreindex = blob.get_u8("selpart0");
+			u8 barrelindex = blob.get_u8("selpart1");
+			u8 stockindex = blob.get_u8("selpart2");
+			u8 gripindex = blob.get_u8("selpart3");
+			u8 magindex = blob.get_u8("selpart4");
+			
+			//FIRST INDEX IS TYPE, SECOND IS PART
+			if(coreindex >= gunparts[0].length || barrelindex >= gunparts[1].length || stockindex >= gunparts[2].length || gripindex >= gunparts[3].length || magindex >= gunparts[4].length)
+			{
+				//this.server_Die();
+				print("INVALID CUSTOM GUN PARTS Gunbench.as onRender()");
+				return;
+			}
+			CGunPart@ corepart = @(gunparts[0][coreindex]);
+			CGunPart@ barrelpart = @(gunparts[1][barrelindex]);
+			CGunPart@ stockpart = @(gunparts[2][stockindex]);
+			CGunPart@ grippart = @(gunparts[3][gripindex]);
+			CGunPart@ magpart = @(gunparts[4][magindex]);
+
+			CGunEquipment@ gun = calculateGunStats(corepart, barrelpart, stockpart, grippart, magpart);
+	
+			string rendertext = getGunTitle(corepart, barrelpart, stockpart, grippart, magpart) + "\n" + getGunDescription(corepart, gun);
+			Vec2f txtdim;
+			GUI::GetTextDimensions(rendertext, txtdim);
+			GUI::DrawText(rendertext, 
+			Vec2f(getScreenWidth() - 50 - txtdim.x, (getScreenHeight() / 4) * 3 - txtdim.y / 2), 
+			Vec2f(getScreenWidth() - 50, (getScreenHeight() / 4) * 3 + txtdim.y / 2),
+			SColor(255, 255, 255, 255),
+			true, true, true);
+		}
+	
+	}
+}
+
 void makeGunMenu(CBlob@ this, CBlob@ caller)
 {
 	caller.ClearMenus();
 	int buttons = gunparts.length;
-	int startoffsx = ((buttons - 1) * -96);
+	int startoffsx = ((buttons - 1) * -96) - 100;
 	Vec2f screencenter(getScreenWidth() / 2, getScreenHeight() / 2);
+
+	//Ahhh fun, adding requirements is always my favorite thing to do ever
+	CInventory@ inv = caller.getInventory();
+	array<array<bool>> reqcache;
+
+	array<string> totalreqs;
+	array<int> totalamt;
+	bool canmakegunoverride = true;
+	for(int i = 0; i < gunreqs.size(); i++)
+	{
+		reqcache.push_back(array<bool>());
+		for(int j = 0; j < gunreqs[i].size(); j++)
+		{
+			CGunRequirements@ tr = @(gunreqs[i][j]);
+			bool canmake = true;
+			
+			for(int e = 0; e < tr.materials.size(); e++)
+			{
+				if(this.get_u8("selpart" + i) == j)
+				{
+					int findpos = totalreqs.find(tr.materials[e]);
+					if(findpos >= 0)
+					{	
+						totalamt[findpos] += tr.amt[e];
+					}
+					else
+					{
+						totalreqs.push_back(tr.materials[e]);
+						totalamt.push_back(tr.amt[e]);
+					}
+				}
+
+				if(inv.getCount(tr.materials[e]) < tr.amt[e])
+				{
+					canmake = false;
+					if(this.get_u8("selpart" + i) == j)
+						canmakegunoverride = false;
+					break;
+				}
+			}
+			reqcache[i].push_back(canmake);
+		}
+	}
 	
 	for(int i = 0; i < gunparts.length; i++)
 	{
-		CGridMenu@ menu = CreateGridMenu(screencenter + Vec2f(startoffsx + i * 96, 0), this, Vec2f(2, gunparts[i].length), "Part");
+		int shortening = 0;
+		for(int x = 0; x < gunreqs[i].size(); x++)
+		{
+			if(gunreqs[i][x].hidden && !reqcache[i][x])
+				shortening++;
+		}
+		CGridMenu@ menu = CreateGridMenu(screencenter + Vec2f(startoffsx + i * 96, 0), this, Vec2f(2, gunparts[i].length - shortening), "Part");
 		menu.SetCaptionEnabled(false);
 		for(int j = 0; j < gunparts[i].length; j++)
 		{
+			if(gunreqs[i][j].hidden && !reqcache[i][j])
+				continue;
 			CBitStream params;
 			params.write_u16(caller.getNetworkID());
 			params.write_u8(i);
@@ -137,16 +296,31 @@ void makeGunMenu(CBlob@ this, CBlob@ caller)
 			CGridButton@ butt = menu.AddButton("$gun_part" + i + "" + j + "$", "Select " + gunparts[i][j].name, this.getCommandID("selectpart"), params);
 			if(this.get_u8("selpart" + i) == j)
 				butt.SetSelected(1);
+			if(!reqcache[i][j])
+				butt.SetEnabled(false);
 			butt.SetHoverText(gunparts[i][j].name);
 		}
 	}
 	
+	if(canmakegunoverride)
+	{
+		for(int i = 0; i < totalreqs.size(); i++)
+		{
+			if(inv.getCount(totalreqs[i]) < totalamt[i])
+			{
+				canmakegunoverride = false;
+				break;
+			}
+		}
+	}
 	CGridMenu@ menu = CreateGridMenu(screencenter + Vec2f(startoffsx + 6 * 96, 0), this, Vec2f(2, 2), "Finish");
 	CBitStream params;
 	params.write_u16(caller.getNetworkID());
 	params.write_u8(6);
 	params.write_u8(0);
 	CGridButton@ butt = menu.AddButton("$finish_gun$", "Finish Building", this.getCommandID("selectpart"), params);
+	if(!canmakegunoverride)
+		butt.SetEnabled(false);
 	
 }
 

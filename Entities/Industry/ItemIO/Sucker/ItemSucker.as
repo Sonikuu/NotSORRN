@@ -3,6 +3,7 @@
 void onInit(CBlob@ this)
 {	
 	CItemIO@ output = addItemIO(this, "Output", false, Vec2f(0, 0));	
+	output.dynamictank = true;
 }
 
 void onTick(CBlob@ this)
@@ -34,6 +35,7 @@ void onTick(CBlob@ this)
 	}
 	else
 	{
+		this.set_f32("railmult", 1);
 		if((getGameTime() + this.getNetworkID()) % 30 == 0 && this.get_bool("riding"))
 		{
 			CMap@ map = getMap();

@@ -66,7 +66,7 @@ void onRender(CSprite@ this)
 		// 	}
 		// }
 
-		f32 r = ammount/b.maxQuantity;
+		f32 r = Maths::Min(ammount, b.maxQuantity)/b.maxQuantity;
 		GUI::SetFont("snes");
 		Vec2f txtStart = Vec2f(iconPositons[i].x,startPos.y +  scale * tallest + 3 * scale);
 		GUI::DrawText( ammount + '',txtStart, txtStart + Vec2f(scale * 16, scale * 16), colorLerp(SColor(255,255,0,0),color_white,r), false, false, false);

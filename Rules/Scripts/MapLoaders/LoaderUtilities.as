@@ -146,7 +146,7 @@ TileType server_onTileHit(CMap@ this, f32 damage, u32 index, TileType oldTileTyp
 	else if(oldTileType >= CCTiles::tile_gold && oldTileType < CCTiles::tile_goldd1)
 	{
 		output = CCTiles::tile_goldd1;
-		hitsfx = "dig_gold" + (XORRandom(3) + 1);
+		hitsfx = "dig_stone" + (XORRandom(3) + 1);
 	}
 	else if(oldTileType >= CCTiles::tile_goldd1 && oldTileType < CCTiles::tile_goldd1 + gold_damaged)
 	{
@@ -158,12 +158,12 @@ TileType server_onTileHit(CMap@ this, f32 damage, u32 index, TileType oldTileTyp
 		else//DAMAGING TILE
 		{
 			output += 1;
-			 hitsfx = "dig_gold" + (XORRandom(3) + 1);
+			 hitsfx = "dig_stone" + (XORRandom(3) + 1);
 		}
 	}
 	hitsfx += ".ogg";
 	if(oldTileType > 256)
-		Sound::Play(hitsfx, Vec2f(index % this.tilemapwidth, index / this.tilemapheight) * 8, 7.0);
+		Sound::Play(hitsfx, Vec2f(index % this.tilemapwidth, index / this.tilemapwidth) * 8, 1.0);
 	return output;
 }
 
@@ -223,13 +223,15 @@ void onSetTile(CMap@ map, u32 index, TileType tile_new, TileType tile_old)
 		{
 			if(tile_new == CCTiles::tile_mar || tile_new == CCTiles::tile_bas || tile_new == CCTiles::tile_bas_back || tile_new == CCTiles::tile_mar_back)
 				buildsfx = "build_wall2";
+			else if (tile_new == CCTiles::tile_gold)
+				buildsfx = "dig_stone" + (XORRandom(3) + 1);
 			HandleCustomTile(map, index, tile_new);
 			map.SetTileSupport(index, 8);
 		}
 			//YEET
 		buildsfx += ".ogg";
 		if(buildsfx != ".ogg")
-			Sound::Play(buildsfx, Vec2f(index % map.tilemapwidth, index / map.tilemapheight) * 8, 7.0);
+			Sound::Play(buildsfx, Vec2f(index % map.tilemapwidth, index / map.tilemapwidth) * 8, 1.0);
 
 		updateAllNeighbors(index, map);
 	}

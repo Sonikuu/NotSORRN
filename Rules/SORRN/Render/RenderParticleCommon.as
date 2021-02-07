@@ -358,6 +358,100 @@ shared class CRenderParticleBlazing : CRenderParticleBase
 	}
 }
 
+shared class CRenderParticleLightning : CRenderParticleBase
+{
+	Vec2f topos;
+	Vec2f frompos;
+	CRenderParticleLightning(float scale, bool collides, bool dieoncollide, int timelimit, float gravity, SColor color, bool rotates, u32 randoseed)
+	{
+		super(scale, collides, dieoncollide, timelimit, gravity, color, rotates, randoseed);
+		updatedeath = true;
+		topos = Vec2f_zero;
+		frompos = Vec2f_zero;
+	}
+
+	bool onTick()
+	{
+		if(deathtime > 0)
+		{
+			//if(updatedeath)
+			{
+			//	velocity.y += gravity;
+			//	position += velocity;
+			}
+			deathtime--;
+			//color.setAlpha(Maths::Max(color.getAlpha() - 30, 0));
+			if(deathtime == 0)
+				return false;
+			//return true;
+		}
+
+		if(deathtime <= 0)
+		{
+			timelimit--;
+			if(timelimit < 0)
+				startDeath();
+		}
+		return true;
+	}
+
+	void startDeath()
+	{
+		deathtime = 1;
+	}
+
+	void appendVerts(array<Vertex>@ verts)
+	{
+		if(deathtime > 0)
+		 	return;
+		//ul, ur, lr, and ll mean this
+		//Upper left
+		//Upper right
+		//Lower right
+		//Lower left
+		//Makes this easier
+
+		//Dont have to account for map light cause, well, its lightning lel
+		Vec2f sul(0, 0);
+		Vec2f sur(1, 0);
+		Vec2f slr(1, 1);
+		Vec2f sll(0, 1);
+
+
+		const float randomness = 8;
+
+		u8 points = (frompos - topos).Length() / 32 + 1;
+		float angle = (topos - frompos).Angle() * -1;
+		Vec2f difflength = (topos - frompos) / points;
+
+		Vec2f lastu = frompos;
+		Vec2f lastl = frompos;
+		Vec2f lastcenter = frompos;
+
+		for(int i = 0; i < points; i++)
+		{
+			u8 varationmult = Maths::Min(i + 1, Maths::Min(points - 1 - i, 5));
+			Vec2f randfactor = Vec2f_lengthdir_deg(difflength.Length(), angle + (XORRandom(1000) - 500) / 500.0 * randomness * varationmult);
+			Vec2f pointcenter = difflength * (i) + randfactor + frompos;
+			float newangle = (lastcenter - pointcenter).Angle() * -1;
+
+			Vec2f newu = pointcenter + Vec2f_lengthdir_deg(scale, newangle - 90);
+			Vec2f newl = pointcenter + Vec2f_lengthdir_deg(scale, newangle + 90);
+
+			verts.push_back(Vertex(lastu, 0, sul, color));
+			verts.push_back(Vertex(newu, 0, sur, color));
+			verts.push_back(Vertex(newl, 0, slr, color));
+			verts.push_back(Vertex(lastl, 0, sll, color));
+
+			lastu = newu;
+			lastl = newl;
+		}
+
+
+		
+	}
+}
+
 shared class CRenderParticleDrop : CRenderParticleBase
 {
 	Vec2f ul;

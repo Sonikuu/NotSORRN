@@ -97,7 +97,7 @@ void onTick(CBlob@ this)
 			bc.rayBlocked = isBuildRayBlocked(this.getPosition(), bc.tileAimPos + halftileoffset, bc.rayBlockedPos);
 			bc.buildable = bc.buildableAtPos && !bc.rayBlocked;
 
-			bc.supported = bc.buildable && map.hasSupportAtPos(bc.tileAimPos);
+			bc.supported = bc.buildable && (map.hasSupportAtPos(bc.tileAimPos) /*|| (buildtile == CCTiles::tile_gold)*/);//NOTE: Replace tile_gold with a tile we want to float
 		}
 
 		// place block

@@ -22,7 +22,7 @@ void onTick(CBlob@ this)
 				if(thisblob.get_bool("riding"))
 				{
 					CItemIO@ bloboutput = getItemIO(thisblob, "Output");
-					if(bloboutput !is null && bloboutput.connection is null)
+					if(bloboutput !is null && bloboutput.connection is null && thisblob.getInventory() !is null && thisblob.getInventory().getItemsCount() > 0)
 					{
 						CItemIO@ input = getItemIO(this, "Input");
 						CBitStream params;

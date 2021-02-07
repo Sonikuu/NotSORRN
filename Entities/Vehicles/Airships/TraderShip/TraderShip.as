@@ -95,6 +95,7 @@ void onTick(CBlob@ this)
 			this.set_bool("stopped", true);
 			this.set_u32("departtime", getGameTime() + 30000);
 			
+			if(isServer())
 			{
 				for(int y = 0; y < 30; y++)
 				{

@@ -240,16 +240,42 @@ array<array<CGunRequirements>> gunreqs = {
 		CGunRequirements().addRequirement("mat_metal", 3),//SOMETHING, UZI MAYBE
 		CGunRequirements().addRequirement("mat_metal", 5).addRequirement("somethingcool", 1).setHidden(true),//CHARGE RIFLE
 		CGunRequirements().addRequirement("mat_metal", 5),//SHOTGUN
-		CGunRequirements().addRequirement("mat_metal", 5),//SNIPER RIFLE
-		CGunRequirements().addRequirement("mat_metal", 6).addRequirement("unstablecore", 1)//GATLING
+		CGunRequirements().addRequirement("mat_metal", 5).addRequirement("mat_acceleratum", 1).setHidden(true),//SNIPER RIFLE
+		CGunRequirements().addRequirement("mat_metal", 6).addRequirement("unstablecore", 1).setHidden(true)//GATLING
 	},
 	{
 		CGunRequirements().addRequirement("mat_metal", 1),//SHORT
 		CGunRequirements().addRequirement("mat_metal", 2),//LONG
 		CGunRequirements().addRequirement("mat_metal", 2),//SPLIT LUL
-		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("accelerationplate", 1),//ACCELERATED
-		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("unstablecore", 1),//UNSTABLE?
-		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("natureheart", 1)//GUIDED
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("mat_acceleratum", 1).setHidden(true),//ACCELERATED
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("unstablecore", 1).setHidden(true),//UNSTABLE?
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("natureheart", 1).setHidden(true)//GUIDED
+	},
+	{
+		CGunRequirements(),//NONE
+		CGunRequirements().addRequirement("mat_metal", 1),//LIGHT
+		CGunRequirements().addRequirement("mat_wood", 100),//WOOD
+		CGunRequirements().addRequirement("mat_metal", 3),//HEAVY
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("mat_acceleratum", 1).setHidden(true),//ACCELERATED
+		CGunRequirements().addRequirement("mat_metal", 1).addRequirement("natureheart", 1).setHidden(true)//GUIDED
+	},
+	{
+		CGunRequirements(),//NONE
+		CGunRequirements().addRequirement("mat_metal", 1),//SMALL
+		CGunRequirements().addRequirement("mat_metal", 2),//VERT
+		CGunRequirements().addRequirement("mat_metal", 2),//HORZ
+		CGunRequirements().addRequirement("mat_metal", 2),//COMP + GRIP
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("unstablecore", 1).setHidden(true),//UNSTABLE
+		CGunRequirements().addRequirement("mat_metal", 1).addRequirement("decorheart", 1).setHidden(true)//LUL
+	},
+	{
+		CGunRequirements().addRequirement("mat_metal", 2),//LOWCAP
+		CGunRequirements().addRequirement("mat_metal", 4),//HIGHCAP
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("holyammopack", 1).setHidden(true),//HOLY
+		CGunRequirements().addRequirement("mat_metal", 8),//DRUM
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("yeetammopack", 1).setHidden(true),//YEET
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("mat_glass", 100).setHidden(true),//PIERCING
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("unstablecore", 2).setHidden(true)//EXPLOSIVE
 	}
 };
 
@@ -274,6 +300,97 @@ void buildGun(CBlob@ this)
 	CGunPart@ grippart = @(gunparts[3][gripindex]);
 	CGunPart@ magpart = @(gunparts[4][magindex]);
 	
+	CGunEquipment@ gun = calculateGunStats(corepart, barrelpart, stockpart, grippart, magpart);
+	
+	setEquipment(this, @gun);
+	
+	this.setInventoryName(getGunTitle(corepart, barrelpart, stockpart, grippart, magpart) + "\n" + getGunDescription(corepart, gun));
+
+	//part.spriteoffset = Vec2f(0, 1.25);
+	//part.tracercolor = SColor(255, 150, 255, 255);
+	//part.tiledamagechance = 0.5;
+	
+	//SPRITE BUILDING
+	if(isClient())
+	{
+		CSprite@ sprite = this.getSprite();
+		string texname = "customgun" + coreindex + "" + barrelindex + "" + stockindex + "" + gripindex + "" + magindex;
+		//print(texname);
+		Vec2f spritesize(32, 16);
+		if(Texture::exists(texname))
+		{
+			sprite.SetTexture(texname, 32, 16);
+			sprite.SetFrame(0);
+		}
+		else
+		{
+			
+			if(!Texture::exists("CustomGunBase"))
+			{
+				if(!Texture::createFromFile("CustomGunBase", "CustomGun.png"))
+					print("oh this is a problem");
+			}
+			ImageData@ baseimage = Texture::data("CustomGunBase");
+			//if(!Texture::createBySize(texname, 32, 16))
+				//print("ohno");
+			ImageData@ newimage = @ImageData(32, 16);
+			
+			Vec2f barrelpos = corepart.barrelpoint;
+			Vec2f stockpos = corepart.stockpoint;
+			Vec2f grippos = barrelpos + barrelpart.grippoint;
+			Vec2f magpos = corepart.magpoint;
+			
+			for(int x = 0; x < 32; x++)
+			{
+				for(int y = 0; y < 16; y++)
+				{
+					newimage.put(x, y, SColor(0, 0, 0, 0));
+				}
+			}
+			
+			
+			Vec2f startpos = Vec2f(0, 16 * coreindex);
+			mergeOnto(newimage, baseimage, Vec2f_zero, startpos, startpos + spritesize);
+			startpos = Vec2f(32, 16 * barrelindex);
+			mergeOnto(newimage, baseimage, barrelpos, startpos, startpos + spritesize);
+			startpos = Vec2f(64, 16 * stockindex);
+			mergeOnto(newimage, baseimage, stockpos, startpos, startpos + spritesize);
+			startpos = Vec2f(96, 16 * gripindex);
+			mergeOnto(newimage, baseimage, grippos, startpos, startpos + spritesize);
+			startpos = Vec2f(128, 16 * magindex);
+			mergeOnto(newimage, baseimage, magpos, startpos, startpos + spritesize);
+			
+			//sprite.ReloadSprite(texname);
+			Texture::createFromData(texname, newimage);
+			sprite.SetTexture(texname, 32, 16);
+			sprite.SetFrame(0);
+			//FML everytime i use imagedata i want to die
+			//ill get used to it eventually
+		}
+	}
+}
+
+string getGunTitle(CGunPart@ corepart, CGunPart@ barrelpart, CGunPart@ stockpart, CGunPart@ grippart, CGunPart@ magpart)
+{
+	return (magpart.name + " " + barrelpart.name + " " + corepart.name + " with " + stockpart.name + " and " + grippart.name);
+}
+
+string getGunDescription(CGunPart@ corepart, CGunEquipment@ gun)
+{
+	return getSymbol(gun.damage, corepart.damage) + "Damage: " + gun.damage +
+	"\n" + getSymbol(corepart.firerate, gun.firerate) + "Firerate: " + (30.0 / gun.firerate) +
+	"\n" + getSymbol(gun.shotcount, corepart.shotcount) + "Bullet Count: " + gun.shotcount +
+	"\n" + getSymbol(corepart.spread, gun.spread) + "Spread: " + gun.spread +
+	"\n" + getSymbol(gun.range, corepart.range) + "Range: " + gun.range +
+	"\n" + getSymbol(gun.movespeed, corepart.movespeed) + "Movement Penalty: " + (100.0 - gun.movespeed * 100.0) + "%" +
+	"\n" + getSymbol(corepart.recoil, gun.recoil) + "Recoil: " + gun.recoil +
+	"\n" + getSymbol(gun.maxammo, corepart.maxammo) + "Max Ammo: " + gun.maxammo +
+	"\n" + getSymbol(corepart.reloadspeed, gun.reloadtime) + "Reload Time: " + (gun.reloadtime / 30.0) +
+	"\nUses: " + gun.ammotype;
+}
+
+CGunEquipment@ calculateGunStats(CGunPart@ corepart, CGunPart@ barrelpart, CGunPart@ stockpart, CGunPart@ grippart, CGunPart@ magpart)
+{
 	//STAT BUILDING
 	float damage = 0;
 	float firerate = 0;
@@ -364,83 +481,9 @@ void buildGun(CBlob@ this)
 	@gun.blobfx = @blobfx;
 	@gun.tilefx = @tilefx;
 	gun.ammoguifile = corepart.ammoguifile;
-	gun.ammoguisize = corepart.ammoguisize;									
-	setEquipment(this, @gun);
-	
-	this.setInventoryName(magpart.name + " " + barrelpart.name + " " + corepart.name + " with " + stockpart.name + " and " + grippart.name +
-							"\n" + getSymbol(damage, corepart.damage) + "Damage: " + damage +
-							"\n" + getSymbol(corepart.firerate, firerate) + "Firerate: " + (30.0 / firerate) +
-							"\n" + getSymbol(shotcount, corepart.shotcount) + "Bullet Count: " + gun.shotcount +
-							"\n" + getSymbol(corepart.spread, spread) + "Spread: " + spread +
-							"\n" + getSymbol(range, corepart.range) + "Range: " + range +
-							"\n" + getSymbol(movespeed, corepart.movespeed) + "Movement Penalty: " + (100.0 - gun.movespeed * 100.0) + "%" +
-							"\n" + getSymbol(corepart.recoil, recoil) + "Recoil: " + recoil +
-							"\n" + getSymbol(maxammo, corepart.maxammo) + "Max Ammo: " + gun.maxammo +
-							"\n" + getSymbol(corepart.reloadspeed, reloadspeed) + "Reload Time: " + (reloadspeed / 30.0) +
-							"\nUses: " + gun.ammotype);
+	gun.ammoguisize = corepart.ammoguisize;	
 
-	//part.spriteoffset = Vec2f(0, 1.25);
-	//part.tracercolor = SColor(255, 150, 255, 255);
-	//part.tiledamagechance = 0.5;
-	
-	//SPRITE BUILDING
-	if(isClient())
-	{
-		CSprite@ sprite = this.getSprite();
-		string texname = "customgun" + coreindex + "" + barrelindex + "" + stockindex + "" + gripindex + "" + magindex;
-		//print(texname);
-		Vec2f spritesize(32, 16);
-		if(Texture::exists(texname))
-		{
-			sprite.SetTexture(texname, 32, 16);
-			sprite.SetFrame(0);
-		}
-		else
-		{
-			
-			if(!Texture::exists("CustomGunBase"))
-			{
-				if(!Texture::createFromFile("CustomGunBase", "CustomGun.png"))
-					print("oh this is a problem");
-			}
-			ImageData@ baseimage = Texture::data("CustomGunBase");
-			//if(!Texture::createBySize(texname, 32, 16))
-				//print("ohno");
-			ImageData@ newimage = @ImageData(32, 16);
-			
-			Vec2f barrelpos = corepart.barrelpoint;
-			Vec2f stockpos = corepart.stockpoint;
-			Vec2f grippos = barrelpos + barrelpart.grippoint;
-			Vec2f magpos = corepart.magpoint;
-			
-			for(int x = 0; x < 32; x++)
-			{
-				for(int y = 0; y < 16; y++)
-				{
-					newimage.put(x, y, SColor(0, 0, 0, 0));
-				}
-			}
-			
-			
-			Vec2f startpos = Vec2f(0, 16 * coreindex);
-			mergeOnto(newimage, baseimage, Vec2f_zero, startpos, startpos + spritesize);
-			startpos = Vec2f(32, 16 * barrelindex);
-			mergeOnto(newimage, baseimage, barrelpos, startpos, startpos + spritesize);
-			startpos = Vec2f(64, 16 * stockindex);
-			mergeOnto(newimage, baseimage, stockpos, startpos, startpos + spritesize);
-			startpos = Vec2f(96, 16 * gripindex);
-			mergeOnto(newimage, baseimage, grippos, startpos, startpos + spritesize);
-			startpos = Vec2f(128, 16 * magindex);
-			mergeOnto(newimage, baseimage, magpos, startpos, startpos + spritesize);
-			
-			//sprite.ReloadSprite(texname);
-			Texture::createFromData(texname, newimage);
-			sprite.SetTexture(texname, 32, 16);
-			sprite.SetFrame(0);
-			//FML everytime i use imagedata i want to die
-			//ill get used to it eventually
-		}
-	}
+	return @gun;
 }
 
 string getSymbol(float val, float baseval)

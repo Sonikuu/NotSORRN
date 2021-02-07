@@ -132,7 +132,7 @@ bool isBuildableAtPos(CBlob@ this, Vec2f p, TileType buildTile, CBlob @blob, boo
 //printf("c");
 	bool canPlaceOnBackground = ((blob is null) || (blob.getShape().getConsts().support > 0));   // if this is a blob it has to do support - so spikes cant be placed on back
 
-	if (
+	if (/*buildTile != CCTiles::tile_gold &&*/ //Again, replace tile_gold with tile we want to float 
 		(!canPlaceOnBackground || !map.isTileBackgroundNonEmpty(backtile)) &&      // can put against background
 		!(                                              // can put sticking next to something
 			canPlaceNextTo(map, left) || (canPlaceOnBackground && map.isTileBackgroundNonEmpty(left))  ||

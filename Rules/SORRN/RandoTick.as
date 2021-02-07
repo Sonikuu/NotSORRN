@@ -27,6 +27,16 @@ void onTick(CRules@ this)
 {
 	//Going to move rain stuff to another file eventually
 	//i swear
+
+	//TEMP
+	/*{
+		CRenderParticleLightning light(1, false, false, 0, 0, SColor(255, 255, 255, 200), false, 0);
+		light.frompos = getCamera().getPosition();
+		light.topos =  getControls().getMouseWorldPos();
+		addParticleToList(light);
+	}*/
+	
+
 	CMap@ map = getMap();
 	Noise noise(this.get_u32("rainseed"));//lel
 	float sample = (noise.Sample(getGameTime() / 5000.0, 0) - 0.5) * 4;
@@ -49,6 +59,7 @@ void onTick(CRules@ this)
 		}
 	}
 
+	
 
 	if(raincount > 0)
 	{
