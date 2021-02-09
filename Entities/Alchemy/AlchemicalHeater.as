@@ -28,7 +28,7 @@ void onTick(CBlob@ this)
 					CBlob@[] fuelblobs;
 					for (int i = 0; i < blobs.length; i++)
 					{
-						if(blobs[i].exists("fuel") && blobs[i].get_f32("fuel") < blobs[i].get_f32("maxFuel") && blobs[i].getConfig() != "alchemyburner")
+						if(blobs[i].exists("fuel") && blobs[i].get_f32("fuel") < (blobs[i].exists("maxFuel") ? blobs[i].get_f32("maxFuel") : 1000) && blobs[i].getConfig() != "alchemyburner")
 							fuelblobs.push_back(blobs[i]);
 					}
 					if(fuelblobs.length > 0)

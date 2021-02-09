@@ -20,7 +20,7 @@ void PlaceBlob(CBlob@ this, CBlob @blob, Vec2f cursorPos)
 		{
 			blob.SetDamageOwnerPlayer(this.getPlayer());
 		}
-		if (this.server_DetachFrom(blob))
+		if (this.server_DetachFrom(blob) || true)
 		{
 			blob.setPosition(cursorPos);
 			if (blob.isSnapToGrid())
@@ -355,30 +355,59 @@ void onRender(CSprite@ this)
 
 		if (bc !is null)
 		{
+			SColor color;
+			Vec2f pos;
 			if (bc.cursorClose && bc.hasReqs && bc.buildable)
 			{
-				SColor color;
+				
 
 				if (bc.buildable && bc.supported)
 				{
 					color.set(255, 255, 255, 255);
-					carryBlob.RenderForHUD(getBottomOfCursor(bc.tileAimPos, carryBlob) - carryBlob.getPosition(), 0.0f, color, RenderStyle::normal);
+					pos = getBottomOfCursor(bc.tileAimPos, carryBlob) - carryBlob.getPosition();
 				}
 				else
 				{
 					color.set(255, 255, 46, 50);
 					Vec2f offset(0.0f, -1.0f + 1.0f * ((getGameTime() * 0.8f) % 8));
-					carryBlob.RenderForHUD(getBottomOfCursor(bc.tileAimPos, carryBlob) + offset - carryBlob.getPosition(), 0.0f, color, RenderStyle::normal);
+					pos = getBottomOfCursor(bc.tileAimPos, carryBlob) + offset - carryBlob.getPosition();
 				}
 			}
 			else
 			{
 				f32 halfTile = getMap().tilesize / 2.0f;
 				Vec2f aimpos = blob.getMovement().getVars().aimpos;
-				carryBlob.RenderForHUD(Vec2f(aimpos.x - halfTile, aimpos.y - halfTile) - carryBlob.getPosition(), 0.0f,
-				                       SColor(255, 255, 46, 50) ,
-				                       RenderStyle::normal);
+				color.set(255, 255, 46, 50);
+				pos = Vec2f(aimpos.x - halfTile, aimpos.y - halfTile) - carryBlob.getPosition();
 			}
+			if(carryBlob.getConfig() == "mat_accelplate")
+			{
+				array<Vertex> vertlist;
+				int rot = blob.get_u16("build_angle");
+				pos += carryBlob.getPosition();
+
+				Vec2f ul = Vec2f(-4, -4).RotateByDegrees(rot);
+				ul += pos;
+				
+				Vec2f ur = Vec2f(4, -4).RotateByDegrees(rot);
+				ur += pos;
+				
+				Vec2f lr = Vec2f(4, 4).RotateByDegrees(rot);
+				lr += pos;
+				
+				Vec2f ll = Vec2f(-4, 4).RotateByDegrees(rot);
+				ll += pos;
+
+				vertlist.push_back(Vertex(ul, 0, Vec2f(0, 0), color));
+				vertlist.push_back(Vertex(ur, 0, Vec2f(1, 0), color));
+				vertlist.push_back(Vertex(lr, 0, Vec2f(1, 1), color));
+				vertlist.push_back(Vertex(ll, 0, Vec2f(0, 1), color));
+
+
+				addVertsToExistingRender(@vertlist, "Booster.png", "RLrender");
+			}
+			else
+				carryBlob.RenderForHUD(pos, 0.0f, color, RenderStyle::normal);
 		}
 	}
 }
@@ -401,9 +430,18 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 		CBlob @carryBlob = getBlobByNetworkID(params.read_u16());
 		if (carryBlob !is null)
 		{
-			Vec2f pos = params.read_Vec2f();
-			PlaceBlob(this, carryBlob, pos);
-			SendGameplayEvent(createBuiltBlobEvent(this.getPlayer(), carryBlob.getName()));
+			if(carryBlob.getConfig() == "mat_accelplate")
+			{
+				//Custom placement code
+				@carryBlob = @server_CreateBlob("booster", this.getTeamNum(), this.getPosition());
+				carryBlob.setAngleDegrees(this.get_u16("build_angle"));
+			}
+			//else
+			{
+				Vec2f pos = params.read_Vec2f();
+				PlaceBlob(this, carryBlob, pos);
+				SendGameplayEvent(createBuiltBlobEvent(this.getPlayer(), carryBlob.getName()));
+			}
 		}
 	}
 	else if (cmd == this.getCommandID("settleLadder"))
