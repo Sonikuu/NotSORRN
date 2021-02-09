@@ -23,8 +23,6 @@ void onInit(CBlob@ this)
 	this.addCommandID("partcmd");
 	this.set_bool("equipped", false);
 	
-	Render::addBlobScript(Render::layer_objects, this, "EquipmentGunBladeCommon.as", "renderGunBladeTracers");
-	
 	
 }
 

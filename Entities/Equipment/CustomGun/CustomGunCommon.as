@@ -240,14 +240,14 @@ array<array<CGunRequirements>> gunreqs = {
 		CGunRequirements().addRequirement("mat_metal", 3),//SOMETHING, UZI MAYBE
 		CGunRequirements().addRequirement("mat_metal", 5).addRequirement("somethingcool", 1).setHidden(true),//CHARGE RIFLE
 		CGunRequirements().addRequirement("mat_metal", 5),//SHOTGUN
-		CGunRequirements().addRequirement("mat_metal", 5).addRequirement("mat_acceleratum", 1).setHidden(true),//SNIPER RIFLE
+		CGunRequirements().addRequirement("mat_metal", 5).addRequirement("mat_accelplate", 1).setHidden(true),//SNIPER RIFLE
 		CGunRequirements().addRequirement("mat_metal", 6).addRequirement("unstablecore", 1).setHidden(true)//GATLING
 	},
 	{
 		CGunRequirements().addRequirement("mat_metal", 1),//SHORT
 		CGunRequirements().addRequirement("mat_metal", 2),//LONG
 		CGunRequirements().addRequirement("mat_metal", 2),//SPLIT LUL
-		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("mat_acceleratum", 1).setHidden(true),//ACCELERATED
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("mat_accelplate", 1).setHidden(true),//ACCELERATED
 		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("unstablecore", 1).setHidden(true),//UNSTABLE?
 		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("natureheart", 1).setHidden(true)//GUIDED
 	},
@@ -256,7 +256,7 @@ array<array<CGunRequirements>> gunreqs = {
 		CGunRequirements().addRequirement("mat_metal", 1),//LIGHT
 		CGunRequirements().addRequirement("mat_wood", 100),//WOOD
 		CGunRequirements().addRequirement("mat_metal", 3),//HEAVY
-		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("mat_acceleratum", 1).setHidden(true),//ACCELERATED
+		CGunRequirements().addRequirement("mat_metal", 2).addRequirement("mat_accelplate", 1).setHidden(true),//ACCELERATED
 		CGunRequirements().addRequirement("mat_metal", 1).addRequirement("natureheart", 1).setHidden(true)//GUIDED
 	},
 	{

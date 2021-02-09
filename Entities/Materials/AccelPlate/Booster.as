@@ -4,6 +4,8 @@ void onInit(CBlob@ this)
   this.Tag("builder always hit");
   
   this.set_TileType("background tile", CMap::tile_castle_back);
+  if(isClient())
+    this.getSprite().SetZ(-10);
  
 }
 
@@ -19,4 +21,15 @@ void onCollision(CBlob@ this, CBlob@ blob, bool solid)
   blob.setVelocity((blob.getVelocity() * 3 + addedvel) / 4.0);
 }
 
+void onDie(CBlob@ this)
+{
+  if(isServer())
+  {
+    CBlob@ output = server_CreateBlobNoInit("mat_accelplate");
+		output.Tag("custom quantity");
+		output.setPosition(this.getPosition());
+		output.server_SetQuantity(1);
+		output.Init();
+  }
+}
 

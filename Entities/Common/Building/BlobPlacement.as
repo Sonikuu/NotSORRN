@@ -433,6 +433,10 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 			if(carryBlob.getConfig() == "mat_accelplate")
 			{
 				//Custom placement code
+				if(carryBlob.getQuantity() == 1)
+					carryBlob.server_Die();
+				else
+					carryBlob.server_SetQuantity(carryBlob.getQuantity() - 1);
 				@carryBlob = @server_CreateBlob("booster", this.getTeamNum(), this.getPosition());
 				carryBlob.setAngleDegrees(this.get_u16("build_angle"));
 			}

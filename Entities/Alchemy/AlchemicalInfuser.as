@@ -186,6 +186,16 @@ array<CAlchemyInfuse@> infuserecipes =
 	1,//item amount
 	1,//output amount
 	150//processing time
+	),
+
+	@CAlchemyInfuse(
+	"force",//input element
+	"mat_metal",//input item
+	"mat_accelplate",//output item
+	100,//element amount
+	1,//item amount
+	1,//output amount
+	300//processing time
 	)
 };
 

@@ -117,7 +117,7 @@ class CGunEquipment : CEquipmentCore
 		semi = false;
 		reloadtime = 60;
 		reloadprog = 0;
-		ammotype = "mat_ammo";
+		ammotype = "ammopack";
 		maxammo = 30;
 		
 		range = 512;
@@ -152,15 +152,20 @@ class CGunEquipment : CEquipmentCore
 	{
 		if(user.isMyPlayer())
 		{
+			if(equipmentBlocked(user))
+			{
+				getHUD().SetDefaultCursor();
+				return;
+			}
 			CControls@ controls = getControls();
 			CCamera@ camera = getCamera();
 			if(camera !is null && controls !is null)
 			{
 				int currammo = blob.get_u16("ammo" + cmdstr);
 				//--------Cursor rendering----
-				Vec2f diff = controls.getMouseWorldPos() - user.getPosition();
+				Vec2f diff = getDriver().getWorldPosFromScreenPos(controls.getInterpMouseScreenPos()) - user.getInterpolatedPosition();
 				float dist = Maths::Min(diff.Length(), range);
-				Vec2f maxdistpoint = Vec2f_lengthdir_deg(dist, -diff.Angle()) + user.getPosition();
+				Vec2f maxdistpoint = Vec2f_lengthdir_deg(dist, -diff.Angle()) + user.getInterpolatedPosition();
 				float pointdist = Vec2f_lengthdir_deg(dist, -(spread + currrecoil)).y;
 				//pointdist /= camera.targetDistance;
 				
@@ -197,7 +202,7 @@ class CGunEquipment : CEquipmentCore
 					{
 						ammostart = 0;
 						ammoend = maxammo;
-						print("remak");
+						//print("remak");
 					}
 					
 					
@@ -215,7 +220,7 @@ class CGunEquipment : CEquipmentCore
 					if(remakegui)
 					{
 						Texture::destroy(texname);
-						print("texdes");
+						//print("texdes");
 					}
 					if(Texture::exists(texname))
 						@newimage = Texture::data(texname);
