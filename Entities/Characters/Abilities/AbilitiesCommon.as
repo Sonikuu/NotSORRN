@@ -6,6 +6,8 @@
 #include "FxHookCommon.as"
 #include "Utilities"
 
+
+//--Abilities Start--//
 interface IAbility
 {
     string getTextureName();
@@ -781,7 +783,7 @@ class CGolemiteRepair : CAbilityBase
 		return blob.get_s32("golemiteCount") > 25;
 	}
 }
-
+//--Abilities End--//
 enum EAbilities
 {
 	Empty = 0,
@@ -926,7 +928,7 @@ class CAbilityBar
 
 		return -1;
 	}
-
+	//--CAbilityBar Tick--//
 	void onTick()
 	{
 		if(blob.isMyPlayer())
@@ -979,6 +981,8 @@ class CAbilityBar
 		blob.get("AbilityManager",@m);
 		return Vec2f(getBarEndPos().x,m.abilityMenu.menuButtonDimentions.y * fRealScale + m.abilityMenu.menuOpenTargetPos.y);
 	}
+
+	//--CAbilityBar Render--//
 	void onRender()
 	{
 		if(blob.isMyPlayer())
@@ -1101,7 +1105,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 			}
 		}
 	}
-
+	//--CAbilityMenu Tick--//
 	void onTick()
 	{
 		for(int i = 0; i < list.size(); i++)
@@ -1271,7 +1275,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 		mpos.y <= menuOpenTargetPos.y + menuButtonDimentions.y * fRealScale;
 
 	}
-
+	//--CAbilityMenu Render--//
 	void onRender(CSprite@ sprite)
 	{
 		for(int i = 0; i < list.size(); i++)
