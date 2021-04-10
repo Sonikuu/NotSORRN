@@ -1028,7 +1028,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	CBlob@ blob;
 	Vec2f menuStartPos = Vec2f(5,52);
 	Vec2f menuOpenTargetPos = Vec2f(5,52);
-	Vec2f menuClosedTargetPos; //set in constructor to prevent null poitner access
+	Vec2f menuClosedTargetPos; //set in constructor to prevent null pointer access
 	Vec2f menuCurrentPos = Vec2f(0,0);
 	Vec2f menuButtonDimentions = Vec2f(32,16);
 	int columns = 5;
@@ -1036,6 +1036,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 	bool menuOpen = false;
 	bool newAbility = false;//note abilities are added right away so this could be true by default
 	s32 heldItem = -1;
+	
 
 	u32[] list = {
 		EAbilities::Empty
@@ -1303,7 +1304,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 			}
 
 			menuCurrentPos = Vec2f_lerp(menuCurrentPos,menuOpen ? menuOpenTargetPos : menuClosedTargetPos,0.1);
-			if(menuOpen || true)
+			if(menuOpen)
 			{
 				GUI::DrawRectangle(menuCurrentPos,getMenuEndPos());//background
 
