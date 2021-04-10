@@ -1304,7 +1304,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 			}
 
 			menuCurrentPos = Vec2f_lerp(menuCurrentPos,menuOpen ? menuOpenTargetPos : menuClosedTargetPos,0.1);
-			if(menuOpen)
+			if(menuCurrentPos != menuClosedTargetPos)
 			{
 				GUI::DrawRectangle(menuCurrentPos,getMenuEndPos());//background
 
