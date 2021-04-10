@@ -27,8 +27,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params){
         if(b is null){return;}
 
         b.server_SetActive(true);
-
-        b.getSprite().PlaySound("man_scream.ogg", 1, 1);
+        Sound::Play("man_scream.ogg",this.getPosition(), 1, XORRandom(11)/10.0);
 
         b.server_Die();
     }
