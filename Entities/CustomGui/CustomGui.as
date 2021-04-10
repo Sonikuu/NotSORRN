@@ -14,11 +14,8 @@ void onRender(CSprite@ this)
 	}
 	f32 kagScale = 1;
 	f32 scale = kagScale/0.5; //kag scale is 2 when you put in 1 because kag hates you
-	f32 spacing = 3;
 
 	Vec2f startPos = Vec2f(5,68 + (3 * scale));
-
-	f32 widest = -1;
 
 	array<Vec2f> iconPositons;
 	Vec2f lastItemPos = startPos;
@@ -59,12 +56,6 @@ void onRender(CSprite@ this)
 		GUI::DrawIcon(b.inventoryIconName , b.inventoryIconFrame , b.inventoryFrameDimension,iconPositons[i] + Vec2f(0,x < 16 ? scale *(x/2 + 6) : 12), kagScale);
 
 		f32 ammount = blob.getBlobCount(b.getName());
-
-		// for(int j = 0; j < blobs.size(); j++){
-		// 	if(blobs[j].getName() == b.getName()){
-		// 		ammount += blobs[i].getQuantity();
-		// 	}
-		// }
 
 		f32 r = Maths::Min(ammount, b.maxQuantity)/b.maxQuantity;
 		GUI::SetFont("snes");
