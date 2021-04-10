@@ -991,7 +991,7 @@ class CAbilityBar
 
 				if(getAbility(i).isEnabled())
 				{
-					if(isSlotHovered(i))
+					if(isSlotHovered(i) && i != selectedSlot)
 					{
 						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale,SColor(255,127,127,127));
 					}
