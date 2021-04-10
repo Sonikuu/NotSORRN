@@ -993,7 +993,7 @@ class CAbilityBar
 				{
 					if(isSlotHovered(i))
 					{
-						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale,SColor(127,255,255,255));
+						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,drawPos,fDrawScale,SColor(255,127,127,127));
 					}
 					else
 					{
@@ -1307,7 +1307,7 @@ class CAbilityMenu //this will act as the "unlocked" abilities and run them ever
 				{
 					if(i == heldItem || (heldItem <= -1 && i == getHoveredItem()))
 					{
-						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,getItemPos(i),fDrawScale,SColor(127,255,255,255));
+						GUI::DrawIcon(getAbility(i).getTextureName(),0,slotDimentions,getItemPos(i),fDrawScale,SColor(255,127,127,127));
 					}
 					else
 					{
