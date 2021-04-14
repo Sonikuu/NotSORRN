@@ -5,7 +5,10 @@
 void onDie(CBlob@ this)
 {
 	if(this.hasTag("nodrops"))
+	{
 		return;
+	}
+
 	Vec2f pos = this.getPosition();
 	f32 fall_angle = 0.0f;
 
@@ -18,6 +21,11 @@ void onDie(CBlob@ this)
 	this.get("TreeSegments", @segments);
 	if (segments is null)
 		return;
+
+	if(isServer() && getMap().getTile(this.getPosition()).type == 0 && (XORRandom(10) == 0 || true))
+	{ 
+		server_CreateBlob("birb",-1,this.getPosition() - Vec2f(0,5 * segments.size()));
+	}
 
 	for (uint i = 0; i < segments.length; i++)
 	{
