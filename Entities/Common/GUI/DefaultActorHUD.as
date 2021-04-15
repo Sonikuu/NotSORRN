@@ -2,6 +2,7 @@
 // a bar with hearts in the bottom left, bottom right free for actor specific stuff
 
 #include "ActorHUDStartPos.as";
+#include "CHealth.as";
 
 void renderBackBar(Vec2f origin, f32 width, f32 scale)
 {
@@ -36,7 +37,7 @@ void renderHPBar(CBlob@ blob, Vec2f origin)
 	GUI::DrawIcon("Entities/Common/GUI/BaseGUI.png", 0, Vec2f(16, 32), origin + Vec2f(-segmentWidth, 0));
 	int HPs = 0;
 
-	for (f32 step = 0.0f; step < Maths::Max(blob.getInitialHealth(), blob.getHealth()); step += 0.5f)
+	for (f32 step = 0.0f; step < Maths::Max(getMaxHealth(blob), blob.getHealth()); step += 0.5f)
 	{
 		GUI::DrawIcon("Entities/Common/GUI/BaseGUI.png", 1, Vec2f(16, 32), origin + Vec2f(segmentWidth * HPs, 0));
 		f32 thisHP = blob.getHealth() - step;

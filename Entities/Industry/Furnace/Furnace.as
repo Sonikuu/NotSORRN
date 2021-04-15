@@ -68,6 +68,13 @@ array<CBurnableItem@> burnlist =
 	"unstablecore",
 	1,
 	1,
+	100),
+
+	@CBurnableItem(
+	"mat_glass",
+	"inertcrystal",
+	100,
+	1,
 	100)
 };
 

@@ -64,9 +64,13 @@ shared interface IEquipment
 	
 	void onUnequip(CBlob@ blob, CBlob@ user);
 	
-	bool canBeEquipped(string slot);
+	bool canBeEquipped(int slot);
 	
 	void onCreateInventoryMenu(CBlob@ blob, CBlob@ user, CGridMenu @gridmenu);
+
+	float modifyHealth(CBlob@ blob, CBlob@ user, float health);
+
+	f32 onHit(CBlob@ blob, CBlob@ user, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitterBlob, u8 customData);
 }
 
 shared class CEquipmentCore : IEquipment
@@ -96,9 +100,13 @@ shared class CEquipmentCore : IEquipment
 	
 	void onUnequip(CBlob@ blob, CBlob@ user){}
 	
-	bool canBeEquipped(string slot){return true;}
+	bool canBeEquipped(int slot){return true;}
 	
 	void onCreateInventoryMenu(CBlob@ blob, CBlob@ user, CGridMenu @gridmenu){}
+
+	float modifyHealth(CBlob@ blob, CBlob@ user, float health){return health;}
+
+	f32 onHit(CBlob@ blob, CBlob@ user, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitterBlob, u8 customData){return damage;}
 }
 
 IEquipment@ getEquipment(CBlob@ this)

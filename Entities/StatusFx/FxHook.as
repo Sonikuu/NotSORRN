@@ -9,6 +9,7 @@
 #include "CHitters.as";
 #include "DamageModCommon.as";
 #include "FxHookCommon.as";
+#include "CHealth.as";
 
 //Fook it, time to redo the fx systems
 void onInit(CBlob@ this)

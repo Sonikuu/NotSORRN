@@ -17,7 +17,7 @@ bool doesCollideWithBlob(CBlob@ this, CBlob@ blob)
 void onCollision(CBlob@ this, CBlob@ blob, bool solid)
 {
   if (blob is null) return;
-  Vec2f addedvel = Vec2f(22, 0).RotateByDegrees(this.getAngleDegrees());
+  Vec2f addedvel = Vec2f(22, 0).RotateByDegrees(this.getAngleDegrees() - 90);
   blob.setVelocity((blob.getVelocity() * 3 + addedvel) / 4.0);
 }
 

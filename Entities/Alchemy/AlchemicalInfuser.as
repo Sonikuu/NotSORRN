@@ -196,6 +196,16 @@ array<CAlchemyInfuse@> infuserecipes =
 	1,//item amount
 	1,//output amount
 	300//processing time
+	),
+
+	@CAlchemyInfuse(
+	"force",//input element
+	"inertcrystal",//input item
+	"powercrystal",//output item
+	100,//element amount
+	1,//item amount
+	1,//output amount
+	300//processing time
 	)
 };
 

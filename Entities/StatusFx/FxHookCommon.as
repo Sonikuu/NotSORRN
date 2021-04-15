@@ -278,7 +278,7 @@ class CStatusRegen : CStatusBase
 	void onTick(CBlob@ this)
 	{
 		if(getGameTime() % 15 == 0)
-			this.server_SetHealth(Maths::Max(Maths::Min(this.getHealth() + this.get_u16("fxregenpower") * 0.01, this.getInitialHealth()), this.getHealth()));
+			this.server_SetHealth(Maths::Max(Maths::Min(this.getHealth() + this.get_u16("fxregenpower") * 0.01, getMaxHealth(this)), this.getHealth()));
 	}
 	string getFxName()
 	{

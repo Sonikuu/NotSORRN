@@ -40,10 +40,10 @@ funcdef float gunHitTile(CBlob@ user, Vec2f pos, float angle, CGunEquipment@ gun
 
 class CGunEquipment : CEquipmentCore
 {
-	int cooldown;
+	float cooldown;
 	
 	float damage;
-	int firerate;
+	float firerate;
 	int shotcount;
 	float spread;
 	
@@ -94,7 +94,7 @@ class CGunEquipment : CEquipmentCore
 	
 	bool userissound; //Used for vehicles mainly, cause cant have multiple emit sounds in one so we turn user into sound emitter
 	
-	CGunEquipment(float damage, int firerate, int shotcount, float spread)
+	CGunEquipment(float damage, float firerate, int shotcount, float spread)
 	{
 		super();
 		this.firerate = firerate;
@@ -426,10 +426,13 @@ class CGunEquipment : CEquipmentCore
 			{
 				
 				semiready = false;
-				fireWeapon(blob);
-				if(blob.get_u16("ammo" + cmdstr) > 0)
+				while(cooldown < 0)
 				{
-					doRecoil(user);
+					fireWeapon(blob);
+					if(blob.get_u16("ammo" + cmdstr) > 0)
+					{
+						doRecoil(user);
+					}
 				}
 					 
 			}
@@ -438,7 +441,7 @@ class CGunEquipment : CEquipmentCore
 	
 	bool isActive(CBlob@ blob, CBlob@ user)
 	{
-		return cooldown >= 0 || reloadprog > 0;
+		return cooldown >= -1 || reloadprog > 0;
 	}
 	
 	bool getAmmo(CBlob@ blob, CBlob@ user)
@@ -511,7 +514,7 @@ class CGunEquipment : CEquipmentCore
 		//if(blob.get_u16("ammo") > 0 && reloadprog <= 0)
 			//blob.sub_u16("ammo", 1);
 		
-		cooldown = firerate;
+		cooldown += firerate;
 	}
 	
 	float doBlobHitEffects(CBlob@ user, CBlob@ hit_blob, Vec2f pos, float angle, float damage)
@@ -541,7 +544,7 @@ class CGunEquipment : CEquipmentCore
 	
 	bool isSpriteShowing(CBlob@ blob)
 	{
-		return cooldown > -1 || reloadprog > 0;
+		return cooldown > 0 || reloadprog > 0;
 	}
 	
 	void onTick(CSprite@ sprite, CBlob@ user)
@@ -556,6 +559,14 @@ class CGunEquipment : CEquipmentCore
 		}
 		else
 		{
+			if(reloadprog > 0)
+			{
+				
+				float tlastshotrotation = user.isFacingLeft() ? 150 : 30;
+				if(tlastshotrotation != lastshotrotation)
+					fixedsprite = false;
+				lastshotrotation = tlastshotrotation;
+			}
 			CSprite@ usersprite = user.getSprite();
 			if(usersprite !is null && usersprite.getSpriteLayer("equipgunfx") is null)
 			{
@@ -675,7 +686,7 @@ class CGunEquipment : CEquipmentCore
 			}
 			
 			if(user !is getLocalPlayerBlob())
-				cooldown = firerate;
+				cooldown =+ firerate;
 				
 			//How homing is going to work:
 			//Get blobs in homing range + gun range
@@ -994,9 +1005,9 @@ class CGunEquipment : CEquipmentCore
 		
 	}
 	
-	bool canBeEquipped(string slot)
+	bool canBeEquipped(int slot)
 	{
-		if(slot == "BACK_ARM" || slot == "FRONT_ARM")
+		if(slot == 0 || slot == 1)//REMEMBER TO FIX FOR DUAL WIELDINGNNGNMG
 			return true;
 		return false;
 	}
@@ -1004,11 +1015,11 @@ class CGunEquipment : CEquipmentCore
 
 class CSpoolGunEquipment : CGunEquipment
 {
-	int spoollimit;//This is how much below base firerate we can go
+	float spoollimit;//This is how much below base firerate we can go
 	float spoolspeed;//amount per shot to reduce firerate
 	
 	float spooltime;//current spool speed
-	CSpoolGunEquipment(float damage = 2.0, int firerate = 10, int shotcount = 1, float spread = 10.0, int spoollimit = 9, float spoolspeed = 1)
+	CSpoolGunEquipment(float damage = 2.0, float firerate = 10, int shotcount = 1, float spread = 10.0, float spoollimit = 9, float spoolspeed = 1)
 	{
 		super(damage, firerate, shotcount, spread);
 		
@@ -1048,12 +1059,18 @@ class CSpoolGunEquipment : CGunEquipment
 			
 				if(user is getLocalPlayerBlob())
 				{
-					if(blob.get_u16("ammo" + cmdstr) > 0)
+					int limiter = 0;//Sanity check?
+					while(cooldown <= 0 || limiter > 25)
 					{
-						doRecoil(user);
+						limiter++;
+						if(blob.get_u16("ammo" + cmdstr) > 0)
+						{
+							doRecoil(user);
+						}
+
+						fireWeapon(blob);
+						cooldown -= spooltime;
 					}
-					fireWeapon(blob);
-					cooldown = firerate - spooltime;
 					semiready = false;
 				}
 				
@@ -1064,8 +1081,8 @@ class CSpoolGunEquipment : CGunEquipment
 	u32 onCommand(CBlob@ blob, CBlob@ user, u32 bits, CBitStream@ params)
 	{
 		bits = CGunEquipment::onCommand(blob, user, bits, params);
-		if(user !is getLocalPlayerBlob())
-			cooldown = firerate - spooltime;
+		//if(user !is getLocalPlayerBlob())
+			//cooldown = firerate - spooltime;
 		return bits;
 	}
 }
@@ -1081,7 +1098,7 @@ class CChargeGunEquipment : CGunEquipment
 	
 	float exponent;
 	
-	CChargeGunEquipment(float damage, int firerate, int shotcount, float spread, int mincharge, int maxcharge)
+	CChargeGunEquipment(float damage, float firerate, int shotcount, float spread, int mincharge, int maxcharge)
 	{
 		super(damage, firerate, shotcount, spread);
 		basedamage = damage;

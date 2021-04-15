@@ -3,6 +3,7 @@
 #include "Help.as"
 #include "StandardControlsCommon.as"
 #include "GenericButtonCommon.as"
+#include "CHealth.as"
 
 const u8 heal_rate = 30;
 const f32 heal_amount = 0.25f;
@@ -63,7 +64,7 @@ void onTick( CBlob@ this )
 					if (isServer)
 					{
 						f32 oldHealth = patient.getHealth();
-						patient.server_Heal(heal_amount);
+						server_Heal(patient, heal_amount);
 						patient.add_f32("heal amount", patient.getHealth() - oldHealth);
 					}
 				}
@@ -113,7 +114,7 @@ bool bedAvailable(CBlob@ this)
 
 bool requiresTreatment(CBlob@ this, CBlob@ caller)
 {
-	return caller.getHealth() < caller.getInitialHealth() && (!caller.isAttached() || caller.isAttachedTo(this));
+	return caller.getHealth() < getMaxHealth(caller) && (!caller.isAttached() || caller.isAttachedTo(this));
 }
 
 
