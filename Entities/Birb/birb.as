@@ -10,7 +10,7 @@ void onInit(CBlob@ this)
 		this.Sync("direction",true);
 	}
 
-	server_SetTimeToDie(60);
+	this.server_SetTimeToDie(60);
 }
 
 void onTick(CBlob@ this)
