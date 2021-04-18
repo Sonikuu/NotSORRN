@@ -8,6 +8,7 @@ namespace CHitters
 		pure,
 		bullet,
 		yeet,
-		poison
+		poison,
+		lightning
 	};
 }

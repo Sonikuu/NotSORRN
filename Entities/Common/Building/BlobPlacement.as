@@ -386,6 +386,9 @@ void onRender(CSprite@ this)
 				int rot = blob.get_u16("build_angle");
 				pos += carryBlob.getPosition();
 
+				if(!bc.cursorClose || !bc.hasReqs || !bc.buildable)
+					pos += Vec2f(4, 4);
+
 				Vec2f ul = Vec2f(-4, -4).RotateByDegrees(rot);
 				ul += pos;
 				

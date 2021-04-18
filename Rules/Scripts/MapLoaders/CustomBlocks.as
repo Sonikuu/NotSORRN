@@ -82,6 +82,24 @@ namespace CCTiles
 	};
 };
 
+/*class CCustomBlock
+{
+	int stile;
+	int endvartile;
+	int startdam;
+	int etile;
+	CCustomBlock(int stile, int endvartile, int etile)
+	{
+		this.stile = stile;
+		this.endvartile = endvartile;
+		this.etile = etile;
+	}
+}
+
+array<CCustomBlock> tilelist = {
+	CCustomBlock(tile_cor1, tile_cor3, tile_cord3)
+};*/
+
 const SColor color_spawn_cave(255, 128, 128, 0);
 const SColor color_trade_post(255, 200, 200, 150);
 const SColor color_rail_platform(255, 200, 200, 10);

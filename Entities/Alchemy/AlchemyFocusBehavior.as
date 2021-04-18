@@ -5,6 +5,7 @@
 #include "TileInteractions.as";
 #include "LoaderColors.as";
 #include "FxHookCommon.as";
+#include "CHealth.as";
 
 //Ehm, this might get weird, trying something new here
 //Callbacks?
@@ -53,7 +54,7 @@ float padAer(CBlob@ blob, int power, CBlob@ pad)
 
 float padLife(CBlob@ blob, int power, CBlob@ pad)
 {
-	blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.2, blob.getInitialHealth() * 2));
+	blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.2, getMaxHealth(blob) * 2));
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 20; i++)
@@ -352,11 +353,11 @@ float wardLife(float radius, int power, CBlob@ ward)
 	{
 		for (int i = 0; i < blobs.length; i++)
 		{
-			if(blobs[i].getHealth() < blobs[i].getInitialHealth() && blobs[i].hasTag("flesh"))
+			if(blobs[i].getHealth() < getMaxHealth(blobs[i]) && blobs[i].hasTag("flesh"))
 			{
 				activated = true;
 				if(getGameTime() % 30 == 0)
-					blobs[i].server_Heal(0.08 * power);
+					server_Heal(blobs[i], 0.08 * power);
 			}
 		}
 	}
@@ -696,7 +697,7 @@ void bindAer(CBlob@ blob, int power, CBlob@ bind)
 void bindLife(CBlob@ blob, int power, CBlob@ bind)
 {
 	if(getGameTime() % 30 == 0)
-		blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.05, blob.getInitialHealth() * 2));
+		blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.05, getMaxHealth(blob) * 2));
 }
 
 void bindEcto(CBlob@ blob, int power, CBlob@ bind)
@@ -911,10 +912,10 @@ float sprayLife(int power, float aimdir, float spread, float range, CBlob@ spray
 		{
 			if(list[i].blob !is null)
 			{
-				if(list[i].blob.getHealth() < list[i].blob.getInitialHealth() && list[i].blob.hasTag("flesh"))
+				if(list[i].blob.getHealth() < getMaxHealth(list[i].blob) && list[i].blob.hasTag("flesh"))
 				{
 					if(getGameTime() % 10 == 0)
-						list[i].blob.server_Heal(0.1 * power);
+						server_Heal(list[i].blob, 0.1 * power);
 					activated = true;
 				}
 			}
@@ -1355,7 +1356,7 @@ bool vialIngestEcto(CBlob@ drinker, CBlob@ vial, f32 power)
 }
 bool vialIngestLife(CBlob@ drinker, CBlob@ vial, f32 power)
 {
-	drinker.server_SetHealth(Maths::Min(drinker.getHealth() + float(power) * 0.2, drinker.getInitialHealth() * 2));
+	drinker.server_SetHealth(Maths::Min(drinker.getHealth() + float(power) * 0.2, getMaxHealth(drinker) * 2));
 	return true;
 }
 bool vialIngestNatura(CBlob@ drinker, CBlob@ vial, f32 power)
@@ -1449,7 +1450,7 @@ bool vialSplashLife(CBlob@ vial, f32 power)
 	{
 		CBlob@ blob = blobs[i];
 		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
-		blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.2, blob.getInitialHealth() * 2));
+		blob.server_SetHealth(Maths::Min(blob.getHealth() + float(power) * 0.2, getMaxHealth(blob) * 2));
 	}
 	return true;
 }
