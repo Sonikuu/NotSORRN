@@ -27,7 +27,6 @@ void onCollision( CBlob@ this, CBlob@ blob, bool solid, Vec2f normal)
 {
 	if(solid)
 	{
-		print(normal + "");
 		if(isServer())
 		{
 			if(normal.y == 1)

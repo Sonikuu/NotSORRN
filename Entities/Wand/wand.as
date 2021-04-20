@@ -1,7 +1,4 @@
 
-
-
-
 void onInit(CBlob@ this)
 {
 	this.set_Vec2f("lastaim",this.getAimPos());
@@ -25,7 +22,16 @@ void onTick(CBlob@ this)
 	this.get("lines",@lines);
 
 	CControls@ c = getControls();
-	if(!getControls().isKeyPressed(KEY_KEY_V) && !getControls().isKeyJustReleased(KEY_KEY_V))
+
+	CBlob@ holder = getHolder(this);
+	if(holder is null || holder !is getLocalPlayerBlob())
+	{
+		return;
+	}
+
+	this.SetFacingLeft(holder.isFacingLeft());
+
+	if(!getControls().isKeyPressed(KEY_LBUTTON) && !getControls().isKeyJustReleased(KEY_LBUTTON))
 	{
 
 		lines.clear();
@@ -35,7 +41,7 @@ void onTick(CBlob@ this)
 	Vec2f aim = c.getMouseScreenPos();
 	Vec2f lastaim = this.get_Vec2f("lastaim");
 
-	if(getControls().isKeyJustPressed(KEY_KEY_V))
+	if(getControls().isKeyJustPressed(KEY_LBUTTON))
 	{
 		this.set_Vec2f("startaim",aim);
 	}
@@ -52,9 +58,9 @@ void onTick(CBlob@ this)
 		this.set_bool("newlineready",false);
 	}
 
-	if(getControls().isKeyJustReleased(KEY_KEY_V))
+	if(getControls().isKeyJustReleased(KEY_LBUTTON))
 	{
-		shape(this);
+		shape(this,holder);
 	}
 
 
@@ -76,7 +82,7 @@ void line(CBlob@ this, Vec2f start, Vec2f end)
 	lines.push_back(end);
 }
 
-void shape(CBlob@ this)
+void shape(CBlob@ this, CBlob@ holder)
 {
 	Vec2f[]@ lines;
 	this.get("lines",@lines);
@@ -90,18 +96,18 @@ void shape(CBlob@ this)
 
 	if(isSpell(angles,ESpells::up))
 	{
-		this.setVelocity(Vec2f(0,-8));
+		holder.setVelocity(Vec2f(0,-8));
 	}
 	else if(isSpell(angles,ESpells::right))
 	{
-		this.setVelocity(Vec2f(8,0));
+		holder.setVelocity(Vec2f(8,0));
 	}
 	else if(isSpell(angles,ESpells::teleport))
 	{
 		f32[] minmax = minimumMaximumVectorValues(lines);
 
 		Vec2f rand = Vec2f(XORRandom(minmax[2] - minmax[0]) + minmax[0],XORRandom(minmax[3] - minmax[1]) + minmax[1]);
-		this.setPosition(getDriver().getWorldPosFromScreenPos(rand));
+		holder.setPosition(getDriver().getWorldPosFromScreenPos(rand));
 	}
 
 }
@@ -174,8 +180,24 @@ u32[][] spells =
 };
 
 void onRender(CSprite@ this)
-{
+{	
 	CBlob@ b = this.getBlob();
+
+	CBlob@ holder = getHolder(b);
+	if(holder is null || holder !is getLocalPlayerBlob())
+	{
+		return;
+	}
+
+	Vec2f pos = b.getPosition();
+	Vec2f other = holder.getAimPos();
+
+	Vec2f norm = pos - other;
+	norm.Normalize();
+
+	this.ResetTransform();
+	this.RotateBy(((-norm.Angle() -270) % 180) + (holder.isFacingLeft() ? 0 : 180), Vec2f(holder.isFacingLeft() ? -2 : 2,7));
+
 	Vec2f[]@ lines;
 	b.get("lines",@lines);
 
@@ -215,9 +237,38 @@ u32 closestValidAngle(f32 a)
 	return valid;
 }
 
+CBlob@ getHolder(CBlob@ this)
+{
+	return getBlobByNetworkID(this.get_u16("holder"));
+}
+
 u32 angleDistance(f32 a, f32 b)
 {
 	u32 c = a - b;
 	c = Maths::Abs(c);
 	return Maths::Min(360 - c, c);
+}
+
+void onAttach(CBlob@ this, CBlob@ attached, AttachmentPoint @attachedPoint)
+{
+	this.set_u16("holder", attached.getNetworkID());
+
+	CShape@ shape = this.getShape();
+	if (shape !is null)
+	{
+		this.setPosition(attached.getPosition()); // required to stop the first tick to be out of position
+
+		shape.SetGravityScale(0); // this stops the shape from 'falling' when its attached to something
+	}
+}
+
+void onDetach(CBlob@ this, CBlob@ detached, AttachmentPoint @attachedPoint)
+{
+	this.set_u16("holder", 0);
+
+	CShape@ shape = this.getShape();
+	if (shape !is null)
+	{
+		shape.SetGravityScale(1);
+	}
 }
