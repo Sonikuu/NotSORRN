@@ -94,13 +94,15 @@ void shape(CBlob@ this, CBlob@ holder)
 		angles.push_back(closestValidAngle((lines[i] - lines[i+1]).Angle()));
 	}
 
-	if(isSpell(angles,ESpells::up))
+	if(angles.size() == 2)
 	{
-		holder.setVelocity(Vec2f(0,-8));
-	}
-	else if(isSpell(angles,ESpells::right))
-	{
-		holder.setVelocity(Vec2f(8,0));
+		f32 angleDist = angleDistance(angles[0], angles[1]);
+		if(angleDist > (135 - 30) && angleDist < (135 + 30))
+		{
+			Vec2f vec = Vec2f(8,0).RotateBy(angles[0]);
+			vec.x *= -1; //for some reason the x is reversed so fixing it here.
+			holder.setVelocity(vec);
+		}
 	}
 	else if(isSpell(angles,ESpells::teleport))
 	{
@@ -156,24 +158,34 @@ void printSpell(u32[] s)
 
 bool isSpell(u32[] angles, int spellID)
 {
-	return angles == spells[spellID];
+	if(angles.size() != spells[spellID].size())
+	{
+		return false;
+	}
+	for(int i = 0; i < angles.size(); i++)
+	{
+		if(angleDistance(angles[i],spells[spellID][i]) > 30)
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 enum ESpells
 {
-	up = 0,
-	right = 1,
-	teleport = 2
+	teleport = 0
 }
+
+/* spell template: target, allowed varience
+{
+	180, 25
+	45, 25
+}
+*/
 
 u32[][] spells = 
 {
-	{
-		270,45
-	},
-	{
-		180, 45
-	},
 	{
 		180, 90, 0, 270
 	}
