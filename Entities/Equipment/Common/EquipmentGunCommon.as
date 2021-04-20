@@ -184,107 +184,136 @@ class CGunEquipment : CEquipmentCore
 				int imagey = ammoguisize.y * (maxammo / bulperlayer + 1);
 				
 				//-----Ammo rendering----
-				//Hey cool i did stuff with imagedata and i didnt want to die
-				Vec2f startpos = /*controls.getMouseScreenPos() - Vec2f(64, 128)*/ Vec2f_zero;
-				Vec2f offspos(0, 0);
-				string texname = "AmmoGUIData";
-				const float scale = 1;
-				
-				if(currammo != lastammo || remakegui)
+				if(attachedPoint == 0)
 				{
-					if(reloadprog > 0)
-						currammo = maxammo * (1.0 - (float(reloadprog) / reloadtime));
-				
-					int ammorange = Maths::Abs(lastammo - currammo);
-					int ammostart = Maths::Max(currammo - ammorange, 0);
-					int ammoend = Maths::Min(currammo + ammorange, maxammo);
-					if(remakegui)
+					//Hey cool i did stuff with imagedata and i didnt want to die
+					Vec2f startpos = /*controls.getMouseScreenPos() - Vec2f(64, 128)*/ Vec2f_zero;
+					Vec2f offspos(0, 0);
+					string texname = "AmmoGUIData";
+					const float scale = 1;
+					
+					if(currammo != lastammo || remakegui)
 					{
-						ammostart = 0;
-						ammoend = maxammo;
-						//print("remak");
-					}
+						if(reloadprog > 0)
+							currammo = maxammo * (1.0 - (float(reloadprog) / reloadtime));
 					
-					
-					
-					lastammo = currammo;
-					if(!Texture::exists(ammoguifile))
-					{
-						if(!Texture::createFromFile(ammoguifile, ammoguifile))
-							print("oh this is a problem");
-					}
-					ImageData@ baseimage = Texture::data(ammoguifile);
-					//if(!Texture::createBySize(texname, 32, 16))
-						//print("ohno");
-					ImageData@ newimage;
-					if(remakegui)
-					{
-						Texture::destroy(texname);
-						//print("texdes");
-					}
-					if(Texture::exists(texname))
-						@newimage = Texture::data(texname);
-					else
-						@newimage = @ImageData(imagex + 16, imagey);	
-					
-					remakegui = false;
-					
-					//This is dumb, oh well
-					
-					offspos = Vec2f((ammostart % bulperlayer) * (ammoguisize.x - 1), (ammostart / bulperlayer) * (ammoguisize.y - 1));
-					
-					/*for(int i = 0; i < ammostart; i++)
-					{
-						offspos.x += ammoguisize.x - 1;
-						if(offspos.x >= imagex)
+						int ammorange = Maths::Abs(lastammo - currammo);
+						int ammostart = Maths::Max(currammo - ammorange, 0);
+						int ammoend = Maths::Min(currammo + ammorange, maxammo);
+						if(remakegui)
 						{
-							offspos.x = 0;
-							offspos.y += ammoguisize.y - 1;
+							ammostart = 0;
+							ammoend = maxammo;
+							//print("remak");
 						}
-					}*/
-					
-					for(int i = ammostart; i < ammoend; i++)
-					{
-						Vec2f startpos = Vec2f((currammo > i ? 1 : 0) * ammoguisize.x, 0);
-						Vec2f endpos = startpos + ammoguisize;
 						
-						for(int x = startpos.x; x < endpos.x; x++)
+						
+						
+						lastammo = currammo;
+						if(!Texture::exists(ammoguifile))
 						{
-							for(int y = startpos.y; y < endpos.y; y++)
+							if(!Texture::createFromFile(ammoguifile, ammoguifile))
+								print("oh this is a problem");
+						}
+						ImageData@ baseimage = Texture::data(ammoguifile);
+						//if(!Texture::createBySize(texname, 32, 16))
+							//print("ohno");
+						ImageData@ newimage;
+						if(remakegui)
+						{
+							Texture::destroy(texname);
+							//print("texdes");
+						}
+						if(Texture::exists(texname))
+							@newimage = Texture::data(texname);
+						else
+							@newimage = @ImageData(imagex + 16, imagey);	
+						
+						remakegui = false;
+						
+						//This is dumb, oh well
+						
+						offspos = Vec2f((ammostart % bulperlayer) * (ammoguisize.x - 1), (ammostart / bulperlayer) * (ammoguisize.y - 1));
+						
+						/*for(int i = 0; i < ammostart; i++)
+						{
+							offspos.x += ammoguisize.x - 1;
+							if(offspos.x >= imagex)
 							{
-								SColor pixcol = baseimage.get(x, y);
-								Vec2f thispos = (Vec2f(x, y) - startpos) + offspos;
-								if(pixcol.getAlpha() > 0)
-									newimage.put(thispos.x, thispos.y, pixcol);
+								offspos.x = 0;
+								offspos.y += ammoguisize.y - 1;
+							}
+						}*/
+						
+						for(int i = ammostart; i < ammoend; i++)
+						{
+							Vec2f startpos = Vec2f((currammo > i ? 1 : 0) * ammoguisize.x, 0);
+							Vec2f endpos = startpos + ammoguisize;
+							
+							for(int x = startpos.x; x < endpos.x; x++)
+							{
+								for(int y = startpos.y; y < endpos.y; y++)
+								{
+									SColor pixcol = baseimage.get(x, y);
+									Vec2f thispos = (Vec2f(x, y) - startpos) + offspos;
+									if(pixcol.getAlpha() > 0)
+										newimage.put(thispos.x, thispos.y, pixcol);
+								}
+							}
+							
+							offspos.x += ammoguisize.x - 1;
+							if(offspos.x >= imagex)
+							{
+								offspos.x = 0;
+								offspos.y += ammoguisize.y - 1;
 							}
 						}
 						
-						offspos.x += ammoguisize.x - 1;
-						if(offspos.x >= imagex)
-						{
-							offspos.x = 0;
-							offspos.y += ammoguisize.y - 1;
-						}
+						if(Texture::exists(texname))
+							Texture::update(texname, newimage);
+						else
+							Texture::createFromData(texname, newimage);
 					}
+					//GUI::DrawIcon(texname, 0, Vec2f(272, 48), startpos, scale);
 					
-					if(Texture::exists(texname))
-						Texture::update(texname, newimage);
-					else
-						Texture::createFromData(texname, newimage);
+					//GUI::DrawIconDirect(texname, startpos, Vec2f_zero, Vec2f(272, 48));
+					
+					//GUI::DrawIconByName(texname, startpos, scale);
+					
+					array<Vertex> verts;
+					verts.push_back(Vertex(startpos, 0, Vec2f_zero, SColor(255, 255, 255, 255)));
+					verts.push_back(Vertex(startpos + Vec2f(imagex + 16, 0) * scale * 2, 0, Vec2f(1, 0), SColor(255, 255, 255, 255)));
+					verts.push_back(Vertex(startpos + Vec2f(imagex + 16, imagey) * scale * 2, 0, Vec2f(1, 1), SColor(255, 255, 255, 255)));
+					verts.push_back(Vertex(startpos + Vec2f(0, imagey) * scale * 2, 0, Vec2f(0, 1), SColor(255, 255, 255, 255)));
+					
+					addVertsToExistingRender(@verts, texname, "RLgui");
 				}
-				//GUI::DrawIcon(texname, 0, Vec2f(272, 48), startpos, scale);
-				
-				//GUI::DrawIconDirect(texname, startpos, Vec2f_zero, Vec2f(272, 48));
-				
-				//GUI::DrawIconByName(texname, startpos, scale);
-				
-				array<Vertex> verts;
-				verts.push_back(Vertex(startpos, 0, Vec2f_zero, SColor(255, 255, 255, 255)));
-				verts.push_back(Vertex(startpos + Vec2f(imagex + 16, 0) * scale * 2, 0, Vec2f(1, 0), SColor(255, 255, 255, 255)));
-				verts.push_back(Vertex(startpos + Vec2f(imagex + 16, imagey) * scale * 2, 0, Vec2f(1, 1), SColor(255, 255, 255, 255)));
-				verts.push_back(Vertex(startpos + Vec2f(0, imagey) * scale * 2, 0, Vec2f(0, 1), SColor(255, 255, 255, 255)));
-				
-				addVertsToExistingRender(@verts, texname, "RLgui");
+				else
+				{
+					//NON PRIMARY GUN AMMO RENDER
+					float ammolength = 32 + maxammo;
+					Vec2f startpos = controls.getInterpMouseScreenPos() + Vec2f(32, -(ammolength / 2.0));
+
+					SColor barcol = SColor(255, 0, 255, 0);
+
+					array<Vertex> verts;
+					verts.push_back(Vertex(startpos, 0, Vec2f_zero, color_black));
+					verts.push_back(Vertex(startpos + Vec2f(2, 0), 0, Vec2f(1, 0), color_black));
+					verts.push_back(Vertex(startpos + Vec2f(2, ammolength), 0, Vec2f(1, 1), color_black));
+					verts.push_back(Vertex(startpos + Vec2f(0, ammolength), 0, Vec2f(0, 1), color_black));
+
+					if(reloadprog > 0)
+						currammo = maxammo * (1.0 - (float(reloadprog) / reloadtime));
+					
+					ammolength *= float(currammo) / float(maxammo);
+
+					verts.push_back(Vertex(startpos, 0, Vec2f_zero, barcol));
+					verts.push_back(Vertex(startpos + Vec2f(2, 0), 0, Vec2f(1, 0), barcol));
+					verts.push_back(Vertex(startpos + Vec2f(2, ammolength), 0, Vec2f(1, 1), barcol));
+					verts.push_back(Vertex(startpos + Vec2f(0, ammolength), 0, Vec2f(0, 1), barcol));
+					
+					addVertsToExistingRender(@verts, "Rules/Render/PixelWhite.png", "RLgui");
+				}
 			}
 			
 			if (getHUD().hasButtons())
@@ -330,18 +359,18 @@ class CGunEquipment : CEquipmentCore
 		if(user !is null)
 		{
 			bool actionkey = (semi ? 
-							(attachedPoint == "FRONT_ARM" ? user.isKeyPressed(key_action1) && semiready :
-							attachedPoint == "BACK_ARM" ? user.isKeyPressed(key_action2) && semiready :
+							(attachedPoint == 0 ? user.isKeyPressed(key_action1) && semiready :
+							attachedPoint == 1 ? user.isKeyPressed(key_action2) && semiready :
 							user.isKeyPressed(key_action1) && semiready)
 							:
-							(attachedPoint == "FRONT_ARM" ? user.isKeyPressed(key_action1) :
-							attachedPoint == "BACK_ARM" ? user.isKeyPressed(key_action2) :
+							(attachedPoint == 0 ? user.isKeyPressed(key_action1) :
+							attachedPoint == 1 ? user.isKeyPressed(key_action2) :
 							user.isKeyPressed(key_action1)));
 			
 			if(equipmentBlocked(user))//Override if menu open
 				actionkey = false;
 								
-			if(user.isKeyJustReleased(attachedPoint == "FRONT_ARM" ? key_action1 : attachedPoint == "BACK_ARM" ? key_action2 : key_action1))
+			if(user.isKeyJustReleased(attachedPoint == 0 ? key_action1 : attachedPoint == 1 ? key_action2 : key_action1))
 				semiready = true;
 										
 			
@@ -408,12 +437,12 @@ class CGunEquipment : CEquipmentCore
 		{
 		
 			bool actionkey = (semi ? 
-							(attachedPoint == "FRONT_ARM" ? user.isKeyPressed(key_action1) && semiready :
-							attachedPoint == "BACK_ARM" ? user.isKeyPressed(key_action2) && semiready :
+							(attachedPoint == 0 ? user.isKeyPressed(key_action1) && semiready :
+							attachedPoint == 1 ? user.isKeyPressed(key_action2) && semiready :
 							user.isKeyPressed(key_action1) && semiready)
 							:
-							(attachedPoint == "FRONT_ARM" ? user.isKeyPressed(key_action1) :
-							attachedPoint == "BACK_ARM" ? user.isKeyPressed(key_action2) :
+							(attachedPoint == 0 ? user.isKeyPressed(key_action1) :
+							attachedPoint == 1 ? user.isKeyPressed(key_action2) :
 							user.isKeyPressed(key_action1)));
 
 			if(equipmentBlocked(user))//Override if menu open
@@ -552,9 +581,9 @@ class CGunEquipment : CEquipmentCore
 		if(!isSpriteShowing(sprite.getBlob()))
 		{
 			CSprite@ usersprite = user.getSprite();
-			if(usersprite !is null && usersprite.getSpriteLayer("equipgunfx") !is null)
+			if(usersprite !is null && usersprite.getSpriteLayer("equipgunfx" + attachedPoint) !is null)
 			{
-				usersprite.RemoveSpriteLayer("equipgunfx");
+				usersprite.RemoveSpriteLayer("equipgunfx" + attachedPoint);
 			}
 		}
 		else
@@ -568,12 +597,12 @@ class CGunEquipment : CEquipmentCore
 				lastshotrotation = tlastshotrotation;
 			}
 			CSprite@ usersprite = user.getSprite();
-			if(usersprite !is null && usersprite.getSpriteLayer("equipgunfx") is null)
+			if(usersprite !is null && usersprite.getSpriteLayer("equipgunfx" + attachedPoint) is null)
 			{
-				CSpriteLayer@ layer = (texture ? usersprite.addTexturedSpriteLayer("equipgunfx", sprite.getTextureName(), sprite.getFrameWidth(), sprite.getFrameHeight()) :
-												usersprite.addSpriteLayer("equipgunfx", sprite.getFilename(), sprite.getFrameWidth(), sprite.getFrameHeight()));
+				CSpriteLayer@ layer = (texture ? usersprite.addTexturedSpriteLayer("equipgunfx" + attachedPoint , sprite.getTextureName(), sprite.getFrameWidth(), sprite.getFrameHeight()) :
+												usersprite.addSpriteLayer("equipgunfx" + attachedPoint, sprite.getFilename(), sprite.getFrameWidth(), sprite.getFrameHeight()));
 				layer.SetFrame(0);
-				layer.TranslateBy(spriteoffset);
+				layer.TranslateBy(spriteoffset + (attachedPoint != 0 ? Vec2f(-3, 0) : Vec2f_zero));
 				layer.ScaleBy(Vec2f(1, 1) * spritescale);
 				
 				
@@ -593,11 +622,11 @@ class CGunEquipment : CEquipmentCore
 			}
 			else if(!fixedsprite)
 			{
-				CSpriteLayer@ layer = usersprite.getSpriteLayer("equipgunfx");
+				CSpriteLayer@ layer = usersprite.getSpriteLayer("equipgunfx" + attachedPoint);
 				layer.ResetTransform();
 				//layer.ScaleBy(Vec2f(0.5, 0.5));
 				
-				layer.TranslateBy(spriteoffset);
+				layer.TranslateBy(spriteoffset + (attachedPoint != 0 ? Vec2f(-3, 0) : Vec2f_zero));
 				
 				if(lastshotrotation >= 90 && lastshotrotation < 270)
 				{
@@ -618,9 +647,9 @@ class CGunEquipment : CEquipmentCore
 				fixedsprite = true;
 			}
 			
-			if(sprite.getBlob().hasTag("haspumpframe") && usersprite.getSpriteLayer("equipgunfx") !is null)
+			if(sprite.getBlob().hasTag("haspumpframe") && usersprite.getSpriteLayer("equipgunfx" + attachedPoint) !is null)
 			{
-				CSpriteLayer@ layer = usersprite.getSpriteLayer("equipgunfx");
+				CSpriteLayer@ layer = usersprite.getSpriteLayer("equipgunfx" + attachedPoint);
 				float refiretimeratio = float(Maths::Max(0, cooldown)) / float(firerate);
 				if(refiretimeratio <= 0.10)
 				{
@@ -993,9 +1022,9 @@ class CGunEquipment : CEquipmentCore
 		if(user is null) return;
 		
 		CSprite@ usersprite = user.getSprite();
-		if(usersprite !is null && usersprite.getSpriteLayer("equipgunfx") !is null)
+		if(usersprite !is null && usersprite.getSpriteLayer("equipgunfx" + attachedPoint) !is null)
 		{
-			usersprite.RemoveSpriteLayer("equipgunfx");
+			usersprite.RemoveSpriteLayer("equipgunfx" + attachedPoint);
 		}
 		
 		if(user.isMyPlayer())
@@ -1036,12 +1065,9 @@ class CSpoolGunEquipment : CGunEquipment
 		if(user !is null)
 		{
 		
-			bool actionkey = (semi ? user.isKeyPressed(key_action1) && semiready : 
-																		   
-																		 
-										  
-		
-								user.isKeyPressed(key_action1));
+			bool actionkey = (attachedPoint == 0 ? user.isKeyPressed(key_action1) :
+							attachedPoint == 1 ? user.isKeyPressed(key_action2) :
+							user.isKeyPressed(key_action1));
 
 			if(equipmentBlocked(user))//Override if menu open
 				actionkey = false;
@@ -1116,7 +1142,9 @@ class CChargeGunEquipment : CGunEquipment
 		if(user !is null)
 		{
 																				   
-			bool actionkey = user.isKeyPressed(key_action1);
+			bool actionkey = (attachedPoint == 0 ? user.isKeyPressed(key_action1) :
+							attachedPoint == 1 ? user.isKeyPressed(key_action2) :
+							user.isKeyPressed(key_action1));
 									  
 
 			if(equipmentBlocked(user))//Override if menu open

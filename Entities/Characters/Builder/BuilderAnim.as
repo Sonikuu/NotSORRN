@@ -61,8 +61,6 @@ void LoadSprites(CSprite@ this)
 void onTick(CSprite@ this)
 {
 	// store some vars for ease and speed
-	if(getGameTime() % 30 == 0)
-		print(this.getTextureName());
 		
 	CBlob@ blob = this.getBlob();
 	if(blob.get_bool("soulless"))
