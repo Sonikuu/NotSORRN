@@ -5,6 +5,7 @@
 #include "Hitters.as"
 #include "FxHookCommon.as"
 #include "Utilities"
+#include "CHealth.as"
 
 
 //--Abilities Start--//
@@ -304,11 +305,11 @@ class CConsume : CAbilityBase
                     addToMyChat("The fruit magicall heals your wounds");
                     held.server_Die();
                     stomachItems++;
-                    blob.server_Heal(99999999);
+                    server_Heal(blob, 99999999);
                 } else if (held !is null && held.hasTag("Eatable"))
                 {
 					f32 healAmmount = getHealAmmount(held);
-                    blob.server_Heal(healAmmount == 0 ? 1 : healAmmount);
+                    server_Heal(blob, healAmmount == 0 ? 1 : healAmmount);
 					//Hi, sonic speaking, im modifying your code :^)
 					if(held.exists("fxid"))
 						applyFx(blob, held.get_u32("fxduration"), held.get_u16("fxpower"), effectlist[held.get_u8("fxid")].getFxName());
@@ -770,7 +771,7 @@ class CGolemiteRepair : CAbilityBase
 		{
 			if(isServer())
 			{
-				blob.server_Heal(0.25);
+				server_Heal(blob, 0.25);
 
 				blob.add_s32("golemiteCount",-25);
 				blob.Sync("golemiteCount",true);

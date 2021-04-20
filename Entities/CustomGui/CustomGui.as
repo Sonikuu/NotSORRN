@@ -65,7 +65,7 @@ void onRender(CSprite@ this)
 
 
 	//health bar
-	f32 ph = blob.getHealth()/blob.getInitialHealth();
+	f32 ph = blob.getHealth()/getMaxHealth(blob);
 	Vec2f hpPos = startPos + Vec2f(0, (tallest > 0 ? tallest + 9 : 4) * scale);
 	GUI::DrawIcon("HealthBar.png", 1, Vec2f(16,64), hpPos,kagScale);
 
