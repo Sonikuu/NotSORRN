@@ -176,14 +176,6 @@ enum ESpells
 {
 	teleport = 0
 }
-
-/* spell template: target, allowed varience
-{
-	180, 25
-	45, 25
-}
-*/
-
 u32[][] spells = 
 {
 	{
