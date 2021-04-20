@@ -1,4 +1,5 @@
 
+#include "CHealth.as";
 
 void onRender(CSprite@ this)
 {
