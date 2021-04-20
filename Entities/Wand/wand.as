@@ -237,16 +237,16 @@ u32 closestValidAngle(f32 a)
 	return valid;
 }
 
-CBlob@ getHolder(CBlob@ this)
-{
-	return getBlobByNetworkID(this.get_u16("holder"));
-}
-
 u32 angleDistance(f32 a, f32 b)
 {
 	u32 c = a - b;
 	c = Maths::Abs(c);
 	return Maths::Min(360 - c, c);
+}
+
+CBlob@ getHolder(CBlob@ this)
+{
+	return getBlobByNetworkID(this.get_u16("holder"));
 }
 
 void onAttach(CBlob@ this, CBlob@ attached, AttachmentPoint @attachedPoint)
