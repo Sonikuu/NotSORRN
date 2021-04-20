@@ -198,8 +198,8 @@ class CSwordEquipment : CEquipmentCore
 		Vec2f pos = user.getPosition();
 		const bool myplayer = user.isMyPlayer();
 		CSprite@ sprite = user.getSprite();
-		keys usekey = attachedPoint == "FRONT_ARM" ? key_action1 :
-						attachedPoint == "BACK_ARM" ? key_action2 :
+		keys usekey = attachedPoint == 0 ? key_action1 :
+						attachedPoint == 1 ? key_action2 :
 						key_action1;
 		
 		bool actionkey = user.isKeyPressed(usekey);
@@ -231,7 +231,7 @@ class CSwordEquipment : CEquipmentCore
 			{
 				chargetime++;
 			}
-			if(usekey == key_action2)
+			/*if(usekey == key_action2)
 			{
 				if(user.isKeyJustPressed(key_action1))
 				{
@@ -250,7 +250,7 @@ class CSwordEquipment : CEquipmentCore
 					if(sprite !is null)
 						sprite.PlaySound("PopIn.ogg");
 				}
-			}
+			}*/
 		}
 		if((!jabonly && chargetime != 0 && user.isKeyJustReleased(usekey) && timetocharge != 0) || (jabonly && user.isKeyJustPressed(usekey)))
 		{
@@ -369,5 +369,12 @@ class CSwordEquipment : CEquipmentCore
 				getHUD().SetCursorFrame(frame);
 			}
 		}
+	}
+
+	bool canBeEquipped(int slot)
+	{
+		if(slot == 0 || slot == 1)//REMEMBER TO FIX FOR DUAL WIELDINGNNGNMG
+			return true;
+		return false;
 	}
 }

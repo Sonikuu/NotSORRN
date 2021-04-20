@@ -56,8 +56,8 @@ class CSprayerEquipment : CEquipmentCore
 		
 		if(user !is null)
 		{
-			bool actionkey = attachedPoint == "FRONT_ARM" ? user.isKeyPressed(key_action1) :
-							attachedPoint == "BACK_ARM" ? user.isKeyPressed(key_action2) :
+			bool actionkey = attachedPoint == 0 ? user.isKeyPressed(key_action1) :
+							attachedPoint == 1 ? user.isKeyPressed(key_action2) :
 							user.isKeyPressed(key_action1);
 
 			if(equipmentBlocked(user))//Override if menu open
@@ -114,8 +114,8 @@ class CSprayerEquipment : CEquipmentCore
 	
 	void onTick(CSprite@ sprite, CBlob@ user)
 	{
-		bool actionkey = attachedPoint == "FRONT_ARM" ? user.isKeyPressed(key_action1) :
-							attachedPoint == "BACK_ARM" ? user.isKeyPressed(key_action2) :
+		bool actionkey = attachedPoint == 0 ? user.isKeyPressed(key_action1) :
+							attachedPoint == 1 ? user.isKeyPressed(key_action2) :
 							user.isKeyPressed(key_action1);
 	
 	
@@ -209,9 +209,9 @@ class CSprayerEquipment : CEquipmentCore
 		}
 	}
 	
-	bool canBeEquipped(string slot)
+	bool canBeEquipped(int slot)
 	{
-		if(slot == "BACK_ARM" || slot == "FRONT_ARM")
+		if(slot == 0 || slot == 1)
 			return true;
 		return false;
 	}

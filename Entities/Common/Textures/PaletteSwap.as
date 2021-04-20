@@ -64,7 +64,7 @@ bool CreatePaletteSwappedTexture(ImageData@ input, string output_name, ImageData
 	//do the remap
 	edit.remap(in_colours, out_colours, 1, true, true);
 	
-	if(true)
+	if(false)
 	{
 		if (!Texture::exists("TestEqipOver"))
 			Texture::createFromFile("TestEqipOver", "EquipOverTest.png");

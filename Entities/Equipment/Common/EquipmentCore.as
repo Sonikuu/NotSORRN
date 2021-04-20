@@ -13,6 +13,10 @@
 //Because I stole this from the mech mod
 //Is it stealing if I also made the mech mod? :V
 
+//I'm back again in this file, 4/16/2021
+//Lets see when i'm back again
+//I really should go through and clean everything up
+
 namespace EquipmentBitStreams
 {
 	enum Types
@@ -71,11 +75,13 @@ shared interface IEquipment
 	float modifyHealth(CBlob@ blob, CBlob@ user, float health);
 
 	f32 onHit(CBlob@ blob, CBlob@ user, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitterBlob, u8 customData);
+
+	void setAttachPoint(int index);
 }
 
 shared class CEquipmentCore : IEquipment
 {
-	string attachedPoint;
+	int attachedPoint;
 	string shapeName;
 	float spritescale;
 	Vec2f spriteoffset;
@@ -107,6 +113,8 @@ shared class CEquipmentCore : IEquipment
 	float modifyHealth(CBlob@ blob, CBlob@ user, float health){return health;}
 
 	f32 onHit(CBlob@ blob, CBlob@ user, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitterBlob, u8 customData){return damage;}
+
+	void setAttachPoint(int index){attachedPoint = index;};
 }
 
 IEquipment@ getEquipment(CBlob@ this)

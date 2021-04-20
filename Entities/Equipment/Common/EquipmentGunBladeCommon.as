@@ -12,7 +12,7 @@ class CGunBladeEquipment : CSwordEquipment
 		super(damage, range, speed, knockback, jabonly, jabtime, slashtime, lungespeed);
 
 		@gun = @CGunEquipment(0.8, 40, 1, 1.5);
-		gun.attachedPoint = "BACK_ARM";
+		gun.attachedPoint = 1;
 		
 		gun.recoil = 30;
 		gun.movespeed = 0.8;
@@ -40,8 +40,8 @@ class CGunBladeEquipment : CSwordEquipment
 		Vec2f pos = user.getPosition();
 		const bool myplayer = user.isMyPlayer();
 		CSprite@ sprite = user.getSprite();
-		keys usekey = attachedPoint == "FRONT_ARM" ? key_action1 :
-						attachedPoint == "BACK_ARM" ? key_action2 :
+		keys usekey = attachedPoint == 0 ? key_action1 :
+						attachedPoint == 1 ? key_action2 :
 						key_action1;
 						
 		gun.onTick(blob, user);

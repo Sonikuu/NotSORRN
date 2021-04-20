@@ -99,9 +99,9 @@ class CTileSetterEquipment : CEquipmentCore
 	
 	bool canBeEquipped(CBlob@ blob, int slot)
 	{
-		//if(slot == EquipmentSlots::Secondary)
+		if(slot == 0)
 			return true;
-		//return false;
+		return false;
 	}
 	
 	string getDescription()
