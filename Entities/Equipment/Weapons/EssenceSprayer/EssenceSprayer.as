@@ -7,6 +7,7 @@ void onInit(CBlob@ this)
 	CSprayerEquipment part(5, 0.2, 60, 64);
 	
 	part.spriteoffset = Vec2f(0, 1.25);
+	part.twohand = true;
 	
 	CAlchemyTank@ tank = addTank(this, "Input", true, Vec2f(0, 0));
 	tank.maxelements = 100;

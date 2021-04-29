@@ -5,10 +5,22 @@
 void onInit(CBlob@ this)
 {	
 	//Setup tanks
-	CAlchemyTank@ tank = addTank(this, "Input", true, Vec2f(0, -9.5));
+	CAlchemyTank@ tank = addTank(this, "Input", true, Vec2f(0, -1.5));
 	tank.onlyele = 5;//5 Is ignis
 	tank.maxelements = 250;
 	this.set_u16("dumptotal", 0);
+	
+}
+
+void onInit(CSprite@ this)
+{
+	this.addSpriteLayer("lum","lum.png",64,64).setRenderStyle(RenderStyle::Style::light);
+	CSpriteLayer@ l = this.getSpriteLayer("lum");
+	//this.ScaleBy(Vec2f(1.0 / 256.0, 1.0 / 256.0));
+	l.ScaleBy(Vec2f(1.0 / 16.0, 1.0 / 16.0));
+	l.TranslateBy(Vec2f(0, -9.5));
+	l.SetColor(SColor(150, 255, 150, 20));
+	l.SetLighting(false);
 }
 
 void onTick(CBlob@ this)

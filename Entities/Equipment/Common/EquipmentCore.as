@@ -77,6 +77,8 @@ shared interface IEquipment
 	f32 onHit(CBlob@ blob, CBlob@ user, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitterBlob, u8 customData);
 
 	void setAttachPoint(int index);
+
+	bool isTwoHand();
 }
 
 shared class CEquipmentCore : IEquipment
@@ -86,12 +88,14 @@ shared class CEquipmentCore : IEquipment
 	float spritescale;
 	Vec2f spriteoffset;
 	string cmdstr;
+	bool twohand;
 	
 	CEquipmentCore()
 	{
 		spritescale = 1;
 		spriteoffset = Vec2f_zero;
 		cmdstr = "partcmd";
+		twohand = false;
 	} 
 	
 	void onRender(CBlob@ blob, CBlob@ user){}
@@ -114,7 +118,9 @@ shared class CEquipmentCore : IEquipment
 
 	f32 onHit(CBlob@ blob, CBlob@ user, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitterBlob, u8 customData){return damage;}
 
-	void setAttachPoint(int index){attachedPoint = index;};
+	void setAttachPoint(int index){attachedPoint = index;}
+	
+	bool isTwoHand(){return twohand;}
 }
 
 IEquipment@ getEquipment(CBlob@ this)

@@ -16,6 +16,7 @@ class CTileSetterEquipment : CEquipmentCore
 		
 		selected = 0;
 		menuopen = false;
+		twohand = true;
 	}
 	
 	void onRender(CBlob@ blob, CBlob@ user)

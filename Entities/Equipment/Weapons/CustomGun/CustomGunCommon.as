@@ -301,9 +301,11 @@ void buildGun(CBlob@ this)
 	CGunPart@ magpart = @(gunparts[4][magindex]);
 	
 	CGunEquipment@ gun = calculateGunStats(corepart, barrelpart, stockpart, grippart, magpart);
+	if(coreindex != 0)
+		gun.twohand = true;
 	
 	setEquipment(this, @gun);
-	
+
 	this.setInventoryName(getGunTitle(corepart, barrelpart, stockpart, grippart, magpart) + "\n" + getGunDescription(corepart, gun));
 
 	//part.spriteoffset = Vec2f(0, 1.25);

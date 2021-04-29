@@ -135,6 +135,7 @@ class CItemIO : INodeCore
 
 	void update(CBlob@ blob, int recursionsleft)
 	{
+		bool moving = false;
 		if(connection !is null)
 		{
 			CBlob@ toblob = getBlobByNetworkID(connectionid);
@@ -177,9 +178,13 @@ class CItemIO : INodeCore
 				{
 					if(blob.getInventory() !is null)
 					{
+						
 						CBlob@ item = getFirstPossibleItem(blob, toblob);
 						if(item !is null)
+						{
 							transfercooldown--;
+							moving = true;
+						}
 						
 						if(transfercooldown == 0)
 						{
@@ -194,6 +199,8 @@ class CItemIO : INodeCore
 				}
 			}
 		}
+		if(!moving)
+			transfercooldown = 60;
 		return;
 	}
 

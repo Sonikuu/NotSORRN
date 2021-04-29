@@ -29,6 +29,7 @@ void onInit(CBlob@ this)
 	if (this.hasTag("instant_grow") || this.hasTag(grown_tag))
 	{
 		GrowGrain(this);
+		this.set_u8(grown_amount, this.get_u8("growth max"));
 	}
 }
 

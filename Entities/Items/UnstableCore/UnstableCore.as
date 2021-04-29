@@ -43,7 +43,7 @@ f32 onHit(CBlob@ this, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitt
 {
 	if(customData != Hitters::explosion)
 	{
-		Explode(this, this.getPosition(), 24, 2.5, "Bomb.ogg", 16, 1.0, true, Hitters::explosion, true);
+		Explode(this, this.getPosition(), 24, 2.5, "Bomb.ogg", 24, 0.5, true, Hitters::explosion, true, false, true);
 		Random rand(this.getNetworkID() + this.getHealth());
 		this.setVelocity(Vec2f((rand.NextFloat() - 0.5) * (Maths::Abs(this.getOldVelocity().y) + 4) * 4, (rand.NextFloat() - 0.5) * 4) + Vec2f(0, (this.getOldVelocity().y + 4.0) * -1) * 1.5);
 	}

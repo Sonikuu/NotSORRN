@@ -48,7 +48,7 @@ void makeLargeExplosionParticle(Vec2f pos)
 	                 -0.1f, true);
 }
 
-void Explode(CBlob@ this, Vec2f pos, f32 radius, f32 damage, string custom_explosion_sound, f32 map_damage_radius, f32 map_damage_ratio, bool map_damage_raycast, u8 custom_hitter, bool should_teamkill, bool chancetiledam = false)
+void Explode(CBlob@ this, Vec2f pos, f32 radius, f32 damage, string custom_explosion_sound, f32 map_damage_radius, f32 map_damage_ratio, bool map_damage_raycast, u8 custom_hitter, bool should_teamkill, bool chancetiledam = false, bool hitdirt = false)
 {
 	CMap@ map = getMap();
 
@@ -135,12 +135,12 @@ void Explode(CBlob@ this, Vec2f pos, f32 radius, f32 damage, string custom_explo
 								Vec2f tpos = m_pos + offset;
 
 								TileType tile = map.getTile(tpos).type;
-								if (canExplosionDamage(map, tpos, tile) && (!chancetiledam || (XORRandom(100) / 100.0 <= map_damage_ratio)))
+								if (canExplosionDamage(map, tpos, tile, hitdirt) && (!chancetiledam || (XORRandom(100) / 100.0 <= map_damage_ratio)))
 								{
 									if (!map.isTileBedrock(tile))
 									{
 										if (dist >= rad_thresh ||
-										        !canExplosionDestroy(map, tpos, tile))
+										        (!canExplosionDestroy(map, tpos, tile) && !hitdirt))
 										{
 											map.server_DestroyTile(tpos, 1.0f, this);
 										}
@@ -432,7 +432,7 @@ void BombermanExplosion(CBlob@ this, f32 radius, f32 damage, f32 map_damage_radi
 
 }
 
-bool canExplosionDamage(CMap@ map, Vec2f tpos, TileType t)
+bool canExplosionDamage(CMap@ map, Vec2f tpos, TileType t, bool hitdirt = false)
 {
 	CBlob@ blob = map.getBlobAtPosition(tpos); // TODO: make platform get detected
 	bool hasValidFrontBlob = false;
@@ -443,7 +443,7 @@ bool canExplosionDamage(CMap@ map, Vec2f tpos, TileType t)
 		hasValidFrontBlob = (name == "wooden_door" || name == "stone_door" || name == "trap_block" || name == "wooden_platform");
 	}
 	return map.getSectorAtPosition(tpos, "no build") is null &&
-	       (t != CMap::tile_ground_d0 && t != CMap::tile_stone_d0) && //don't _destroy_ ground, hit until its almost dead tho
+	       ((t != CMap::tile_ground_d0 && t != CMap::tile_stone_d0) || hitdirt) && //don't _destroy_ ground, hit until its almost dead tho
 		   !(hasValidFrontBlob && isBackwall); // don't destroy backwall if there is a door or trap block
 }
 

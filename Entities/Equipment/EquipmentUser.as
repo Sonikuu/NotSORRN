@@ -37,7 +37,8 @@ void onInit(CBlob@ this)
 		this.set_u16(equipslots[i].name, 0xFFFF);
 	}
 	
-	AddIconToken("$equip_button$", "AbilityIcons.png", Vec2f(16, 16), 3);
+	AddIconToken("$hand_equip_button$", "AbilityIcons.png", Vec2f(16, 16), 0);
+	AddIconToken("$chest_equip_button$", "AbilityIcons.png", Vec2f(16, 16), 1);
 }
 
 void onRender(CSprite@ this)
@@ -152,6 +153,18 @@ void onDie(CBlob@ this)
 
 void equipBlob(CBlob@ this, CBlob@ blob, u8 slot)
 {
+	IEquipment@ equip = @getEquipment(blob);
+	if(equip !is null && slot == 1 && equip.isTwoHand())
+	{
+		slot = 0;
+		if(this.get_u16(equipslots[slot].name) != 0xFFFF)//Quick fix
+		{
+			CBlob@ tempblob = getBlobByNetworkID(this.get_u16(equipslots[slot].name));
+			if(tempblob !is null)
+				unequipBlob(this, tempblob, slot);
+		}
+	}
+
 	this.set_u16(equipslots[slot].name, blob.getNetworkID());
 	blob.set_u16("equipper", this.getNetworkID());
 	//blob.server_DetachAll();
@@ -163,9 +176,30 @@ void equipBlob(CBlob@ this, CBlob@ blob, u8 slot)
 	CShape@ shape = blob.getShape();
 	shape.SetStatic(true);
 	
-	IEquipment@ equip = @getEquipment(blob);
+	
 	if(equip !is null)
 	{
+		//Dual handed special cases
+		if(slot == 0 && equip.isTwoHand())
+		{
+			CBlob@ secondhand = null;
+			if(this.get_u16(equipslots[1].name) != 0xFFFF)
+				@secondhand = getBlobByNetworkID(this.get_u16(equipslots[1].name));
+			if(secondhand !is null)
+			{
+				unequipBlob(this, secondhand, 1);
+			}
+		}
+		else if(slot == 1)
+		{
+			CBlob@ firsthand = null;
+			if(this.get_u16(equipslots[0].name) != 0xFFFF)
+				@firsthand = getBlobByNetworkID(this.get_u16(equipslots[0].name));
+			if(firsthand !is null && getEquipment(firsthand) !is null && getEquipment(firsthand).isTwoHand())
+			{
+				unequipBlob(this, firsthand, 0);
+			}
+		}
 		equip.onEquip(blob, this);
 		equip.setAttachPoint(slot);
 	}
@@ -232,7 +266,7 @@ void onCreateInventoryMenu(CBlob@ this, CBlob@ forBlob, CGridMenu @gridmenu)
 			CBitStream params;
 			params.write_u8(0);
 			params.write_u16(this.getCarriedBlob() is null ? 0xFFFF : this.getCarriedBlob().getNetworkID());
-            CGridButton@ button = menu.AddButton("$equip_button$", "Equip Held item (Hand)", this.getCommandID("equipitem"), params);
+            CGridButton@ button = menu.AddButton("$hand_equip_button$", "Equip Held item (Hand)", this.getCommandID("equipitem"), params);
 
 			if(equip !is null)
 			{
@@ -244,7 +278,7 @@ void onCreateInventoryMenu(CBlob@ this, CBlob@ forBlob, CGridMenu @gridmenu)
 			CBitStream params;
 			params.write_u8(1);
 			params.write_u16(this.getCarriedBlob() is null ? 0xFFFF : this.getCarriedBlob().getNetworkID());
-            CGridButton@ button = menu.AddButton("$equip_button$", "Equip Held item (Hand)", this.getCommandID("equipitem"), params);
+            CGridButton@ button = menu.AddButton("$hand_equip_button$", "Equip Held item (Hand)", this.getCommandID("equipitem"), params);
 
 			if(equip !is null)
 			{
@@ -256,7 +290,7 @@ void onCreateInventoryMenu(CBlob@ this, CBlob@ forBlob, CGridMenu @gridmenu)
 			CBitStream params;
 			params.write_u8(2);
 			params.write_u16(this.getCarriedBlob() is null ? 0xFFFF : this.getCarriedBlob().getNetworkID());
-            CGridButton@ button = menu.AddButton("$equip_button$", "Equip Held item (Chest)", this.getCommandID("equipitem"), params);
+            CGridButton@ button = menu.AddButton("$chest_equip_button$", "Equip Held item (Chest)", this.getCommandID("equipitem"), params);
 
 			if(equip !is null)
 			{
