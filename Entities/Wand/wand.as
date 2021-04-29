@@ -89,12 +89,14 @@ void shape(CBlob@ this, CBlob@ holder)
 
 	u32[] angles;
 
+	f32 drainAmount = 0;
+	f32 powerLevel = getPowerLevel(this);
 	for(int i = 0; i < lines.size(); i+= 2)
 	{
 		angles.push_back(closestValidAngle((lines[i] - lines[i+1]).Angle()));
 	}
 
-	if(angles.size() == 2)
+	if(angles.size() == 2 && powerLevel >= 10)
 	{
 		f32 angleDist = angleDistance(angles[0], angles[1]);
 		if(angleDist > (135 - 30) && angleDist < (135 + 30))
@@ -102,19 +104,25 @@ void shape(CBlob@ this, CBlob@ holder)
 			Vec2f vec = Vec2f(8,0).RotateBy(angles[0]);
 			vec.x *= -1; //for some reason the x is reversed so fixing it here.
 			holder.setVelocity(vec);
+
+			drainAmount = 10;
 		}
 	}
-	else if(isSpell(angles,ESpells::teleport))
+	else if(isSpell(angles,ESpells::teleport) && powerLevel >= 50)
 	{
-		f32[] minmax = minimumMaximumVectorValues(lines);
+		f32[] minmax = getMinMaxVectorValues(lines);
 
 		Vec2f rand = Vec2f(XORRandom(minmax[2] - minmax[0]) + minmax[0],XORRandom(minmax[3] - minmax[1]) + minmax[1]);
 		holder.setPosition(getDriver().getWorldPosFromScreenPos(rand));
+
+		drainAmount = 50;
 	}
+
+	drainPower(this, drainAmount);
 
 }
 
-f32[] minimumMaximumVectorValues(Vec2f[] vecs)
+f32[] getMinMaxVectorValues(Vec2f[] vecs)
 {
 	f32 minX = 9999999999, minY = 9999999999, maxX = 0, maxY = 0;
 
@@ -172,6 +180,52 @@ bool isSpell(u32[] angles, int spellID)
 	return true;
 }
 
+f32 getPowerLevel(CBlob@ this)
+{
+	CInventory@ inv = getHolder(this).getInventory();
+	f32 powerlevel = 0;
+	for(u32 i = 0; i < inv.getItemsCount(); i++)
+	{
+		CBlob@ b = inv.getItem(i);
+		if(b.getName() == "powercrystal")
+		{
+			powerlevel += b.get_f32("powerlevel");
+		}
+	}
+
+	return powerlevel;
+}
+
+bool drainPower(CBlob@ this, f32 amount)
+{
+	CInventory@ inv = getHolder(this).getInventory();
+
+	for(u32 i = 0; i < inv.getItemsCount(); i++)
+	{
+		CBlob@ b = inv.getItem(i);
+
+		if(b.getName() == "powercrystal")
+		{
+			f32 power = b.get_f32("powerlevel");
+			if(amount > power                   )//spacing fixed thanks to numan spotting it for me
+			{
+				amount -= power;
+				b.set_f32("powerlevel", 0);
+				b.SendCommand(b.getCommandID("powerlevelchanged"));
+			}
+			else
+			{
+				power -= amount;
+				b.set_f32("powerlevel", power);
+				b.SendCommand(b.getCommandID("powerlevelchanged"));
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 enum ESpells
 {
 	teleport = 0
@@ -192,6 +246,13 @@ void onRender(CSprite@ this)
 	{
 		return;
 	}
+
+	//--GUI--a
+	f32 p;
+	p = getPowerLevel(b)/100.0f;
+	GUI::DrawIcon("PixelWhite.png", 0, Vec2f(1,1), Vec2f(190,9 + 37 * 2),20,-(37 * p), SColor(255,50,175,200));
+	GUI::DrawIcon("ManaMeter.png", 0, Vec2f(8,16),Vec2f(190,4),2.5);
+	//--GUI End--
 
 	Vec2f pos = b.getPosition();
 	Vec2f other = holder.getAimPos();

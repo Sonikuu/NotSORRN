@@ -9,6 +9,10 @@ void onInit(CBlob@ this)
 	this.SetLightColor(SColor(255, 50, 126, 252));
 	this.SetLightRadius(8.0f);
 	this.SetLight(true);
+
+	this.set_f32("powerlevel",100.0f);
+
+	this.addCommandID("powerlevelchanged");
 }
 
 bool doesCollideWithBlob(CBlob@ this, CBlob@ blob)
@@ -22,6 +26,8 @@ void onTick(CBlob@ this)
 {
 	if(this.hasTag("dying"))
 	{
+		this.set_f32("intensity",Maths::Min(this.get_f32("powerlevel")/100 * 60, this.get_f32("intensity")));
+
 		if(getGameTime() % 20 == 0)
 		{
 			this.add_u16("intensity", 2);//Intensity from 0 - 60, 60 should be pretty crazy
@@ -90,4 +96,20 @@ f32 onHit(CBlob@ this, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitt
 		this.setVelocity(this.getVelocity() + velocity);
 	}
 	return damage;
+}
+
+void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
+{
+	if(cmd == this.getCommandID("powerlevelchanged"))
+	{
+		if(this.get_f32("powerlevel") <= 0)
+		{
+			this.server_Die();
+		}
+	}
+}
+
+void onDie(CBlob@ this)
+{
+	this.getSprite().PlaySound("shatter.ogg");
 }
