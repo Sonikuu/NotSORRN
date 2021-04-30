@@ -8,6 +8,7 @@
 
 #include "PaletteSwap.as"
 #include "PixelOffsets.as"
+#include "Accolades.as"
 
 shared u32 FG_HEAD_COLOUR()
 {
@@ -103,16 +104,16 @@ shared class RunnerTextures
 	}
 };
 
-string getRunnerTeamTexture(RunnerTextures@ textures, int gender, int team_num, int skin_num)
+string getRunnerTeamTexture(RunnerTextures@ textures, int gender, int team_num, int skin_num, CBlob@ blob = null)
 {
 	if (textures is null) return "";
-	return ApplyTeamTexture(textures.texname(u8(gender)), team_num, skin_num);
+	return ApplyTeamTexture(textures.texname(u8(gender)), team_num, skin_num, blob);
 }
 
 string getRunnerTextureName(CSprite@ sprite)
 {
 	CBlob@ b = sprite.getBlob();
-	return getRunnerTeamTexture(getRunnerTextures(sprite), b.getSexNum(), b.getTeamNum(), 0);
+	return getRunnerTeamTexture(getRunnerTextures(sprite), b.getSexNum(), b.getTeamNum(), 0, b);
 }
 
 void setRunnerTexture(CSprite@ sprite)
@@ -176,16 +177,17 @@ RunnerTextures@ getRunnerTextures(CSprite@ sprite)
 void ensureCorrectRunnerTexture(CSprite@ sprite, string shortname, string texture_prefix)
 {
 	RunnerTextures@ tex = getRunnerTextures(sprite);
-	if (tex is null || tex.shortname != shortname)
+	//if (tex is null || tex.shortname != shortname)
 	{
 		//first time set up
 		addRunnerTextures(sprite, shortname, texture_prefix);
-		ensureCorrectRunnerTexture(sprite, shortname, texture_prefix);
-		return;
+		//ensureCorrectRunnerTexture(sprite, shortname, texture_prefix);
+		//return;
 	}
 	//just set the texture
 	CBlob@ b = sprite.getBlob();
-	b.set("head_offsets", tex.cached_offsets(sprite));
+	if(tex !is null)
+		b.set("head_offsets", tex.cached_offsets(sprite));
 	setRunnerTexture(sprite);
 }
 
@@ -231,4 +233,39 @@ Vec2f getHeadOffset(CBlob@ blob, int frame, int &out layer)
 	}
 	layer = 0;
 	return Vec2f(0,0);
+}
+
+//------------------------------I'm lazy so I'm copying this function to here to make stuff a little easier
+
+void LoadSpritesBuilder(CSprite@ this)
+{
+	int armour = PLAYER_ARMOUR_STANDARD;
+
+	CPlayer@ p = this.getBlob().getPlayer();
+	if (p !is null)
+	{
+		armour = p.getArmourSet();
+		if (armour == PLAYER_ARMOUR_STANDARD)
+		{
+			Accolades@ acc = getPlayerAccolades(p.getUsername());
+			if (acc.hasCape())
+			{
+				armour = PLAYER_ARMOUR_CAPE;
+			}
+		}
+	}
+
+	switch (armour)
+	{
+	case PLAYER_ARMOUR_STANDARD:
+		ensureCorrectRunnerTexture(this, "builder", "Builder");
+		break;
+	case PLAYER_ARMOUR_CAPE:
+		ensureCorrectRunnerTexture(this, "builder_cape", "BuilderCape");
+		break;
+	case PLAYER_ARMOUR_GOLD:
+		ensureCorrectRunnerTexture(this, "builder_gold", "BuilderGold");
+		break;
+	}
+
 }

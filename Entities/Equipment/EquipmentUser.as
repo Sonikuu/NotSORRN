@@ -4,24 +4,6 @@
 #include "Hitters.as";
 #include "CHealth.as";
 
-class CEquipmentSlot
-{
-	string name;
-	int type;
-	CEquipmentSlot(string name, int type)
-	{
-		this.name = name;
-		this.type = type;
-	}
-}
-
-array<CEquipmentSlot@> equipslots = 
-{
-	CEquipmentSlot("primaryequip", 0),
-	CEquipmentSlot("secondaryequip", 0),
-	CEquipmentSlot("torsoequip", 1)
-};
-
 void onInit(CBlob@ this)
 {
 	this.addCommandID("equipitem");
@@ -52,7 +34,7 @@ void onRender(CSprite@ this)
 			@equipped = getBlobByNetworkID(blob.get_u16(equipslots[i].name));
 		
 		if(equipped is null)
-			return;
+			continue;
 		
 		IEquipment@ equip = @getEquipment(equipped);
 		if(equip !is null)
@@ -72,7 +54,7 @@ void onTick(CBlob@ this)
 		
 		if(equipped is null)
 		{
-			return;
+			continue;
 		}
 		
 		IEquipment@ equip = @getEquipment(equipped);

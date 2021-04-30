@@ -26,7 +26,7 @@ void onTick(CBlob@ this)
 {
 	if(this.hasTag("dying"))
 	{
-		this.set_f32("intensity",Maths::Min(this.get_f32("powerlevel")/100 * 60, this.get_f32("intensity")));
+		this.set_u16("intensity", Maths::Min(this.get_f32("powerlevel") / 100 * 60, this.get_u16("intensity")));
 
 		if(getGameTime() % 20 == 0)
 		{
@@ -118,6 +118,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 	{
 		if(this.get_f32("powerlevel") <= 0)
 		{
+			CBlob@ inert = server_CreateBlob("inertcrystal", this.getTeamNum(), this.getPosition());
 			this.server_Die();
 		}
 	}

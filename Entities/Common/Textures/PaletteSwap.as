@@ -25,7 +25,9 @@
 //		note: this is the low-level texture creation function - see below for "easymode"
 //
 
-bool CreatePaletteSwappedTexture(ImageData@ input, string output_name, ImageData@ palette, int palette_index)
+#include "EquipmentCore.as";
+
+bool CreatePaletteSwappedTexture(ImageData@ input, string output_name, ImageData@ palette, int palette_index, CBlob@ blob)
 {
 	//not needed on server or something went wrong with getting imagedata
 	if (!getNet().isClient() || input is null || palette is null)
@@ -64,19 +66,20 @@ bool CreatePaletteSwappedTexture(ImageData@ input, string output_name, ImageData
 	//do the remap
 	edit.remap(in_colours, out_colours, 1, true, true);
 	
-	if(false)
+	if(blob !is null)
 	{
-		if (!Texture::exists("TestEqipOver"))
-			Texture::createFromFile("TestEqipOver", "EquipOverTest.png");
-		ImageData@ equip = Texture::data("TestEqipOver");
-		
-		for(int x = 0; x < edit.width(); x++)
+		for(int i = 0; i < equipslots.size(); i++)
 		{
-			for(int y = 0; y < edit.height(); y++)
+			CBlob@ equipped = null;
+			if(blob.get_u16(equipslots[i].name) != 0xFFFF)
+				@equipped = getBlobByNetworkID(blob.get_u16(equipslots[i].name));
+			
+			if(equipped is null)
+				continue;
+			IEquipment@ equip = @getEquipment(equipped);
+			if(equip !is null)
 			{
-				SColor c = equip.get(x, y);
-				if(c.getAlpha() == 255)
-					edit.put(x, y, c);
+				equip.modifyTexture(equipped, blob, output_name, edit);
 			}
 		}
 	}
@@ -103,7 +106,7 @@ bool CreatePaletteSwappedTexture(ImageData@ input, string output_name, ImageData
 //		for multiple remappings, but be aware that it's pretty expensive and try to do
 //		things ahead of time - cost scales with texture size.
 
-string PaletteSwapTexture(string in_tex, string palette_filename, int palette_index)
+string PaletteSwapTexture(string in_tex, string palette_filename, int palette_index, CBlob@ blob)
 {
 	//we make an extra copy - it's not great but these files are pretty small and widely reused
 	string pal_name = "palette_"+palette_filename;
@@ -128,10 +131,27 @@ string PaletteSwapTexture(string in_tex, string palette_filename, int palette_in
 
 	string output_name = in_tex + /*"_p" + filename_digest +*/ "_" + palette_index;
 
+	if(blob !is null)
+	{
+		for(int i = 0; i < equipslots.size(); i++)
+		{
+			CBlob@ equipped = null;
+			if(blob.get_u16(equipslots[i].name) != 0xFFFF)
+				@equipped = getBlobByNetworkID(blob.get_u16(equipslots[i].name));
+			
+			if(equipped is null)
+				continue;
+			IEquipment@ equip = @getEquipment(equipped);
+			if(equip !is null)
+			{
+				output_name = equip.appendTexName(output_name);
+			}
+		}
+	}
 	//use it if it exists
 	if (!Texture::exists(output_name))
 	{
-		if (!CreatePaletteSwappedTexture(Texture::data(in_tex), output_name, palette, palette_index))
+		if (!CreatePaletteSwappedTexture(Texture::data(in_tex), output_name, palette, palette_index, blob))
 		{
 			//failure - just use the in texture
 			return in_tex;
@@ -152,9 +172,9 @@ string PaletteSwapTexture(string in_tex, string palette_filename, int palette_in
 //		knows the base files for team colouring of each
 //
 
-string ApplyTeamTexture(string tex, int team, int skin)
+string ApplyTeamTexture(string tex, int team, int skin, CBlob@ blob = null)
 {
-	tex = PaletteSwapTexture(tex, "TeamPalette.png", team);
+	tex = PaletteSwapTexture(tex, "TeamPalette.png", team, blob);
 	//tex = PaletteSwapTexture(tex, "SkinTones.png", 4); //TODO; this needs intervention in-engine (it recolours to index 1)
 	return tex;
 }

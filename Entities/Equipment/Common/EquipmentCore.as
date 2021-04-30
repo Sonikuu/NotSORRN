@@ -49,6 +49,23 @@ namespace EquipmentBitStreams
 	}
 }
 
+class CEquipmentSlot
+{
+	string name;
+	int type;
+	CEquipmentSlot(string name, int type)
+	{
+		this.name = name;
+		this.type = type;
+	}
+}
+
+array<CEquipmentSlot@> equipslots = 
+{
+	CEquipmentSlot("primaryequip", 0),
+	CEquipmentSlot("secondaryequip", 0),
+	CEquipmentSlot("torsoequip", 1)
+};
 
 shared interface IEquipment
 {
@@ -79,6 +96,10 @@ shared interface IEquipment
 	void setAttachPoint(int index);
 
 	bool isTwoHand();
+
+	string modifyTexture(CBlob@ blob, CBlob@ user, string texname, ImageData@ image);
+
+	string appendTexName(string texname);
 }
 
 shared class CEquipmentCore : IEquipment
@@ -121,6 +142,10 @@ shared class CEquipmentCore : IEquipment
 	void setAttachPoint(int index){attachedPoint = index;}
 	
 	bool isTwoHand(){return twohand;}
+
+	string modifyTexture(CBlob@ blob, CBlob@ user, string texname, ImageData@ image){return texname;}
+
+	string appendTexName(string texname){return texname;}
 }
 
 IEquipment@ getEquipment(CBlob@ this)
