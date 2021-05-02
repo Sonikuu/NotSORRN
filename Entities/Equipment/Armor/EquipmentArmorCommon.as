@@ -9,9 +9,11 @@ class CEquipmentArmor : CEquipmentCore
 	string spritename;
 	string shrtname;
 	bool notexor;
+	int thisslot = 2;
+	//2 = chest, 3 = boots, 4 = helm
 
 	
-	CEquipmentArmor(int healthbonus, string spritename, string shrtname)
+	CEquipmentArmor(float healthbonus, string spritename, string shrtname)
 	{
 		super();
 		this.healthbonus = healthbonus;
@@ -50,9 +52,9 @@ class CEquipmentArmor : CEquipmentCore
 		LoadSpritesBuilder(user.getSprite());
 	}
 	
-	bool canBeEquipped(CBlob@ blob, int slot)
+	bool canBeEquipped(int slot)
 	{
-		if(slot == 2)
+		if(slot == thisslot)
 			return true;
 		return false;
 	}

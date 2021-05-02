@@ -64,7 +64,8 @@ array<CEquipmentSlot@> equipslots =
 {
 	CEquipmentSlot("primaryequip", 0),
 	CEquipmentSlot("secondaryequip", 0),
-	CEquipmentSlot("torsoequip", 1)
+	CEquipmentSlot("torsoequip", 1),
+	CEquipmentSlot("bootsequip", 2)
 };
 
 shared interface IEquipment

@@ -22,8 +22,39 @@ void InitWorkshop(CBlob@ this)
 	InitCosts(); //read from cfg
 
 	this.set_Vec2f("shop offset", Vec2f_zero);
-	this.set_Vec2f("shop menu size", Vec2f(6, 8));
+	this.set_Vec2f("shop menu size", Vec2f(7, 8));
 
+	//-----Temporarily readded because i dun wanna fix log crafting
+	{
+		ShopItem@ s = addShopItem(this, "Lantern", "$lantern$", "lantern", "An empty lantern to light the night", false);
+		AddRequirement(s.requirements, "blob", "log", "Log", 1);
+	}
+	{
+		ShopItem@ s = addShopItem(this, "Bucket", "$bucket$", "bucket", Descriptions::bucket, false);
+		AddRequirement(s.requirements, "blob", "log", "Log", 1);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Wooden Sword", "$woodsword$", "woodsword", "Basic Wooden Sword", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 40);
+		AddRequirement(s.requirements,"blob","log","Log",1);
+		
+		AddIconToken("$woodsword$", "WoodSword.png", Vec2f(24, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Dagger", "$dagger$", "dagger", "Dagger, for Stabbing", false);
+		AddRequirement(s.requirements, "blob", "log", "Log", 1);
+		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 40);
+		
+		AddIconToken("$dagger$", "Dagger.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Spear", "$spear$", "spear", "Poke people with murderous intent", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 40);
+		AddRequirement(s.requirements, "blob", "log", "Log", 1);
+		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 40);
+		
+		AddIconToken("$spear$", "PokingStick.png", Vec2f(32, 16), 0);
+	}
 
 	{
 		ShopItem@ s = addShopItem(this, "Sponge", "$sponge$", "sponge", Descriptions::sponge, false);
@@ -121,14 +152,14 @@ void InitWorkshop(CBlob@ this)
 	{
 		ShopItem@ s = addShopItem(this,  "Ammo Pack", "$ammopack$", "ammopack", "Basic ammo for basic guns", false);
 		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 25);
-		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 2);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 2);
 		
 		AddIconToken("$ammopack$", "AmmoPack.png", Vec2f(16, 16), 0);
 	}
 	{
 		ShopItem@ s = addShopItem(this,  "Piercing Ammo Pack", "$piercingammopack$", "piercingammopack", "Piercing ammo for piercing guns", false);
 		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 25);
-		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 2);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 2);
 		AddRequirement(s.requirements, "blob", "mat_glass", "Glass", 25);
 		
 		AddIconToken("$piercingammopack$", "PiercingAmmoPack.png", Vec2f(16, 16), 0);
@@ -137,7 +168,7 @@ void InitWorkshop(CBlob@ this)
 	{
 		ShopItem@ s = addShopItem(this,  "Explosive Ammo Pack", "$explosiveammopack$", "explosiveammopack", "Explosive ammo for explosive guns", false);
 		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 50);
-		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 2);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 2);
 		AddRequirement(s.requirements, "blob", "blazecore", "Blaze Core", 1);
 		
 		AddIconToken("$explosiveammopack$", "ExplosiveAmmoPack.png", Vec2f(16, 16), 0);
@@ -146,7 +177,7 @@ void InitWorkshop(CBlob@ this)
 	{
 		ShopItem@ s = addShopItem(this,  "Cleaver", "$cleaver$", "cleaver", "Heavy melee weapon, sacrifices speed for damage", false);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 50);
-		AddRequirement(s.requirements, "blob", "mat_metal", "Metal", 4);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 4);
 		
 		AddIconToken("$cleaver$", "Cleaver.png", Vec2f(32, 16), 0);
 	}
@@ -204,7 +235,7 @@ void InitWorkshop(CBlob@ this)
 		AddIconToken("$golemitedust$", "GolemiteDust.png", Vec2f(16, 16), 0);
 	}
 	{
-		ShopItem@ s = addShopItem(this,  "Mine", "$mine$", "mine", "A sensitive explosive", false);
+		ShopItem@ s = addShopItem(this,  "Mine", "$mine$", "mine", "Trap explosive", false);
 		AddRequirement(s.requirements, "blob", "mat_component", "Mechanical Components", 2);
 		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 100);
 		
@@ -228,6 +259,31 @@ void InitWorkshop(CBlob@ this)
 		AddRequirement(s.requirements, "blob", "mat_purifiedgold", "Purified Gold", 2);
 
 		AddIconToken("$golem$", "golem.png", Vec2f(16, 16), 0);
+	}
+	//ARMOR ---- MOVE TO DIFFERENT CRAFTING STATION MAYBE
+	{
+		ShopItem@ s = addShopItem(this,  "Metal Chestplate", "$metal_chestplate$", "metal_chestplate", "Metallic chest armor", false);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 8);
+
+		AddIconToken("$metal_chestplate$", "MetalChestplate.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Metal Boots", "$metal_boots$", "metal_boots", "Metallic foot armor", false);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 4);
+
+		AddIconToken("$metal_boots$", "MetalBoots.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Gold Chestplate", "$gold_chestplate$", "gold_chestplate", "Golden chest armor", false);
+		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 100);
+
+		AddIconToken("$gold_chestplate$", "GoldChestplate.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Gold Boots", "$gold_boots$", "gold_boots", "Golden foot armor", false);
+		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 50);
+
+		AddIconToken("$gold_boots$", "GoldBoots.png", Vec2f(16, 16), 0);
 	}
 }
 

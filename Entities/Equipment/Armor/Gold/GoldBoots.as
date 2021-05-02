@@ -6,7 +6,8 @@ void onInit(CBlob@ this)
 	this.addCommandID("partcmd");
 	this.set_bool("equipped", false);
 	
-	CEquipmentArmor part(1.5, "MetalChestplateSheet", "emc");
+	CEquipmentArmor part(0.4, "GoldBootsSheet", "_egb");
+	part.thisslot = 3;
 	setEquipment(this, @part);
 }
 
