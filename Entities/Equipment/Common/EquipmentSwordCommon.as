@@ -1,6 +1,7 @@
 #include "EquipmentCore.as";
 #include "CHitters.as";
 #include "DamageModCommon.as";
+#include "WorldRenderCommon.as";
 
 
 class CSwordEquipment : CEquipmentCore
@@ -115,11 +116,11 @@ class CSwordEquipment : CEquipmentCore
 			return;
 		if(chargetime < 0 && (lastjab ? chargetime < -(jabtime - 6) : chargetime < -(slashtime - 6)))
 		{
-			if(usersprite.getSpriteLayer("equipslashfx") is null)
+			if(usersprite.getSpriteLayer("equipslashfx" + attachedPoint) is null)
 			{
 				CSpriteLayer@ layer = lastjab ? 
-					usersprite.addSpriteLayer("equipslashfx", "SwordJabFx.png", 32, 32) :
-					usersprite.addSpriteLayer("equipslashfx", "KnightMale.png", 32, 32);
+					usersprite.addSpriteLayer("equipslashfx" + attachedPoint, "SwordJabFx.png", 32, 32) :
+					usersprite.addSpriteLayer("equipslashfx" + attachedPoint, "KnightMale.png", 32, 32);
 					
 				layer.SetFrame(lastjab ? 0 : 35);
 				layer.RotateBy(lastdir + (user.isFacingLeft() ? 180 : 0), Vec2f_zero);
@@ -127,14 +128,14 @@ class CSwordEquipment : CEquipmentCore
 				layer.SetIgnoreParentFacing(true);//Wish I knew this was a thing earlier, oh well
 				layer.SetFacingLeft(user.isFacingLeft());
 				
-				if(usersprite.getSpriteLayer("equipswordfx") is null)
+				if(usersprite.getSpriteLayer("equipswordfx" + attachedPoint) is null)
 				{
-					CSpriteLayer@ bladelayer = usersprite.addSpriteLayer("equipswordfx", sprite.getFilename(), sprite.getFrameWidth(), sprite.getFrameHeight());
+					CSpriteLayer@ bladelayer = usersprite.addSpriteLayer("equipswordfx" + attachedPoint, sprite.getFilename(), sprite.getFrameWidth(), sprite.getFrameHeight());
 					
 					
 					bladelayer.SetIgnoreParentFacing(true);
 					bladelayer.SetFacingLeft(user.isFacingLeft());
-					Vec2f tempoffset = spriteoffset;
+					Vec2f tempoffset = spriteoffset + (attachedPoint != 0 ? Vec2f(-3, 0) : Vec2f_zero);
 					if(user.isFacingLeft())
 						tempoffset.x *= -1;
 					bladelayer.TranslateBy(tempoffset);
@@ -145,8 +146,8 @@ class CSwordEquipment : CEquipmentCore
 			}
 			else 
 			{
-				CSpriteLayer@ layer = usersprite.getSpriteLayer("equipslashfx");
-				CSpriteLayer@ bladelayer = usersprite.getSpriteLayer("equipswordfx");
+				CSpriteLayer@ layer = usersprite.getSpriteLayer("equipslashfx" + attachedPoint);
+				CSpriteLayer@ bladelayer = usersprite.getSpriteLayer("equipswordfx" + attachedPoint);
 				if(!lastjab)
 				{
 					//Best not to ask whats going on here
@@ -158,7 +159,7 @@ class CSwordEquipment : CEquipmentCore
 					if(bladelayer !is null)
 					{
 						bladelayer.ResetTransform();
-						Vec2f tempoffset = spriteoffset;
+						Vec2f tempoffset = spriteoffset + (attachedPoint != 0 ? Vec2f(-3, 0) : Vec2f_zero);
 						if(bladelayer.isFacingLeft())
 							tempoffset.x *= -1;
 						bladelayer.TranslateBy(tempoffset);
@@ -183,13 +184,13 @@ class CSwordEquipment : CEquipmentCore
 		}
 		else
 		{
-			if(usersprite.getSpriteLayer("equipslashfx") !is null)
+			if(usersprite.getSpriteLayer("equipslashfx" + attachedPoint) !is null)
 			{
-				usersprite.RemoveSpriteLayer("equipslashfx");
+				usersprite.RemoveSpriteLayer("equipslashfx" + attachedPoint);
 			}
-			if(usersprite.getSpriteLayer("equipswordfx") !is null)
+			if(usersprite.getSpriteLayer("equipswordfx" + attachedPoint) !is null)
 			{
-				usersprite.RemoveSpriteLayer("equipswordfx");
+				usersprite.RemoveSpriteLayer("equipswordfx" + attachedPoint);
 			}
 		}
 	}
@@ -293,9 +294,9 @@ class CSwordEquipment : CEquipmentCore
 			getHUD().SetDefaultCursor();
 		}
 		CSprite@ usersprite = user.getSprite();
-		if(usersprite !is null && usersprite.getSpriteLayer("equipslashfx") !is null)
+		if(usersprite !is null && usersprite.getSpriteLayer("equipslashfx" + attachedPoint) !is null)
 		{
-			usersprite.RemoveSpriteLayer("equipslashfx");
+			usersprite.RemoveSpriteLayer("equipslashfx" + attachedPoint);
 		}
 		chargetime = 0;
 	}
@@ -337,36 +338,75 @@ class CSwordEquipment : CEquipmentCore
 	{
 		if(user.isMyPlayer())
 		{
-			if (getHUD().hasButtons())
+			if(attachedPoint == 0)
 			{
-				getHUD().SetDefaultCursor();
-			}
-			else
-			{
-				getHUD().SetCursorImage("Entities/Characters/Archer/ArcherCursor.png", Vec2f(32, 32));
-				getHUD().SetCursorOffset(Vec2f(-32, -32));
-				
-				int frame = 0;
-				if(jabonly)
+				if (getHUD().hasButtons())
 				{
-					float currcoolratio = float(Maths::Abs(chargetime)) / float(jabtime);
-					if(chargetime < jabtime)
-						frame = 2 + int(currcoolratio * 8) * 2;
-					if(chargetime == jabtime)
-						frame = 1;
-					if(chargetime == 0)
-						frame = 0;
+					getHUD().SetDefaultCursor();
 				}
 				else
 				{
-					if(chargetime > 0 && timetocharge != 0)
-						frame = 2 + int(float(chargetime) / float(timetocharge) * 8) * 2;
-					if(chargetime >= timetocharge)
-						frame = 1;
-					if(chargetime == 0)
-						frame = 0;
+					getHUD().SetCursorImage("Entities/Characters/Archer/ArcherCursor.png", Vec2f(32, 32));
+					getHUD().SetCursorOffset(Vec2f(-32, -32));
+					
+					int frame = 0;
+					if(jabonly)
+					{
+						float currcoolratio = float(Maths::Abs(chargetime)) / float(jabtime);
+						if(chargetime < jabtime)
+							frame = 2 + int(currcoolratio * 8) * 2;
+						if(chargetime == jabtime)
+							frame = 1;
+						if(chargetime == 0)
+							frame = 0;
+					}
+					else
+					{
+						if(chargetime > 0 && timetocharge != 0)
+							frame = 2 + int(float(chargetime) / float(timetocharge) * 8) * 2;
+						if(chargetime >= timetocharge)
+							frame = 1;
+						if(chargetime == 0)
+							frame = 0;
+					}
+					getHUD().SetCursorFrame(frame);
 				}
-				getHUD().SetCursorFrame(frame);
+			}
+			else
+			{
+				CControls@ con = getControls();
+				if(con !is null)
+				{
+					int frame = 0;
+					float currcoolratio = 0;
+					if(jabonly)
+					{
+						currcoolratio = float(Maths::Abs(chargetime)) / float(jabtime);
+					}
+					else
+					{
+						currcoolratio = (timetocharge != 0 && chargetime <= timetocharge) ? (float(chargetime) / float(timetocharge)) :
+						chargetime == 0 ? 0 :
+						chargetime > timetocharge ? 1 : 0.0;
+					}
+
+					Vec2f startpos = con.getInterpMouseScreenPos() + Vec2f(32, -20);
+
+					SColor barcol = SColor(255, 0, 255, 0);
+
+					array<Vertex> verts;
+					verts.push_back(Vertex(startpos, 0, Vec2f_zero, color_black));
+					verts.push_back(Vertex(startpos + Vec2f(2, 0), 0, Vec2f(1, 0), color_black));
+					verts.push_back(Vertex(startpos + Vec2f(2, 40), 0, Vec2f(1, 1), color_black));
+					verts.push_back(Vertex(startpos + Vec2f(0, 40), 0, Vec2f(0, 1), color_black));
+
+					verts.push_back(Vertex(startpos, 0, Vec2f_zero, barcol));
+					verts.push_back(Vertex(startpos + Vec2f(2, 0), 0, Vec2f(1, 0), barcol));
+					verts.push_back(Vertex(startpos + Vec2f(2, 40 * currcoolratio), 0, Vec2f(1, 1), barcol));
+					verts.push_back(Vertex(startpos + Vec2f(0, 40 * currcoolratio), 0, Vec2f(0, 1), barcol));
+					
+					addVertsToExistingRender(@verts, "Rules/Render/PixelWhite.png", "RLgui");
+				}
 			}
 		}
 	}

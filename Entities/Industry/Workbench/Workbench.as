@@ -34,28 +34,28 @@ void InitWorkshop(CBlob@ this)
 		AddRequirement(s.requirements, "blob", "log", "Log", 1);
 	}
 	{
-		ShopItem@ s = addShopItem(this,  "Wooden Sword", "$woodsword$", "woodsword", "Basic Wooden Sword", false);
+		ShopItem@ s = addShopItem(this,  "Wooden Sword", "$woodsword$", "woodsword", "Basic Wooden Sword\nMust be equipped", false);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 40);
 		AddRequirement(s.requirements,"blob","log","Log",1);
 		
 		AddIconToken("$woodsword$", "WoodSword.png", Vec2f(24, 16), 0);
 	}
 	{
-		ShopItem@ s = addShopItem(this,  "Dagger", "$dagger$", "dagger", "Dagger, for Stabbing", false);
+		ShopItem@ s = addShopItem(this,  "Dagger", "$dagger$", "dagger", "Dagger, for stabbing\nCan be dual-wielded\nMust be equipped", false);
 		AddRequirement(s.requirements, "blob", "log", "Log", 1);
 		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 40);
 		
 		AddIconToken("$dagger$", "Dagger.png", Vec2f(16, 16), 0);
 	}
 	{
-		ShopItem@ s = addShopItem(this,  "Spear", "$spear$", "spear", "Poke people with murderous intent", false);
+		ShopItem@ s = addShopItem(this,  "Spear", "$spear$", "spear", "Poke people with murderous intent\nMust be equipped", false);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 40);
 		AddRequirement(s.requirements, "blob", "log", "Log", 1);
 		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 40);
 		
 		AddIconToken("$spear$", "PokingStick.png", Vec2f(32, 16), 0);
 	}
-
+	//---------------Log crafting end--------------
 	{
 		ShopItem@ s = addShopItem(this, "Sponge", "$sponge$", "sponge", Descriptions::sponge, false);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", WARCosts::sponge_wood);
@@ -97,7 +97,7 @@ void InitWorkshop(CBlob@ this)
 		AddIconToken("$mat_charcoal$", "MaterialCharcoal.png", Vec2f(16, 16), 3);
 	}
 	{
-		ShopItem@ s = addShopItem(this,  "Alchemical Drill", "$alchemydrill$", "alchemydrill", "Can be fed essence to improve some aspects\nAqua increases cooling speed\nTerra allows the drill to get all materials from a tile\nForce increases drill speed", false);
+		ShopItem@ s = addShopItem(this,  "Alchemical Drill", "$alchemydrill$", "alchemydrill", "Can be fed essence to improve some aspects\nAqua increases cooling speed\nTerra allows the drill to get additional materials from a tile\nForce increases drill speed", false);
 		AddRequirement(s.requirements, "blob", "drill", "Drill", 1);
 		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 8);
 		
@@ -175,11 +175,18 @@ void InitWorkshop(CBlob@ this)
 		AddIconToken("$blazecore$", "BlazeCore.png", Vec2f(8, 8), 0);
 	}
 	{
-		ShopItem@ s = addShopItem(this,  "Cleaver", "$cleaver$", "cleaver", "Heavy melee weapon, sacrifices speed for damage", false);
+		ShopItem@ s = addShopItem(this,  "Cleaver", "$cleaver$", "cleaver", "Heavy melee weapon, sacrifices speed for damage\nMust be equipped", false);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 50);
 		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 4);
 		
 		AddIconToken("$cleaver$", "Cleaver.png", Vec2f(32, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Metal Sword", "$metalsword$", "metalsword", "Lighter metallic sword, balanced speed and damage\nMust be equipped", false);
+		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 25);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 3);
+		
+		AddIconToken("$metalsword$", "MetalSword.png", Vec2f(24, 16), 0);
 	}
 	/*{
 		ShopItem@ s = addShopItem(this, "Soul Dust", "$souldust$", "souldust-3", "Smash a soul shard into dust", false);
