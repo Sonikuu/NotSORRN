@@ -31,139 +31,228 @@ bool onMapTileCollapse(CMap@ map, u32 offset)
 	return true;
 }
 
+CParticle@ makeTileParticles(string pname, Vec2f pos)
+{
+	CParticle@ p = makeGibParticle(pname, pos, Vec2f(0.5f * (-10.0 / 2.0 + XORRandom(10)), 0.60f * (-10.0 / 2.0 + XORRandom(10))), 0, XORRandom(7), Vec2f(1, 1), 0.45, 255, "");
+	if(p !is null)
+	{
+		p.bounce = 0.52;
+		p.damping = 0.994;
+		p.waterdamping = 0.9;
+		p.mass = 4.5;
+		p.deadeffect = 255;
+		p.width = 1;
+		p.height = 1;
+		p.rotates = false;
+		p.Z = XORRandom(50);
+	}
+	return p;
+}
+
 TileType server_onTileHit(CMap@ this, f32 damage, u32 index, TileType oldTileType)
 {
 	string hitsfx = "dig_stone" + (XORRandom(3) + 1);
 	TileType output = oldTileType;
+	int particlec = 0;
+	string particlename = "";
 	//CORRUPT HANDLER
-	if(oldTileType >= CCTiles::tile_cor1 && oldTileType < CCTiles::tile_cor1 + cor_variation)
+	while(damage > 0)
 	{
-		output = CCTiles::tile_cord1;//FIRST HIT ON A TILE
-		hitsfx = "dig_dirt" + (XORRandom(3) + 1);
-	}
-	else if(oldTileType >= CCTiles::tile_cord1 && oldTileType < CCTiles::tile_cord1 + cor_damaged)
-	{
-		if(oldTileType == CCTiles::tile_cord3)//WHEN TILE FINALLY BREAKS
+		int damnum = 255 * damage + 1;
+		bool partial = damage < 1.0;
+		if(partial)
+		{
+			if(this.getTile(index).damage + damnum <= 255)
+			{
+				Tile t = this.getTile(index);
+				t.damage += damnum;
+				break;
+			}
+		}
+
+		if(output >= CCTiles::tile_cor1 && output < CCTiles::tile_cor1 + cor_variation)
+		{
+			output = CCTiles::tile_cord1;//FIRST HIT ON A TILE
+			hitsfx = "dig_dirt" + (XORRandom(3) + 1);
+			particlec += 3;
+			particlename = "Corrupthit.png";
+		}
+		else if(output >= CCTiles::tile_cord1 && output < CCTiles::tile_cord1 + cor_damaged)
+		{
+			if(output == CCTiles::tile_cord3)//WHEN TILE FINALLY BREAKS
+			{
+				output = 0;
+				hitsfx = "destroy_dirt";
+				damage = 0;
+				particlec += 16;
+				particlename = "Corrupthit.png";
+				
+			}
+			else//DAMAGING TILE
+			{
+				output += 1;
+				hitsfx = "dig_dirt" + (XORRandom(3) + 1);
+				particlec += 3;
+				particlename = "Corrupthit.png";
+			}
+		}
+		//PURE
+		else if(output >= CCTiles::tile_pur1 && output < CCTiles::tile_pur1 + pur_variation)
 		{
 			output = 0;
 			hitsfx = "destroy_dirt";
+			damage = 0;
+			particlec += 16;
+			particlename = "Purehit.png";
 		}
-		else//DAMAGING TILE
+		//MARBLE
+		else if(output >= CCTiles::tile_mar && output < CCTiles::tile_mard1)
 		{
-			output += 1;
-			hitsfx = "dig_dirt" + (XORRandom(3) + 1);
-		}
-	}
-	//PURE
-	else if(oldTileType >= CCTiles::tile_pur1 && oldTileType < CCTiles::tile_pur1 + pur_variation)
-	{
-		output = 0;
-		hitsfx = "destroy_dirt";
-	}
-	//MARBLE
-	else if(oldTileType >= CCTiles::tile_mar && oldTileType < CCTiles::tile_mard1)
-	{
-		output = CCTiles::tile_mard1;
-		hitsfx = "PickStone" + (XORRandom(3) + 1);
-	}
-	else if(oldTileType >= CCTiles::tile_mard1 && oldTileType < CCTiles::tile_mard1 + mar_damaged)
-	{
-		if(oldTileType == CCTiles::tile_mard7)//WHEN TILE FINALLY BREAKS
-		{
-			output = 0;
-			hitsfx = "destroy_wall";
-		}
-		else//DAMAGING TILE
-		{
-			output += 1;
+			output = CCTiles::tile_mard1;
 			hitsfx = "PickStone" + (XORRandom(3) + 1);
+			particlec += 3;
+			particlename = "Marblehit.png";
 		}
-	}
-	//MARBLE BACK
-	else if(oldTileType >= CCTiles::tile_mar_back && oldTileType < CCTiles::tile_mar_backd1)
-	{
-		output = CCTiles::tile_mar_backd1;
-		hitsfx = "PickStone" + (XORRandom(3) + 1);
-	}
-	else if(oldTileType >= CCTiles::tile_mar_backd1 && oldTileType <= CCTiles::tile_mar_backd5)
-	{
-		if(oldTileType == CCTiles::tile_mar_backd5)//WHEN TILE FINALLY BREAKS
+		else if(output >= CCTiles::tile_mard1 && output < CCTiles::tile_mard1 + mar_damaged)
 		{
-			output = 0;
-			hitsfx = "destroy_wall";
+			if(output == CCTiles::tile_mard7)//WHEN TILE FINALLY BREAKS
+			{
+				output = 0;
+				hitsfx = "destroy_wall";
+				damage = 0;
+				particlec += 16;
+				particlename = "Marblehit.png";
+			}
+			else//DAMAGING TILE
+			{
+				output += 1;
+				hitsfx = "PickStone" + (XORRandom(3) + 1);
+				particlec += 3;
+				particlename = "Marblehit.png";
+			}
 		}
-		else//DAMAGING TILE
+		//MARBLE BACK
+		else if(output >= CCTiles::tile_mar_back && output < CCTiles::tile_mar_backd1)
 		{
-			output += 1;
+			output = CCTiles::tile_mar_backd1;
 			hitsfx = "PickStone" + (XORRandom(3) + 1);
+			particlec += 3;
+			particlename = "Marblehit.png";
 		}
-	}
-	//BASALT
-	else if(oldTileType >= CCTiles::tile_bas && oldTileType < CCTiles::tile_basd1)
-	{
-		output = CCTiles::tile_basd1;
-		hitsfx = "PickStone" + (XORRandom(3) + 1);
-	}
-	else if(oldTileType >= CCTiles::tile_basd1 && oldTileType < CCTiles::tile_basd1 + bas_damaged)
-	{
-		if(oldTileType == CCTiles::tile_basd7)//WHEN TILE FINALLY BREAKS
+		else if(output >= CCTiles::tile_mar_backd1 && output <= CCTiles::tile_mar_backd5)
 		{
-			output = 0;
-			hitsfx = "destroy_wall";
+			if(output == CCTiles::tile_mar_backd5)//WHEN TILE FINALLY BREAKS
+			{
+				output = 0;
+				hitsfx = "destroy_wall";
+				damage = 0;
+				particlec += 16;
+				particlename = "Marblehit.png";
+			}
+			else//DAMAGING TILE
+			{
+				output += 1;
+				hitsfx = "PickStone" + (XORRandom(3) + 1);
+				particlec += 3;
+				particlename = "Marblehit.png";
+			}
 		}
-		else//DAMAGING TILE
+		//BASALT
+		else if(output >= CCTiles::tile_bas && output < CCTiles::tile_basd1)
 		{
-			output += 1;
+			output = CCTiles::tile_basd1;
 			hitsfx = "PickStone" + (XORRandom(3) + 1);
+			particlec += 3;
+			particlename = "Basalthit.png";
 		}
-	}
-	//BASALT BACKGROUND
-	else if(oldTileType >= CCTiles::tile_bas_back && oldTileType < CCTiles::tile_bas_backd1)
-	{
-		output = CCTiles::tile_bas_backd1;
-		hitsfx = "PickStone" + (XORRandom(3) + 1);
-	}
-	else if(oldTileType >= CCTiles::tile_bas_backd1 && oldTileType < CCTiles::tile_bas_backd1 + bas_back_damaged)
-	{
-		if(oldTileType == CCTiles::tile_bas_backd5)//WHEN TILE FINALLY BREAKS
+		else if(output >= CCTiles::tile_basd1 && output < CCTiles::tile_basd1 + bas_damaged)
 		{
-			output = 0;
-			hitsfx = "destroy_wall";
+			if(output == CCTiles::tile_basd7)//WHEN TILE FINALLY BREAKS
+			{
+				output = 0;
+				hitsfx = "destroy_wall";
+				damage = 0;
+				particlec += 16;
+				particlename = "Basalthit.png";
+			}
+			else//DAMAGING TILE
+			{
+				output += 1;
+				hitsfx = "PickStone" + (XORRandom(3) + 1);
+				particlec += 3;
+				particlename = "Basalthit.png";
+			}
 		}
-		else//DAMAGING TILE
+		//BASALT BACKGROUND
+		else if(output >= CCTiles::tile_bas_back && output < CCTiles::tile_bas_backd1)
 		{
-			output += 1;
+			output = CCTiles::tile_bas_backd1;
 			hitsfx = "PickStone" + (XORRandom(3) + 1);
+			particlec += 3;
+			particlename = "Basalthit.png";
 		}
-	}
-	//TRACK
-	else if(oldTileType >= CCTiles::tile_track && oldTileType < CCTiles::tile_track + track_variation)
-	{
-		output = 0;
-		hitsfx = "metal_stone";
-	}
-	//GOLD
-	else if(oldTileType >= CCTiles::tile_gold && oldTileType < CCTiles::tile_goldd1)
-	{
-		output = CCTiles::tile_goldd1;
-		hitsfx = "dig_stone" + (XORRandom(3) + 1);
-	}
-	else if(oldTileType >= CCTiles::tile_goldd1 && oldTileType < CCTiles::tile_goldd1 + gold_damaged)
-	{
-		if(oldTileType == CCTiles::tile_goldd7)//WHEN TILE FINALLY BREAKS
+		else if(output >= CCTiles::tile_bas_backd1 && output < CCTiles::tile_bas_backd1 + bas_back_damaged)
+		{
+			if(output == CCTiles::tile_bas_backd5)//WHEN TILE FINALLY BREAKS
+			{
+				output = 0;
+				hitsfx = "destroy_wall";
+				damage = 0;
+				particlec += 16;
+				particlename = "Basalthit.png";
+			}
+			else//DAMAGING TILE
+			{
+				output += 1;
+				hitsfx = "PickStone" + (XORRandom(3) + 1);
+				particlec += 3;
+				particlename = "Basalthit.png";
+			}
+		}
+		//TRACK
+		else if(output >= CCTiles::tile_track && output < CCTiles::tile_track + track_variation)
 		{
 			output = 0;
-			 hitsfx = "destroy_gold";
+			hitsfx = "metal_stone";
+			damage = 0;
+			particlec += 16;
+			particlename = "Metalhit.png";
 		}
-		else//DAMAGING TILE
+		//GOLD
+		else if(output >= CCTiles::tile_gold && output < CCTiles::tile_goldd1)
 		{
-			output += 1;
-			 hitsfx = "dig_stone" + (XORRandom(3) + 1);
+			output = CCTiles::tile_goldd1;
+			hitsfx = "dig_stone" + (XORRandom(3) + 1);
+			particlec += 3;
+			particlename = "Goldhit.png";
 		}
+		else if(output >= CCTiles::tile_goldd1 && output < CCTiles::tile_goldd1 + gold_damaged)
+		{
+			if(output == CCTiles::tile_goldd7)//WHEN TILE FINALLY BREAKS
+			{
+				output = 0;
+				hitsfx = "destroy_gold";
+				damage = 0;
+				particlec += 16;
+				particlename = "Goldhit.png";
+			}
+			else//DAMAGING TILE
+			{
+				output += 1;
+				hitsfx = "dig_stone" + (XORRandom(3) + 1);
+				particlec += 3;
+				particlename = "Goldhit.png";
+			}
+		}
+		damage -= 1;
 	}
 	hitsfx += ".ogg";
 	if(oldTileType > 256)
 		Sound::Play(hitsfx, Vec2f(index % this.tilemapwidth, index / this.tilemapwidth) * 8, 1.0);
+	for(int i = 0; i < particlec; i++)
+	{
+		makeTileParticles("Sprites/Tilehits/" + particlename, Vec2f(index % this.tilemapwidth, index / this.tilemapwidth) * 8);
+	}
 	return output;
 }
 
