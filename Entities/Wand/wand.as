@@ -120,6 +120,36 @@ void shape(CBlob@ this, CBlob@ holder)
 
 	drainPower(this, drainAmount);
 
+	if(drainAmount > 0)
+	{
+		//--Particles--
+	for(int i = 0; i < lines.size(); i+=2)
+	{
+		Vec2f start = lines[i];
+		Vec2f end = lines[i + 1];
+
+		Driver@ d = getDriver();
+		Vec2f worldStart = d.getWorldPosFromScreenPos(start);
+		Vec2f worldEnd = d.getWorldPosFromScreenPos(end);
+
+		for(uint j = 0; j <= 10; j+= XORRandom(3))
+		{
+			Vec2f pos = Vec2f_lerp(worldStart, worldEnd, j/10.0f); 
+			CParticle@ p = ParticlePixelUnlimited(
+			pos,
+			getRandomVelocity(0,3,360) * ((XORRandom(2) == 1) ? 0 : 1),
+			SColor(255,50,175,200),
+			true);
+			if(p !is null)
+			{
+				p.collides = false;
+				p.gravity = Vec2f(0,0.1);
+			}
+		}
+	}
+	//--Particles End--
+	}
+
 }
 
 f32[] getMinMaxVectorValues(Vec2f[] vecs)
@@ -247,7 +277,7 @@ void onRender(CSprite@ this)
 		return;
 	}
 
-	//--GUI--a
+	//--GUI Start--
 	f32 p;
 	p = getPowerLevel(b)/100.0f;
 	GUI::DrawIcon("PixelWhite.png", 0, Vec2f(1,1), Vec2f(190,9 + 37 * 2),20,-(37 * p), SColor(255,50,175,200));
@@ -265,16 +295,19 @@ void onRender(CSprite@ this)
 
 	Vec2f[]@ lines;
 	b.get("lines",@lines);
+	
 
 	for(int i = 0; i < lines.size(); i+= 2)
 	{
-		GUI::DrawLine2D(lines[i],lines[i+1], SColor(255,255,0,0));
-
 		f32 angle = (lines[i] - lines[i+1]).Angle();
 		f32 valid = closestValidAngle(angle);
 
-		GUI::DrawTextCentered(angle + "\n\n" + valid, (lines[i] + lines[i+1])/2, SColor(255,255,255,255));
 
+		Vec2f start = lines[i];
+		Vec2f end = lines[i + 1];
+		//Uncomment this to see values when making new spells
+		// GUI::DrawLine2D(lines[i],lines[i+1], SColor(255,255,0,0));
+		// GUI::DrawTextCentered(angle + "\n\n" + valid, (lines[i] + lines[i+1])/2, SColor(255,255,255,255));
 	}
 }
 
