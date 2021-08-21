@@ -556,6 +556,24 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			blocks[2].push_back(b);
 			AddIconToken("$itemunloader$", "ItemUnloader.png", Vec2f(16, 16), 0);
 		}
+		{
+			BuildBlock b(0, "itemfilter", "$itemfilter$", "Item Filter\nFilters off one item from the rest");
+			AddRequirement(b.reqs, "blob", "mat_component", "Components", 4);
+			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 50);
+			b.buildOnGround = false;
+			b.size.Set(16, 8);
+			blocks[2].push_back(b);
+			AddIconToken("$itemfilter$", "ItemFilter.png", Vec2f(16, 8), 0);
+		}
+		{
+			BuildBlock b(0, "itemswitch", "$itemswitch$", "Item Switcher\nSwitches between outputs whenever an item goes through it\nCan be used for an overflow");
+			AddRequirement(b.reqs, "blob", "mat_component", "Components", 4);
+			AddRequirement(b.reqs, "blob", "mat_wood", "Stone", 75);
+			b.buildOnGround = false;
+			b.size.Set(24, 8);
+			blocks[2].push_back(b);
+			AddIconToken("$itemswitch$", "ItemSwitch.png", Vec2f(24, 8), 0);
+		}
 		BuildBlock[] page_3;
 		blocks.push_back(page_3);
 	}

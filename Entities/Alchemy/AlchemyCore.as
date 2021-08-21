@@ -40,6 +40,11 @@ void onInit(CBlob@ this)
 	
 }
 
+void onInit(CSprite@ this)
+{
+	this.force_onrender = true;
+}
+
 void onRender(CSprite@ this)
 {
 	//Change to look gud when possible

@@ -32,19 +32,59 @@ interface INodeCore
 	void onRender(CBlob@);
 }
 
-funcdef bool insertionFunc(CBlob@, CBlob@);
+funcdef bool insertionFunc(CBlob@, CBlob@, bool, CBlob@);
 
-bool routingInsertion(CBlob@ toblob, CBlob@ item)
+bool routingInsertion(CBlob@ toblob, CBlob@ item, bool probe, CBlob@ fromblob)
 {
 	CItemIO@ outio = getItemIO(toblob, "Output");
 	if(outio !is null && outio.connection !is null)
 	{
 		CBlob@ connectblob = getBlobByNetworkID(outio.connectionid);
 		if(connectblob !is null)
-			return outio.doTransfer(toblob, connectblob, item);
+			return outio.doTransfer(toblob, connectblob, item, probe);
 	}
 	return false;
 }
+
+bool filterInsertion(CBlob@ toblob, CBlob@ item, bool probe, CBlob@ fromblob)
+{
+
+	CItemIO@ outio = getItemIO(toblob, "Output");
+	if(item.getConfig() == toblob.get_string("filter"))
+		@outio = getItemIO(toblob, "Filter");
+	if(outio !is null && outio.connection !is null)
+	{
+		CBlob@ connectblob = getBlobByNetworkID(outio.connectionid);
+		if(connectblob !is null)
+			return outio.doTransfer(toblob, connectblob, item, probe);
+	}
+	return false;
+}
+
+bool switchInsertion(CBlob@ toblob, CBlob@ item, bool probe, CBlob@ fromblob)
+{
+	CItemIO@ outio = getItemIO(toblob, "Left Output");
+	if(toblob.get_bool("switched"))
+	{
+		@outio = getItemIO(toblob, "Right Output");
+		if(!probe)
+			toblob.set_bool("switched", false);
+	}
+	else if(!probe)
+	{
+		toblob.set_bool("switched", true);
+	}
+
+	if(outio !is null && outio.connection !is null)
+	{
+		CBlob@ connectblob = getBlobByNetworkID(outio.connectionid);
+		if(connectblob !is null)
+			return outio.doTransfer(toblob, connectblob, item, probe);
+	}
+	return false;
+}
+
+array<Vec2f> routingroute;
 
 class CItemIO : INodeCore
 {
@@ -69,6 +109,8 @@ class CItemIO : INodeCore
 	u8 nodeid;
 	u16 thisnetid;
 	array<CItemIO@> routingcache;
+	array<Vec2f> localroutingroute;
+	
 	CItemIO(string name, bool input, Vec2f offset)
 	{
 		this.name = name;
@@ -206,18 +248,49 @@ class CItemIO : INodeCore
 
 	void onRender(CBlob@ blob)
 	{
+		
+		
 		if(blob.getInventory() !is null && connection !is null)
 		{
 			CBlob@ toblob = getBlobByNetworkID(connectionid);
 			if(toblob is null) return;
 
 			CBlob@ item = getFirstPossibleItem(blob, toblob);
+
+		
+
 			if(item !is null && isClient())
 			{
-		
+				if(transfercooldown == 60 || transfercooldown == 59)//Probe network for route
+				{
+					routingroute.clear();
+					routingroute.push_back(getWorldPosition(blob));
+					bool success = doTransfer(blob, toblob, item, true);
+					if(!success)//Failed to get route: abort
+					{
+						routingroute.clear();
+						return;
+					}
+					routingroute.reverse();
+					localroutingroute.clear();
+					for(int i = 0; i < routingroute.size(); i++)
+					{
+						localroutingroute.push_back(routingroute[i]);
+					}
+				}
+				int conns = localroutingroute.size() - 1;
+				
+				
+				float transferratio = (transfercooldown - getInterpolationFactor()) / 60.0 * conns;
+				if(conns < 0)
+					return;
+				int floored = Maths::Floor(transferratio);
+				Vec2f midpoint = Vec2f_lerp(localroutingroute[floored], localroutingroute[floored + 1], transferratio - floored);
+
+				/*
 				float transferratio = (transfercooldown - getInterpolationFactor()) / 60.0;
 				Vec2f midpoint = Vec2f_lerp(connection.getWorldPosition(toblob), getWorldPosition(blob), transferratio);
-
+				*/
 				array<Vertex> vertlist;
 
 				const float sizeofthisgarbage = 2.0;
@@ -230,14 +303,15 @@ class CItemIO : INodeCore
 				vertlist.push_back(Vertex(midpoint.x - sizeofthisgarbage, midpoint.y + sizeofthisgarbage, 100, 0, 1, linecol));
 
 				addVertsToExistingRender(@vertlist, "Entities/Industry/ItemIO/ItemPacket.png", "RLrender");
-			
+				
 			}
 		}
 	}
 
-	bool doTransfer(CBlob@ blob, CBlob@ toblob, CBlob@ item)
+	bool doTransfer(CBlob@ blob, CBlob@ toblob, CBlob@ item, bool probe = false)
 	{
-		item.Untag("outputblob");
+		if(!probe)
+			item.Untag("outputblob");
 		if(connection.insertfunc !is null)//This overrides other behaviors, i guess
 		{
 			for(int i = 0; i < routingcache.size(); i++)
@@ -250,8 +324,13 @@ class CItemIO : INodeCore
 				}
 			}
 			routingcache.push_back(@connection);
-			transfercooldown = 60;
-			bool results = connection.insertfunc(toblob, item);
+			if(probe)
+			{
+				routingroute.push_back(connection.getWorldPosition(toblob));
+			}
+			else
+				transfercooldown = 60;
+			bool results = connection.insertfunc(toblob, item, probe, blob);
 			routingcache.clear();
 			return results;
 		}
@@ -275,8 +354,16 @@ class CItemIO : INodeCore
 				}
 			}*/
 			//print("Max: " + maxstacks + ", Taken: " + stackstaken);
-
-			return toblob.server_PutInInventory(item);
+			if(!probe)
+			{
+				transfercooldown = 60;
+				return toblob.server_PutInInventory(item);
+			}
+			else
+			{
+				routingroute.insertLast(connection.getWorldPosition(toblob));
+				return true;
+			}
 		}
 		return false;
 	}
@@ -998,6 +1085,12 @@ void addToTank(CAlchemyTank@ tank, string element, int count)
 			return;
 		}
 	}
+}
+
+void addToTank(CAlchemyTank@ tank, int element, int count)
+{
+	if(element < elementlist.size() && tank !is null)
+		tank.storage.elements[element] += count;
 }
 
 int getTotal(array<int>@ values)

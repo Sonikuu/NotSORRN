@@ -62,14 +62,17 @@ float getFuelValue(CBlob@ blob)
 	return 0.0;
 }
 
-bool fuelInsertionFunc(CBlob@ toblob, CBlob@ fuel)
+bool fuelInsertionFunc(CBlob@ toblob, CBlob@ fuel, bool probe, CBlob@ fromblob)
 {
 	float fuelval = getFuelValue(fuel);
 	if(fuelval > 0.0)
 	{
-		toblob.add_f32("fuel", fuelval);
-		toblob.Sync("fuel", true);
-		fuel.server_Die();
+		if(!probe)
+		{
+			toblob.add_f32("fuel", fuelval);
+			toblob.Sync("fuel", true);
+			fuel.server_Die();
+		}
 		return true;
 	}
 	return false;

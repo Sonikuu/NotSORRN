@@ -841,7 +841,11 @@ float sprayAer(int power, float aimdir, float spread, float range, CBlob@ spray,
 		if(attp !is null)
 			@user = @attp.getBlob();
 	}
-	user.setVelocity(user.getVelocity() + Vec2f(1, 0).RotateBy(aimdir + 180) * power * 0.1);
+	float forcemult = Maths::Max(0, 3.0 - user.getVelocity().Length() / power);
+	float anglesim = (((user.getVelocity().getAngleDegrees() * -1 - (aimdir - 180)) + 540) % 360) - 180;
+	forcemult = Maths::Min(Maths::Max(forcemult, Maths::Abs(anglesim) / 90), 1.5);
+	print("" + forcemult + " " + anglesim);
+	user.setVelocity(user.getVelocity() + Vec2f(1, 0).RotateBy(aimdir + 180) * power * 0.1 * forcemult);
 	return 2;
 }
 
@@ -1253,13 +1257,13 @@ bool entropyEffect(CMap@ map, Vec2f pos)
 bool orderEffect(CMap@ map, Vec2f pos)
 {
 	CBlob@ blob = map.getBlobAtPosition(pos);
-	if(blob !is null && blob.hasScript("BuildingEffects.as"))//this might not be the best way to check but "too bad"
+	bool activated = false;
+	if(blob !is null && blob.hasScript("BuildingEffects.as") && blob.getInitialHealth() < blob.getHealth())//this might not be the best way to check but "too bad"
 	{
 		blob.server_Heal(0.1);
+		activated = true;
 	}
-
-
-	bool activated = false;
+	
 	Tile tile = map.getTile(pos);
 	//STONE
 	if(tile.type <= 63 && tile.type >= 58)
@@ -1350,8 +1354,8 @@ bool vialIngestBlank(CBlob@ drinker, CBlob@ vial, f32 power)
 
 bool vialIngestEcto(CBlob@ drinker, CBlob@ vial, f32 power)
 {
-	applyFx(drinker,900 * power, 1, "fxghostlike");
-	applyFx(drinker, 900 * power, 495, "fxgrav");
+	applyFx(drinker, 90 * power, 1, "fxghostlike");
+	applyFx(drinker, 90 * power, 495, "fxgrav");
 	return true;
 }
 bool vialIngestLife(CBlob@ drinker, CBlob@ vial, f32 power)
