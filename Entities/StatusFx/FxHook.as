@@ -82,7 +82,60 @@ void onTick(CBlob@ this)
 			}
 		}
 	}
+	if(this.getPlayer() !is null && isServer())
+	{
+
+	}
 }
+
+/*
+void writeSyncCommand(CBlob@ blob)
+{
+	array<IStatusEffect@>@ effects;
+	blob.get("effectls", @effects);
+	
+	array<int>@ ids = getEffectIDs(effects);
+	if(ids.size() != effects.size())
+	{
+		print("Error writing StatFX sync, wrong amount of effect ids");
+		return;
+	}
+	//Writing effects
+	CBitStream params;
+	for(int i = 0; i < ids.size(); i++)
+	{
+		params.write_u8(ids[i]);
+	}
+	params.write_u8(255);
+}
+
+void readSyncCommand(CBlob@ blob, CBitStream@ params)
+{
+	array<IStatusEffect@>@ effects;
+	blob.get("effectls", @effects);
+	int id = 0;
+	do
+	{
+		id = params.read_u8();
+
+		if(id < effectlist.size())
+		{
+			bool exists = false;
+			for(int i = 0; i < effects.size(); i++)
+			{	
+				if(effects.getFxName() == effectlist[i].getFxName())
+				{
+					exists = true;
+					break;
+				}
+					
+			}
+			if(!exists)
+				addToList()
+		}
+	}
+	while (id != 255)
+}*/
 
 f32 onHit( CBlob@ this, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitterBlob, u8 customData )
 {

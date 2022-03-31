@@ -223,8 +223,11 @@ class CStatusHoly : CStatusBase
 		if((getGameTime() % 10 == 0) && isClient())
 		{
 			CParticle@ p = makeGibParticle("Holy.png", this.getPosition() + Vec2f(XORRandom(16) - 8, XORRandom(16) - 8), Vec2f(XORRandom(10) - 5, XORRandom(10) - 5) / 10.0, 0, XORRandom(4), Vec2f(8, 8), 0, 0, "");
-			p.gravity = Vec2f(0, 0);
-			p.scale = 0.5;
+			if(p !is null)
+			{
+				p.gravity = Vec2f(0, 0);
+				p.scale = 0.5;
+			}
 		}
 	}
 	string getFxName()
@@ -484,8 +487,11 @@ class CStatusPoison : CStatusBase
 		if((getGameTime() % 10 == 0) && isClient())
 		{
 			CParticle@ p = makeGibParticle("Poison.png", this.getPosition() + Vec2f(XORRandom(16) - 8, XORRandom(16) - 8), Vec2f(XORRandom(10) - 5, XORRandom(10) - 10) / 10.0, 0, XORRandom(4), Vec2f(8, 8), 0, 0, "");
-			p.gravity = Vec2f(0, 0);
-			p.scale = 0.5;
+			if(p !is null)
+			{
+				p.gravity = Vec2f(0, 0);
+				p.scale = 0.5;
+			}
 		}
 	}
 	string getFxName()
@@ -551,6 +557,23 @@ bool isInList(string name, array<IStatusEffect@>@ effects)
 			return true;
 	}
 	return false;
+}
+
+array<int>@ getEffectIDs(array<IStatusEffect@>@ effects)
+{
+	array<int> ids;
+	for(int i = 0; i < effects.size(); i++)
+	{
+		for(int j = 0; j < effectlist.size(); j++)
+		{
+			if(effects[i].getFxName() == effectlist[j].getFxName())//Why am I doing it like this? because I hate you
+			{
+				ids.push_back(j);
+				break;
+			}
+		}
+	}
+	return @ids;
 }
 
 IStatusEffect@ addToList(string name, array<IStatusEffect@>@ effects)

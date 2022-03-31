@@ -4,7 +4,7 @@
 #include "ShopCommon.as"
 #include "Descriptions.as"
 #include "CheckSpam.as"
-#include "CustomGunCommon.as"
+#include "CustomCrossbowCommon.as"
 
 void onInit(CBlob@ this)
 {
@@ -19,11 +19,11 @@ void onInit(CBlob@ this)
 	AddIconToken("$gun_menu$", "TechnologyIcons.png", Vec2f(16, 16), 12);
 	AddIconToken("$finish_gun$", "MenuItems.png", Vec2f(32, 32), 28);
 	
-	for(int i = 0; i < gunparts.length; i++)
+	for(int i = 0; i < cbowparts.length; i++)
 	{
-		for(int j = 0; j < gunparts[i].length; j++)
+		for(int j = 0; j < cbowparts[i].length; j++)
 		{
-			AddIconToken("$gun_part" + i + "" + j + "$", "CustomGun.png", Vec2f(32, 16), j * 6 + i);
+			AddIconToken("$cbow_part" + i + "" + j + "$", "CustomCrossbow.png", Vec2f(32, 16), j * 6 + i);
 		}
 	}
 	
@@ -96,22 +96,22 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 			if(isServer && caller !is null)
 			{
 				CInventory@ inv = caller.getInventory();
-				for(int i = 0; i < 5; i++)
+				for(int i = 0; i < 4; i++)
 				{
-					CGunRequirements@ tr = @(gunreqs[i][this.get_u8("selpart" + i)]);
+					CCrossbowRequirements@ tr = @(cbowreqs[i][this.get_u8("selpart" + i)]);
 					for(int j = 0; j < tr.materials.size(); j++)
 					{
 						inv.server_RemoveItems(tr.materials[j], tr.amt[j]);
 					}
 				}
-				CBlob@ targetblob = server_CreateBlobNoInit("customgun");
+				CBlob@ targetblob = server_CreateBlobNoInit("customcbow");
 				targetblob.setPosition(this.getPosition());
 				targetblob.server_setTeamNum(this.getTeamNum());
 				targetblob.set_u8("coreindex", this.get_u8("selpart0"));
 				targetblob.set_u8("barrelindex", this.get_u8("selpart1"));
 				targetblob.set_u8("stockindex", this.get_u8("selpart2"));
 				targetblob.set_u8("gripindex", this.get_u8("selpart3"));
-				targetblob.set_u8("magindex", this.get_u8("selpart4"));
+				//targetblob.set_u8("magindex", this.get_u8("selpart4"));
 				targetblob.Init();
 			}
 		}
@@ -140,12 +140,12 @@ void onRender(CSprite@ this)
 
 		array<string> totalreqs;
 		array<int> totalamt;
-		for(int i = 0; i < gunreqs.size(); i++)
+		for(int i = 0; i < cbowreqs.size(); i++)
 		{
 			reqcache.push_back(array<bool>());
-			for(int j = 0; j < gunreqs[i].size(); j++)
+			for(int j = 0; j < cbowreqs[i].size(); j++)
 			{
-				CGunRequirements@ tr = @(gunreqs[i][j]);
+				CCrossbowRequirements@ tr = @(cbowreqs[i][j]);
 				bool canmake = true;
 				
 				for(int e = 0; e < tr.materials.size(); e++)
@@ -198,17 +198,17 @@ void onRender(CSprite@ this)
 			u8 magindex = blob.get_u8("selpart4");
 			
 			//FIRST INDEX IS TYPE, SECOND IS PART
-			if(coreindex >= gunparts[0].length || barrelindex >= gunparts[1].length || stockindex >= gunparts[2].length || gripindex >= gunparts[3].length || magindex >= gunparts[4].length)
+			if(coreindex >= cbowparts[0].length || barrelindex >= cbowparts[1].length || stockindex >= cbowparts[2].length || gripindex >= cbowparts[3].length || false)
 			{
 				//this.server_Die();
 				print("INVALID CUSTOM GUN PARTS Gunbench.as onRender()");
 				return;
 			}
-			CGunPart@ corepart = @(gunparts[0][coreindex]);
-			CGunPart@ barrelpart = @(gunparts[1][barrelindex]);
-			CGunPart@ stockpart = @(gunparts[2][stockindex]);
-			CGunPart@ grippart = @(gunparts[3][gripindex]);
-			CGunPart@ magpart = @(gunparts[4][magindex]);
+			CCrossBowPart@ corepart = @(cbowparts[0][coreindex]);
+			CCrossBowPart@ barrelpart = @(cbowparts[1][barrelindex]);
+			CCrossBowPart@ stockpart = @(cbowparts[2][stockindex]);
+			CCrossBowPart@ grippart = @(cbowparts[3][gripindex]);
+			CCrossBowPart@ magpart = null;
 
 			CGunEquipment@ gun = calculateGunStats(corepart, barrelpart, stockpart, grippart, magpart);
 	
@@ -228,7 +228,7 @@ void onRender(CSprite@ this)
 void makeGunMenu(CBlob@ this, CBlob@ caller)
 {
 	caller.ClearMenus();
-	int buttons = gunparts.length;
+	int buttons = cbowparts.length;
 	int startoffsx = ((buttons - 1) * -96) - 100;
 	Vec2f screencenter(getScreenWidth() / 2, getScreenHeight() / 2);
 
@@ -239,12 +239,12 @@ void makeGunMenu(CBlob@ this, CBlob@ caller)
 	array<string> totalreqs;
 	array<int> totalamt;
 	bool canmakegunoverride = true;
-	for(int i = 0; i < gunreqs.size(); i++)
+	for(int i = 0; i < cbowreqs.size(); i++)
 	{
 		reqcache.push_back(array<bool>());
-		for(int j = 0; j < gunreqs[i].size(); j++)
+		for(int j = 0; j < cbowreqs[i].size(); j++)
 		{
-			CGunRequirements@ tr = @(gunreqs[i][j]);
+			CCrossbowRequirements@ tr = @(cbowreqs[i][j]);
 			bool canmake = true;
 			
 			for(int e = 0; e < tr.materials.size(); e++)
@@ -275,30 +275,33 @@ void makeGunMenu(CBlob@ this, CBlob@ caller)
 		}
 	}
 	
-	for(int i = 0; i < gunparts.length; i++)
+	for(int i = 0; i < cbowparts.length; i++)
 	{
 		int shortening = 0;
-		for(int x = 0; x < gunreqs[i].size(); x++)
+		for(int x = 0; x < cbowreqs[i].size(); x++)
 		{
-			if(gunreqs[i][x].hidden && !reqcache[i][x])
+			if(cbowreqs[i][x].hidden && !reqcache[i][x])
 				shortening++;
 		}
-		CGridMenu@ menu = CreateGridMenu(screencenter + Vec2f(startoffsx + i * 96, 0), this, Vec2f(2, gunparts[i].length - shortening), "Part");
+		CGridMenu@ menu = CreateGridMenu(screencenter + Vec2f(startoffsx + i * 96, 0), this, Vec2f(2, Maths::Max(0, cbowparts[i].length - shortening)), "Part");
 		menu.SetCaptionEnabled(false);
-		for(int j = 0; j < gunparts[i].length; j++)
+		for(int j = 0; j < cbowparts[i].length; j++)
 		{
-			if(gunreqs[i][j].hidden && !reqcache[i][j])
+			if(cbowreqs[i][j].hidden && !reqcache[i][j])
 				continue;
 			CBitStream params;
 			params.write_u16(caller.getNetworkID());
 			params.write_u8(i);
 			params.write_u8(j);
-			CGridButton@ butt = menu.AddButton("$gun_part" + i + "" + j + "$", "Select " + gunparts[i][j].name, this.getCommandID("selectpart"), params);
-			if(this.get_u8("selpart" + i) == j)
-				butt.SetSelected(1);
-			if(!reqcache[i][j])
-				butt.SetEnabled(false);
-			butt.SetHoverText(gunparts[i][j].name);
+			CGridButton@ butt = menu.AddButton("$cbow_part" + i + "" + j + "$", "Select " + cbowparts[i][j].name, this.getCommandID("selectpart"), params);
+			if(butt !is null)
+			{
+				if(this.get_u8("selpart" + i) == j)
+					butt.SetSelected(1);
+				if(!reqcache[i][j])
+					butt.SetEnabled(false);
+				butt.SetHoverText(cbowparts[i][j].name);
+			}
 		}
 	}
 	

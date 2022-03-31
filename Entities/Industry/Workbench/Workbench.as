@@ -149,7 +149,7 @@ void InitWorkshop(CBlob@ this)
 		AddIconToken("$mat_explosiveammo$", "MaterialExplosiveAmmo.png", Vec2f(16, 16), 3);
 		AddIconToken("$blazecore$", "BlazeCore.png", Vec2f(8, 8), 0);
 	}*/
-	{
+	/*{
 		ShopItem@ s = addShopItem(this,  "Ammo Pack", "$ammopack$", "ammopack", "Basic ammo for basic guns", false);
 		AddRequirement(s.requirements, "blob", "mat_gunpowder", "Gunpowder", 25);
 		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 2);
@@ -173,7 +173,12 @@ void InitWorkshop(CBlob@ this)
 		
 		AddIconToken("$explosiveammopack$", "ExplosiveAmmoPack.png", Vec2f(16, 16), 0);
 		AddIconToken("$blazecore$", "BlazeCore.png", Vec2f(8, 8), 0);
-	}
+	}*/
+	ShopItem@ s = addShopItem(this,  "Bolts", "$mat_bolts$", "mat_bolts-30", "Bolts for your crossbow", false);
+	AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 25);
+	AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 25);
+	
+	AddIconToken("$mat_bolts$", "MaterialBolts.png", Vec2f(16, 16), 0);
 	{
 		ShopItem@ s = addShopItem(this,  "Cleaver", "$cleaver$", "cleaver", "Heavy melee weapon, sacrifices speed for damage\nMust be equipped", false);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 50);
@@ -269,6 +274,12 @@ void InitWorkshop(CBlob@ this)
 	}
 	//ARMOR ---- MOVE TO DIFFERENT CRAFTING STATION MAYBE
 	{
+		ShopItem@ s = addShopItem(this,  "Metal Helmet", "$metal_helmet$", "metal_helmet", "Metallic head armor", false);
+		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 4);
+
+		AddIconToken("$metal_helmet$", "MetalHelmet.png", Vec2f(16, 16), 0);
+	}
+	{
 		ShopItem@ s = addShopItem(this,  "Metal Chestplate", "$metal_chestplate$", "metal_chestplate", "Metallic chest armor", false);
 		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 8);
 
@@ -279,6 +290,12 @@ void InitWorkshop(CBlob@ this)
 		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 4);
 
 		AddIconToken("$metal_boots$", "MetalBoots.png", Vec2f(16, 16), 0);
+	}
+	{
+		ShopItem@ s = addShopItem(this,  "Gold Helmet", "$gold_helmet$", "gold_helmet", "Golden head armor", false);
+		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 50);
+
+		AddIconToken("$gold_helmet$", "GoldHelmet.png", Vec2f(16, 16), 0);
 	}
 	{
 		ShopItem@ s = addShopItem(this,  "Gold Chestplate", "$gold_chestplate$", "gold_chestplate", "Golden chest armor", false);

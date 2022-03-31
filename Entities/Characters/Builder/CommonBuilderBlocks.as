@@ -278,12 +278,12 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			blocks[0].push_back(b);
 		}
 		{
-			BuildBlock b(0, "gunbench", "$gunbench$", "Gun Workbench");
-			AddRequirement(b.reqs, "blob", "mat_metal", "Metal", 6);
+			BuildBlock b(0, "crossbowbench", "$crossbowbench$", "Crossbow Workbench");
+			AddRequirement(b.reqs, "blob", "mat_component", "Mechanical Components", 6);
 			b.buildOnGround = true;
 			b.size.Set(32, 16);
 			blocks[0].push_back(b);
-			AddIconToken("$gunbench$", "GunBench.png", Vec2f(16, 16), 7);
+			AddIconToken("$crossbowbench$", "CrossbowBench.png", Vec2f(16, 16), 7);
 		}
 		{
 			BuildBlock b(0, "decorbench", "$decorbench$", "Decor Bench");

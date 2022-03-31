@@ -22,6 +22,7 @@ void onInit(CBlob@ this)
 	AddIconToken("$hand_equip_button$", "AbilityIcons.png", Vec2f(16, 16), 0);
 	AddIconToken("$chest_equip_button$", "AbilityIcons.png", Vec2f(16, 16), 1);
 	AddIconToken("$boots_equip_button$", "AbilityIcons.png", Vec2f(16, 16), 2);
+	AddIconToken("$helm_equip_button$", "AbilityIcons.png", Vec2f(16, 16), 3);
 }
 
 void onRender(CSprite@ this)
@@ -236,7 +237,7 @@ void onCreateInventoryMenu(CBlob@ this, CBlob@ forBlob, CGridMenu @gridmenu)
     Vec2f lr = gridmenu.getLowerRightPosition();
 
     Vec2f pos = Vec2f(lr.x, (ul.y + lr.y) / 2) + Vec2f(48, 0);
-    CGridMenu@ menu = CreateGridMenu(pos, this, Vec2f(1, 4), "Equip");
+    CGridMenu@ menu = CreateGridMenu(pos, this, Vec2f(1, 5), "Equip");
 
 	CBlob@ carried = this.getCarriedBlob();
 	IEquipment@ equip = carried is null ? null : @getEquipment(carried);
@@ -266,6 +267,18 @@ void onCreateInventoryMenu(CBlob@ this, CBlob@ forBlob, CGridMenu @gridmenu)
 			if(equip !is null)
 			{
 				if(!equip.canBeEquipped(1))
+					button.SetEnabled(false);
+			}
+        }
+		{
+			CBitStream params;
+			params.write_u8(4);
+			params.write_u16(this.getCarriedBlob() is null ? 0xFFFF : this.getCarriedBlob().getNetworkID());
+            CGridButton@ button = menu.AddButton("$helm_equip_button$", "Equip Held item (Helmet)", this.getCommandID("equipitem"), params);
+
+			if(equip !is null)
+			{
+				if(!equip.canBeEquipped(4))
 					button.SetEnabled(false);
 			}
         }

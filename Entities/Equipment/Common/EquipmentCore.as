@@ -65,7 +65,8 @@ array<CEquipmentSlot@> equipslots =
 	CEquipmentSlot("primaryequip", 0),
 	CEquipmentSlot("secondaryequip", 0),
 	CEquipmentSlot("torsoequip", 1),
-	CEquipmentSlot("bootsequip", 2)
+	CEquipmentSlot("bootsequip", 2),
+	CEquipmentSlot("headequip", 3)
 };
 
 shared interface IEquipment
@@ -98,9 +99,9 @@ shared interface IEquipment
 
 	bool isTwoHand();
 
-	string modifyTexture(CBlob@ blob, CBlob@ user, string texname, ImageData@ image);
+	string modifyTexture(CBlob@ blob, CBlob@ user, string texname, ImageData@ image, bool head);
 
-	string appendTexName(string texname);
+	string appendTexName(string texname, bool head);
 }
 
 shared class CEquipmentCore : IEquipment
@@ -144,9 +145,9 @@ shared class CEquipmentCore : IEquipment
 	
 	bool isTwoHand(){return twohand;}
 
-	string modifyTexture(CBlob@ blob, CBlob@ user, string texname, ImageData@ image){return texname;}
+	string modifyTexture(CBlob@ blob, CBlob@ user, string texname, ImageData@ image, bool head){return texname;}
 
-	string appendTexName(string texname){return texname;}
+	string appendTexName(string texname, bool head){return texname;}
 }
 
 IEquipment@ getEquipment(CBlob@ this)

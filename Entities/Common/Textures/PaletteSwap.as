@@ -79,7 +79,7 @@ bool CreatePaletteSwappedTexture(ImageData@ input, string output_name, ImageData
 			IEquipment@ equip = @getEquipment(equipped);
 			if(equip !is null)
 			{
-				equip.modifyTexture(equipped, blob, output_name, edit);
+				equip.modifyTexture(equipped, blob, output_name, edit, false);
 			}
 		}
 	}
@@ -144,7 +144,7 @@ string PaletteSwapTexture(string in_tex, string palette_filename, int palette_in
 			IEquipment@ equip = @getEquipment(equipped);
 			if(equip !is null)
 			{
-				output_name = equip.appendTexName(output_name);
+				output_name = equip.appendTexName(output_name, false);
 			}
 		}
 	}

@@ -93,6 +93,11 @@ class CGunEquipment : CEquipmentCore
 	float fixedspread; //Spread between each individual shot
 	
 	bool userissound; //Used for vehicles mainly, cause cant have multiple emit sounds in one so we turn user into sound emitter
+
+	bool projectile;
+	string projname;
+	float projspeed;
+	float projgrav;
 	
 	CGunEquipment(float damage, float firerate, int shotcount, float spread)
 	{
@@ -146,6 +151,11 @@ class CGunEquipment : CEquipmentCore
 		fixedspread = 0;
 		
 		userissound = true;
+
+		projectile = false;
+		projname = "";
+		projspeed = 20;
+		projgrav = 1;
 	}
 	
 	void onRender(CBlob@ blob, CBlob@ user)
@@ -518,7 +528,7 @@ class CGunEquipment : CEquipmentCore
 	
 	void startReload(CBlob@ blob, CBlob@ user)
 	{
-		//if(maxammo > blob.get_u16("ammo") && reloadprog <= 0)
+		if(maxammo > blob.get_u16("ammo") && reloadprog <= 0)
 		{
 			if(getAmmo(blob, user))
 				reloadprog = reloadtime;
@@ -730,64 +740,80 @@ class CGunEquipment : CEquipmentCore
 				float shotspread = (float(x) - float(shotcount - 1) / 2.0) * fixedspread;
 				f32 offset = (random.NextFloat() * (spread)) - (spread) / 2.0 + recinacc + shotspread;
 				f32 aimdir = aimdef + offset;
-				
-				if(homingrange > 0)
+				if(!projectile)
 				{
-					//print("homing");
-					//bool hastarget = false;
-					CBlob@ currtarg = null;
-					Vec2f currpos = user.getPosition();
-					bool cantfind = false;
-					int errorlp = 10000;
-					CFiringData firedata(blobpiercing, range, false, range, false, null, true);
-					while (firedata.rangeleft > 0 && !firedata.donehits && errorlp > 0)
+					//-------------------HITSCAN--------------
+					if(homingrange > 0)
 					{
-						//Adjusting gun angle, to curve
-						cantfind = homingAdjustment(user, @firedata, currpos, aimdir, aimdir);
-						
-						//Hitting stuff
-						
-						if(cantfind)
+						//print("homing");
+						//bool hastarget = false;
+						CBlob@ currtarg = null;
+						Vec2f currpos = user.getPosition();
+						bool cantfind = false;
+						int errorlp = 10000;
+						CFiringData firedata(blobpiercing, range, false, range, false, null, true);
+						while (firedata.rangeleft > 0 && !firedata.donehits && errorlp > 0)
 						{
-							firedata.endpoint = firedata.rangeleft + 1;
+							//Adjusting gun angle, to curve
+							cantfind = homingAdjustment(user, @firedata, currpos, aimdir, aimdir);
+							
+							//Hitting stuff
+							
+							if(cantfind)
+							{
+								firedata.endpoint = firedata.rangeleft + 1;
+							}
+							
+							HitInfo@[] hitInfos;
+							if (map.getHitInfosFromRay(currpos, aimdir, firedata.endpoint, user, @hitInfos))
+							{
+								handleHitInfos(user, currpos, @hitInfos, aimdir, @firedata);
+							}
+							
+							if(getNet().isClient())
+							{	
+								Vec2f startpoint = currpos;
+								addTracers(startpoint, aimdir, firedata.endpoint);
+							}
+							firedata.rangeleft -= firedata.endpoint;
+							float rotation = (aimdir / 180.0) * Maths::Pi;
+							currpos += Vec2f(Maths::Cos(rotation) * firedata.endpoint, Maths::Sin(rotation) * firedata.endpoint);
 						}
-						
+					}
+					//---------------------NON HOMINH-------------------
+					else
+					{
+						float endpoint = range;
 						HitInfo@[] hitInfos;
-						if (map.getHitInfosFromRay(currpos, aimdir, firedata.endpoint, user, @hitInfos))
+						if (map.getHitInfosFromRay(user.getPosition(), aimdir, range, user, @hitInfos))
 						{
-							handleHitInfos(user, currpos, @hitInfos, aimdir, @firedata);
+							CFiringData firedata(blobpiercing, endpoint, false, 999, false, null, true);
+							handleHitInfos(user, user.getPosition(), @hitInfos, aimdir, @firedata);
+							
+							endpoint = firedata.endpoint;
 						}
-						
 						if(getNet().isClient())
 						{	
-							Vec2f startpoint = currpos;
-							addTracers(startpoint, aimdir, firedata.endpoint);
+							Vec2f startpoint = user.getPosition();
+							addTracers(startpoint, aimdir, endpoint);
 						}
-						firedata.rangeleft -= firedata.endpoint;
-						float rotation = (aimdir / 180.0) * Maths::Pi;
-						currpos += Vec2f(Maths::Cos(rotation) * firedata.endpoint, Maths::Sin(rotation) * firedata.endpoint);
 					}
+					//radius 48, damage 3, sound Bomb.ogg, map radius 24, map ratio 0.4
+					//Explode(user, endpos, range * 0.1, damage, "Bomb.ogg", range * 0.05, damage * 0.4, true, Hitters::explosion, true);
 				}
-				//---------------------NON HOMINH-------------------
 				else
 				{
-					float endpoint = range;
-					HitInfo@[] hitInfos;
-					if (map.getHitInfosFromRay(user.getPosition(), aimdir, range, user, @hitInfos))
+					//-------------MAKE PROJKECTILE-------------
+					CBlob@ proj = server_CreateBlob(projname, user.getTeamNum(), user.getPosition());
+					if(proj !is null)
 					{
-						CFiringData firedata(blobpiercing, endpoint, false, 999, false, null, true);
-						handleHitInfos(user, user.getPosition(), @hitInfos, aimdir, @firedata);
-						
-						endpoint = firedata.endpoint;
-					}
-					if(getNet().isClient())
-					{	
-						Vec2f startpoint = user.getPosition();
-						addTracers(startpoint, aimdir, endpoint);
+						proj.setVelocity(Vec2f(Vec2f_lengthdir_deg(projspeed, aimdir)));
+						proj.set_f32("damage", damage);
+						proj.set_f32("gravity", projgrav);
+						if(homingrange > 0)
+							proj.set_f32("homingrange", homingrange);
 					}
 				}
-				//radius 48, damage 3, sound Bomb.ogg, map radius 24, map ratio 0.4
-				//Explode(user, endpos, range * 0.1, damage, "Bomb.ogg", range * 0.05, damage * 0.4, true, Hitters::explosion, true);
 			}
 		}
 		else if (bits == 0)

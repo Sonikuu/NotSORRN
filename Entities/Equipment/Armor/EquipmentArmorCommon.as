@@ -10,6 +10,7 @@ class CEquipmentArmor : CEquipmentCore
 	string shrtname;
 	bool notexor;
 	int thisslot = 2;
+	bool head;
 	//2 = chest, 3 = boots, 4 = helm
 
 	
@@ -20,6 +21,7 @@ class CEquipmentArmor : CEquipmentCore
 		this.spritename = spritename;
 		this.shrtname = shrtname;
 		notexor = false;
+		head = false;
 	}
 	
 	
@@ -44,12 +46,16 @@ class CEquipmentArmor : CEquipmentCore
 	{
 		notexor = false;
 		LoadSpritesBuilder(user.getSprite());
+		if(head)
+			user.Tag("queueheadremake");
 	}
 	
 	void onUnequip(CBlob@ blob, CBlob@ user)
 	{
 		notexor = true;
 		LoadSpritesBuilder(user.getSprite());
+		if(head)
+			user.Tag("queueheadremake");
 	}
 	
 	bool canBeEquipped(int slot)
@@ -64,9 +70,9 @@ class CEquipmentArmor : CEquipmentCore
 		return "Armor";
 	}
 	
-	string modifyTexture(CBlob@ blob, CBlob@ user, string texname, ImageData@ image)
+	string modifyTexture(CBlob@ blob, CBlob@ user, string texname, ImageData@ image, bool head)
 	{
-		if(notexor)
+		if(notexor || this.head != head)
 			return texname;
 		if (!Texture::exists(spritename))
 			if(!Texture::createFromFile(spritename, spritename + ".png"))
@@ -78,16 +84,16 @@ class CEquipmentArmor : CEquipmentCore
 			for(int y = 0; y < image.height(); y++)
 			{
 				SColor c = equip.get(x, y);
-				if(c.getAlpha() == 255)
+				if(c.getAlpha() == 255 || (head && y < 8))
 					image.put(x, y, c);
 			}
 		}
 		return texname + shrtname;
 	}
 	
-	string appendTexName(string texname)
+	string appendTexName(string texname, bool head)
 	{
-		if(notexor)
+		if(notexor || this.head != head)// yes, i did head != head
 			return texname;
 		return texname + shrtname;
 	}

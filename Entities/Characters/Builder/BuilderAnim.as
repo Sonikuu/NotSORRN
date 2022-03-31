@@ -64,9 +64,6 @@ void onTick(CSprite@ this)
 		
 	CBlob@ blob = this.getBlob();
 	
-	if(getGameTime() % 60 == 0)
-		print(this.getTextureName());
-	
 	if(blob.get_bool("soulless"))
 	{
 		this.setRenderStyle(RenderStyle::Style::shadow);
