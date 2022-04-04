@@ -110,6 +110,8 @@ string getHeadTexture(int headIndex)
 
 CSpriteLayer@ LoadHead(CSprite@ this, int headIndex)
 {
+	if(!isClient())
+		return null;
 	CBlob@ blob = this.getBlob();
 	CPlayer@ player = blob.getPlayer();
 
