@@ -39,6 +39,9 @@ void onTick(CMovement@ this)
 	const f32 vellen = shape.vellen;
 	const bool onground = blob.isOnGround() || blob.isOnLadder();
 
+	if(down)
+		blob.getShape().checkCollisionsAgain = true;
+
 	if (is_client && getGameTime() % 3 == 0)
 	{
 		const string fallscreamtag = "_fallingscream";

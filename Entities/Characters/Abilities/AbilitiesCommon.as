@@ -390,7 +390,8 @@ class CSelfDestruct : CAbilityBase
         blob.SetLightRadius(24.0f);
 	    blob.SetLight(true);
 
-		if(isClient())
+		//Temporarily disabled-needs to be updated to work with head texture eqiupment stuff
+		/*if(isClient())
 		{
 			CSprite@ s = blob.getSprite();
 			SColor[] oldColors = {
@@ -424,7 +425,7 @@ class CSelfDestruct : CAbilityBase
 			Texture::createFromData(s.getTextureName() + "_remapped",bodyData);
 			s.SetTexture(s.getTextureName()+ "_remapped",s.getFrameWidth(),s.getFrameHeight());
 
-		}
+		}*/
 	}
 
     void onTick()

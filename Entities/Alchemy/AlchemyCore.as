@@ -213,7 +213,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 					INodeCore@ totank = getNode(this, tankid);
 					if(fromtank is null || totank is null)
 					{
-						//printInt("Fromtank null with ID: ", targtank);
+						printInt("Fromtank null with ID: ", targtank);
 						return;
 					}
 					
@@ -226,6 +226,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 					}
 					if(cast<CAlchemyTank@>(fromtank) !is null)//Hacky :(
 					{
+
 						CAlchemyTank@ tfromtank = cast<CAlchemyTank@>(fromtank);
 						CAlchemyTank@ ttotank = cast<CAlchemyTank@>(totank);
 						if(tfromtank.connection !is ttotank)

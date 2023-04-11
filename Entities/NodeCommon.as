@@ -478,6 +478,13 @@ class CItemIO : INodeCore
 
 SColor getAverageItemColor(CBlob@ item)
 {
+	if(getRules().exists(item.getConfig() + "_avg_r"))
+	{
+		return SColor(255,
+		getRules().get_u8(item.getConfig() + "_avg_r"),
+		getRules().get_u8(item.getConfig() + "_avg_g"),
+		getRules().get_u8(item.getConfig() + "_avg_b"));
+	}
 	CSprite@ spr = item.getSprite();
 	if(spr !is null)
 	{
@@ -502,9 +509,17 @@ SColor getAverageItemColor(CBlob@ item)
 					count++;
 				}
 			}
+			if(count == 0)
+			{
+				print("Average item color has count of 0: strange behavior");
+				count = 1;
+			}
 			red /= count;
 			green /= count;
 			blue /= count;
+			getRules().set_u8(item.getConfig() + "_avg_r", red);
+			getRules().set_u8(item.getConfig() + "_avg_g", green);
+			getRules().set_u8(item.getConfig() + "_avg_b", blue);
 			return SColor(255, red, green, blue);
 		}
 	}

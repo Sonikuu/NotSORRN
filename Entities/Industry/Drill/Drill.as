@@ -390,6 +390,7 @@ void onTick(CBlob@ this)
 	}
 	else
 	{
+		this.Sync(heat_prop, true);
 		this.set_bool(buzz_prop, false);
 		if (heat <= 0)
 		{
