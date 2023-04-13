@@ -4,6 +4,7 @@ void onInit(CBlob@ this)
 {	
 	CItemIO@ output = addItemIO(this, "Output", false, Vec2f(0, 0));	
 	output.dynamictank = true;
+	this.addCommandID("sucked");
 }
 
 void onTick(CBlob@ this)
@@ -30,13 +31,14 @@ void onTick(CBlob@ this)
 				CBitStream params;
 				params.write_u8(output.nodeid);
 				this.SendCommand(this.getCommandID("disconnect"), params);
+				print("DCed");
 			}
 		}
 	}
 	else
 	{
 		this.set_f32("railmult", 1);
-		if((getGameTime() + this.getNetworkID()) % 30 == 0 && this.get_bool("riding"))
+		if((getGameTime() + this.getNetworkID()) % 10 == 0 && this.get_bool("riding"))
 		{
 			CMap@ map = getMap();
 			CBlob@[] blobs;
@@ -49,8 +51,36 @@ void onTick(CBlob@ this)
 						Vec2f oldpos = blobs[i].getPosition();
 						if(!this.server_PutInInventory(blobs[i]))
 							blobs[i].setPosition(oldpos);
+						else
+						{
+							CBitStream params;
+							params.write_Vec2f(Vec2f(oldpos));
+							params.write_u16(blobs[i].getNetworkID());
+							this.SendCommand(this.getCommandID("sucked"), params);
+						}
+
 					}
 				}
+			}
+		}
+	}
+}
+
+void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
+{
+	if(isClient())
+	{
+		Vec2f from = params.read_Vec2f();
+		CBlob@ blob = getBlobByNetworkID(params.read_u16());
+		if(blob is null)
+			return;
+		for (int i = 0; i < 30; i++)
+		{
+			Vec2f randoffs = Vec2f(500 - XORRandom(1000), 500 - XORRandom(1000)) / 50;
+			CParticle@ p = ParticlePixel(from + randoffs, (this.getPosition() - (from + randoffs)) / 10, getAverageItemColor(blob), false, 10);
+			if(p !is null)
+			{
+				p.gravity = Vec2f_zero;
 			}
 		}
 	}

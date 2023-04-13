@@ -84,6 +84,11 @@ void onTick(CBlob@ this)
 void onDie(CBlob@ this)
 {
 	//Spurt blood or something lel
+	if(isServer() && XORRandom(100) > 80)
+	{
+		CBlob@ blob = server_CreateBlob("mat_chitin", 0, this.getPosition());
+		blob.server_SetQuantity(1);
+	}
 }
 
 bool doesCollideWithBlob(CBlob@ this, CBlob@ blob)
