@@ -526,7 +526,8 @@ class CAbsorb : CAbilityBase
 	{
 		if(cmd == blob.getCommandID("Absorb_activate"))
 		{
-			if(blob.get_s32("golemiteCount") == blob.get_s32("golemiteMax")){return;}
+			bool canAbsorb = true;
+			if(blob.get_s32("golemiteCount") == blob.get_s32("golemiteMax")){canAbsorb = false;}
 
 			CMap@ m = getMap();
 			CBlob@[] blobs;
@@ -534,7 +535,7 @@ class CAbsorb : CAbilityBase
 			for(int i = 0; i < blobs.size(); i++)
 			{
 				CBlob@ b = blobs[i];
-				if(b.getConfig() == "mat_stone" || b.getConfig() == "mat_sand")
+				if((b.getConfig() == "mat_stone" || b.getConfig() == "mat_sand") && canAbsorb )
 				{
 					blob.set_s32("golemiteCount",Maths::Min(blob.get_s32("golemiteMax"), blob.get_s32("golemiteCount") + b.getQuantity()));
 					b.server_Die();
@@ -542,14 +543,20 @@ class CAbsorb : CAbilityBase
 				}
 				else if(b.getConfig() == "boulder")
 				{
-					blob.set_s32("golemiteCount",Maths::Min(blob.get_s32("golemiteMax"), blob.get_s32("golemiteCount") + 30));
-					b.server_Die();
-				
 					CAbilityManager@ manager;
 					blob.get("AbilityManager",@manager);
 					if(manager.abilityMenu.addAbilityIfUnique(EAbilities::SynthesizeBoulder))
 					{
 						addToMyChat("After absorbing the boulder, you learn how to create more from your golemites");
+						if(canAbsorb)
+						{
+							blob.set_s32("golemiteCount",Maths::Min(blob.get_s32("golemiteMax"), blob.get_s32("golemiteCount") + 30));
+						}
+						b.server_Die();
+					}
+					else if(canAbsorb){
+						blob.set_s32("golemiteCount",Maths::Min(blob.get_s32("golemiteMax"), blob.get_s32("golemiteCount") + 30));
+						b.server_Die();
 					}
 
 					break;
