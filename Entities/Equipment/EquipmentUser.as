@@ -48,6 +48,11 @@ void onRender(CSprite@ this)
 
 void onTick(CBlob@ this)
 {
+	if(this.hasTag("recalchp"))
+	{
+		recalculateHealth(this);
+		this.Untag("recalchp");
+	}
 	for(int i = 0; i < equipslots.size(); i++)
 	{
 		CBlob@ equipped = null;
@@ -227,6 +232,7 @@ void recalculateHealth(CBlob@ this)
 			}
 		}
 	}
+	maxhealth += this.get_u16("fxhpboostpower") * 0.3; //0.3 * 5 = 1.5 or half of base HP
 	this.set_f32("chealth", maxhealth);
 }
 

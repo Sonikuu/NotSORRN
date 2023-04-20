@@ -127,6 +127,11 @@ void renderBG(int id)
 	CRules@ rules = getRules();
 	//GUI Rendering
 	rules.get("RLbg", @list);
+	if(list is null)
+	{
+		print("Null list in renderBG function");
+		return;
+	}
 	for(int i = 0; i < list.size(); i++)
 	{
 		//print("Rendering");

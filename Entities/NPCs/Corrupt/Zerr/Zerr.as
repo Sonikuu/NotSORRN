@@ -86,8 +86,11 @@ void onDie(CBlob@ this)
 	//Spurt blood or something lel
 	if(isServer() && XORRandom(100) > 80)
 	{
-		CBlob@ blob = server_CreateBlob("mat_chitin", 0, this.getPosition());
+		CBlob@ blob = server_CreateBlobNoInit("mat_chitin");
+		blob.setPosition(this.getPosition());
+		blob.Tag("custom quantity");
 		blob.server_SetQuantity(1);
+		blob.Init();
 	}
 }
 

@@ -12,7 +12,7 @@ void onInit(CBlob@ this)
 	this.getShape().getConsts().mapCollisions = false;
 
 	this.Tag("can settle"); //for DieOnCollapse to prevent 2 second life :)
-
+	this.Tag("builder always hit");
 	InitWorkshop(this);
 }
 
@@ -32,28 +32,6 @@ void InitWorkshop(CBlob@ this)
 	{
 		ShopItem@ s = addShopItem(this, "Bucket", "$bucket$", "bucket", Descriptions::bucket, false);
 		AddRequirement(s.requirements, "blob", "log", "Log", 1);
-	}
-	{
-		ShopItem@ s = addShopItem(this,  "Wooden Sword", "$woodsword$", "woodsword", "Basic Wooden Sword\nMust be equipped", false);
-		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 40);
-		AddRequirement(s.requirements,"blob","log","Log",1);
-		
-		AddIconToken("$woodsword$", "WoodSword.png", Vec2f(24, 16), 0);
-	}
-	{
-		ShopItem@ s = addShopItem(this,  "Dagger", "$dagger$", "dagger", "Dagger, for stabbing\nCan be dual-wielded\nMust be equipped", false);
-		AddRequirement(s.requirements, "blob", "log", "Log", 1);
-		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 40);
-		
-		AddIconToken("$dagger$", "Dagger.png", Vec2f(16, 16), 0);
-	}
-	{
-		ShopItem@ s = addShopItem(this,  "Spear", "$spear$", "spear", "Poke people with murderous intent\nMust be equipped", false);
-		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 40);
-		AddRequirement(s.requirements, "blob", "log", "Log", 1);
-		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 40);
-		
-		AddIconToken("$spear$", "PokingStick.png", Vec2f(32, 16), 0);
 	}
 	//---------------Log crafting end--------------
 	{
@@ -174,25 +152,7 @@ void InitWorkshop(CBlob@ this)
 		AddIconToken("$explosiveammopack$", "ExplosiveAmmoPack.png", Vec2f(16, 16), 0);
 		AddIconToken("$blazecore$", "BlazeCore.png", Vec2f(8, 8), 0);
 	}*/
-	ShopItem@ s = addShopItem(this,  "Bolts", "$mat_bolts$", "mat_bolts-30", "Bolts for your crossbow", false);
-	AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 25);
-	AddRequirement(s.requirements, "blob", "mat_stone", "Stone", 25);
 	
-	AddIconToken("$mat_bolts$", "MaterialBolts.png", Vec2f(16, 16), 0);
-	{
-		ShopItem@ s = addShopItem(this,  "Cleaver", "$cleaver$", "cleaver", "Heavy melee weapon, sacrifices speed for damage\nMust be equipped", false);
-		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 50);
-		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 4);
-		
-		AddIconToken("$cleaver$", "Cleaver.png", Vec2f(32, 16), 0);
-	}
-	{
-		ShopItem@ s = addShopItem(this,  "Metal Sword", "$metalsword$", "metalsword", "Lighter metallic sword, balanced speed and damage\nMust be equipped", false);
-		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", 25);
-		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 3);
-		
-		AddIconToken("$metalsword$", "MetalSword.png", Vec2f(24, 16), 0);
-	}
 	/*{
 		ShopItem@ s = addShopItem(this, "Soul Dust", "$souldust$", "souldust-3", "Smash a soul shard into dust", false);
 		AddRequirement(s.requirements, "blob", "soul_chunk", "Soul Chunk", 1);
@@ -271,43 +231,6 @@ void InitWorkshop(CBlob@ this)
 		AddRequirement(s.requirements, "blob", "mat_purifiedgold", "Purified Gold", 2);
 
 		AddIconToken("$golem$", "golem.png", Vec2f(16, 16), 0);
-	}
-	//ARMOR ---- MOVE TO DIFFERENT CRAFTING STATION MAYBE
-	{
-		ShopItem@ s = addShopItem(this,  "Metal Helmet", "$metal_helmet$", "metal_helmet", "Metallic head armor", false);
-		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 4);
-
-		AddIconToken("$metal_helmet$", "MetalHelmet.png", Vec2f(16, 16), 0);
-	}
-	{
-		ShopItem@ s = addShopItem(this,  "Metal Chestplate", "$metal_chestplate$", "metal_chestplate", "Metallic chest armor", false);
-		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 8);
-
-		AddIconToken("$metal_chestplate$", "MetalChestplate.png", Vec2f(16, 16), 0);
-	}
-	{
-		ShopItem@ s = addShopItem(this,  "Metal Boots", "$metal_boots$", "metal_boots", "Metallic foot armor", false);
-		AddRequirement(s.requirements, "blob", "mat_metal", "Alchemical Metal Sheets", 4);
-
-		AddIconToken("$metal_boots$", "MetalBoots.png", Vec2f(16, 16), 0);
-	}
-	{
-		ShopItem@ s = addShopItem(this,  "Gold Helmet", "$gold_helmet$", "gold_helmet", "Golden head armor", false);
-		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 50);
-
-		AddIconToken("$gold_helmet$", "GoldHelmet.png", Vec2f(16, 16), 0);
-	}
-	{
-		ShopItem@ s = addShopItem(this,  "Gold Chestplate", "$gold_chestplate$", "gold_chestplate", "Golden chest armor", false);
-		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 100);
-
-		AddIconToken("$gold_chestplate$", "GoldChestplate.png", Vec2f(16, 16), 0);
-	}
-	{
-		ShopItem@ s = addShopItem(this,  "Gold Boots", "$gold_boots$", "gold_boots", "Golden foot armor", false);
-		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", 50);
-
-		AddIconToken("$gold_boots$", "GoldBoots.png", Vec2f(16, 16), 0);
 	}
 }
 

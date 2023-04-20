@@ -92,7 +92,9 @@ array<CIngredientData@> ingredientdata =
 	@CIngredientData("rosarybead", 	"Rosary Bead",	10, 11, -0.5, 15, 300, 1, 1, 	SColor(255, 150, 64, 43),	Categories::Vegetable),
 	@CIngredientData("pineapple", 	"Pineapple",	7, 9, 0.5, 10, 300, 1.5, 1.3, 	SColor(255, 213, 204, 74),	Categories::Fruit | Categories::Vegetable),
 	@CIngredientData("cheddar",	 	"Cheddar Cheese",5, 6, 0.5, 2, 1800, 1.1, 1.4, 	SColor(255, 240, 230, 30),	Categories::Cheese),
-	@CIngredientData("swiss",	 	"Swiss Cheese",	6, 7, 0.5, 1, 2700, 1.5, 1.2, 	SColor(255, 237, 203, 142),	Categories::Cheese)
+	@CIngredientData("swiss",	 	"Swiss Cheese",	6, 7, 0.5, 1, 2700, 1.5, 1.2, 	SColor(255, 237, 203, 142),	Categories::Cheese),
+	@CIngredientData("lifefruit", 	"Life Fruit",	6, 6, 2.0, 10, 150, 1.5, 1.0, 	SColor(255, 44, 175, 222),	Categories::Fruit | Categories::Vegetable),
+	@CIngredientData("egg", 		"Egg",			4, 12, 0.25, 5, 3600, 1.4, 1.0, SColor(255, 233, 213, 213),	Categories::Meat)
 };
 
 CIngredientData@ getIngredientData(string input)
@@ -103,6 +105,13 @@ CIngredientData@ getIngredientData(string input)
 		
 			return @ingredientdata[i];
 	}
+	return null;
+}
+
+CIngredientData@ getIngredientData(int input)
+{
+	if(input < ingredientdata.size())
+		return ingredientdata[input];
 	return null;
 }
 
@@ -199,7 +208,7 @@ void makeFoodData(CBlob@ this)
 			if(!Texture::exists("CustomFood"))
 			{
 				if(!Texture::createFromFile("CustomFood", "CustomFood.png"))
-					print("oh this is a problem");
+					print("Texture error in CustomFoodCommon.as");
 			}
 			//Getting base image data
 			ImageData@ baseimage = Texture::data("CustomFood");

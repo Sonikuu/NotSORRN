@@ -22,10 +22,10 @@ void onDie(CBlob@ this)
 	if (segments is null)
 		return;
 
-	if(isServer() && getMap().getTile(this.getPosition()).type == 0 && (XORRandom(10) == 0 || true))
+	/*if(isServer() && getMap().getTile(this.getPosition()).type == 0 && (XORRandom(10) == 0 || true))
 	{ 
 		server_CreateBlob("birb",-1,this.getPosition() - Vec2f(0,5 * segments.size()));
-	}
+	}*/
 
 	for (uint i = 0; i < segments.length; i++)
 	{

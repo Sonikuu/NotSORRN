@@ -1,5 +1,6 @@
 #include "FuelCommon.as";
 #include "CustomFoodCommon.as";
+#include "FxHookCommon.as";
 
 
 void onRender(CSprite@ this)
@@ -42,6 +43,9 @@ void onInit(CBlob@ this)
 	this.Tag("builder always hit");
 
 	this.inventoryButtonPos = Vec2f(-12, 0);
+
+	array<string> ingcache;
+	this.set("ingcache", @ingcache);
 }
 
 void onInit(CSprite@ this)
@@ -303,6 +307,15 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 	}
 }
 
+void onAddToInventory(CBlob@ this, CBlob@ blob)
+{
+	array<string>@ ingcache;
+	this.get("ingcache", @ingcache);
+
+	if(ingcache.find(blob.getConfig()) < 0)
+		ingcache.push_back(blob.getConfig());
+}
+
 void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 {
 	if(this.getCommandID("addfuel") == cmd)
@@ -416,12 +429,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 			CIngredientData@ ingdata = getIngredientData(this.get_string("selingredient" + i));
 			if(ingdata !is null)
 			{
-				textboi.AddTextButton(ingdata.friendlyname + 
-				"\nEffect: " + ingdata.effect + 
-				"\nHealing: " + ingdata.healing +
-				"\nBase Power: " + ingdata.basepower + 
-				" Base Duration: " + ingdata.baseduration + 
-				"\nFlavor: " + ingdata.flavor, Vec2f(5, 2));
+				textboi.AddTextButton(makeStatText(ingdata), Vec2f(5, 2));
 			}
 			else
 			{
@@ -467,12 +475,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 			CIngredientData@ ingdata = getIngredientData(this.get_string("selingredient" + (i + recipedata.ingredientlist.size())));
 			if(ingdata !is null)
 			{
-				textboi.AddTextButton(ingdata.friendlyname + 
-				"\nEffect: " + ingdata.effect + 
-				"\nHealing: " + ingdata.healing +
-				"\nBase Power: " + ingdata.basepower + 
-				" Base Duration: " + ingdata.baseduration + 
-				"\nFlavor: " + ingdata.flavor, Vec2f(5, 2));
+				textboi.AddTextButton(makeStatText(ingdata), Vec2f(5, 2));
 			}
 			else
 			{
@@ -518,5 +521,99 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 				butt.clickable = false;
 			}
 		}
+
+
+		//Making box for finished result
+		//Real quick, lets make a little text box for stats display :)
+		CGridMenu@ textboi = CreateGridMenu(screenmid + Vec2f(getScreenWidth() / 2 - 128, getScreenHeight() - 90), this, Vec2f(5, 2), "Finished Product");
+		textboi.SetCaptionEnabled(false);
+		array<CIngredientData@> inglist;
+		bool invalid = false;
+		for(int i = 0; i < recipedata.ingredientlist.size() + recipedata.optionals.size(); i++)
+		{
+			CIngredientData@ thising = getIngredientData(this.get_string("selingredient" + i));
+			if(thising is null && i < recipedata.ingredientlist.size())
+			{
+				invalid = true;
+				print("Breaking");
+				break;
+			}
+			inglist.push_back(thising);
+				
+		}
+		for(int i = 0; i < recipedata.ingredientspecific.size(); i++)
+		{
+			CIngredientData@ thising = getIngredientData(this.get_string("selingredient" + i));
+			if(thising is null)
+			{
+				invalid = true;
+				print("Breaking deez nuts");
+				break;
+			}
+			inglist.push_back(thising);
+		}
+		
+		if(!invalid)
+		{
+			textboi.AddTextButton(makeCompletedText(@inglist), Vec2f(5, 2));
+		}
+		else
+		{
+			//hmm
+		}
 	}
+}
+
+string makeStatText(CIngredientData@ ingdata)
+{
+	return ingdata.friendlyname + 
+		"\nEffect: " + effectlist[ingdata.effect].getDisplayName() + 
+		"\nHealing: " + ingdata.healing +
+		"\nBase Power: " + ingdata.basepower + 
+		" Base Duration: " + ingdata.baseduration / 30.0 + "s" + 
+		"\nPower Mod: " + ingdata.powermod + "x" +
+		" Duration Mod: " + ingdata.durationmod + "x" +
+		"\nFlavor: " + ingdata.flavor;
+}
+
+string makeCompletedText(array<CIngredientData@>@ ingdata)
+{
+	if (ingdata.size() == 0)
+	{
+		print("asdsadas");
+		return "Invalid Food";
+	}
+	//Now, we do the stats of the food
+	
+	//First, get the highest flavor, this will determine the basic stats
+	int flavorid = -1;
+	int highestflavor = -1;
+
+	for(int i = 0; i < ingdata.size(); i++)
+	{
+		if(ingdata[i] !is null && ingdata[i].flavor > highestflavor)
+		{
+			flavorid = i;
+			highestflavor = ingdata[i].flavor;
+		}
+	}
+	//Now, extract base stats and multiply the rest into it
+	float foodpower = ingdata[flavorid].basepower;
+	float foodduration = ingdata[flavorid].baseduration;
+	for(int i = 0; i < ingdata.size(); i++)
+	{
+		if(i != flavorid && ingdata[i] !is null)
+		{
+			foodpower *= ingdata[i].powermod;
+			foodduration *= ingdata[i].durationmod;
+		}
+	}
+	
+
+
+	return "Finished Meal" + 
+		"\nEffect: " + effectlist[ingdata[flavorid].effect].getDisplayName() + 
+		"\nHealing: ???" +
+		"\nPower: " + foodpower + 
+		"\nDuration: " + foodduration / 30.0 + "s";
 }

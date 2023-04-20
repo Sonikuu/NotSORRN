@@ -58,6 +58,28 @@ void onTick(CRules@ this)
 			server_CreateBlob("chicken", -1, Vec2f(newx, heightdata[newx]) * map.tilesize);
 		}
 	}
+	//Bison spawning
+	if(isServer() && XORRandom(3000) == 0)
+	{
+		array<CBlob@> bison;
+		getBlobsByName("bison", @bison);
+		if(bison.length < 4)
+		{
+			int newx = XORRandom(map.tilemapwidth);
+			server_CreateBlob("bison", -1, Vec2f(newx, heightdata[newx]) * map.tilesize);
+		}
+	}
+	//Cow spawning
+	if(isServer() && XORRandom(3000) == 0)
+	{
+		array<CBlob@> cow;
+		getBlobsByName("cow", @cow);
+		if(cow.length < 4)
+		{
+			int newx = XORRandom(map.tilemapwidth);
+			server_CreateBlob("cow", -1, Vec2f(newx, heightdata[newx]) * map.tilesize);
+		}
+	}
 
 	
 

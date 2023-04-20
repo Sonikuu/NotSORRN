@@ -9,6 +9,7 @@
 #include "CHitters.as";
 #include "DamageModCommon.as";
 #include "RunnerCommon.as";
+#include "CHealth.as";
 
 
 interface IStatusEffect
@@ -24,6 +25,7 @@ interface IStatusEffect
 	string getFxName();
 	void onApply(CBlob@);
 	void onRemove(CBlob@);
+	string getDisplayName();
 }
 
 class CStatusBase : IStatusEffect
@@ -35,6 +37,7 @@ class CStatusBase : IStatusEffect
 	string getFxName(){return "";}
 	void onApply(CBlob@ this){}
 	void onRemove(CBlob@ this){}
+	string getDisplayName(){return "";};
 	//There, blank implementations
 }
 
@@ -83,6 +86,10 @@ class CStatusDamageReduce : CStatusBase
 			return "Divide damage taken by $GREEN$((power / 10) + 1)$GREEN$";
 		return "Divide damage taken by $GREEN$" + formatFloat(this.get_u16("fxdamagereducepower") / 10.0 + 1, "", 0, 1) + "$GREEN$";
 	}
+	string getDisplayName()
+	{
+		return "Protection";
+	}
 }
 
 //Damage mod type of effect, fun
@@ -122,6 +129,10 @@ class CStatusCorrupt : CStatusBase
 	void onRemove(CBlob@ this)
 	{
 		removeDamageMod(this, @mod);
+	}
+	string getDisplayName()
+	{
+		return "Agression";
 	}
 }
 
@@ -168,6 +179,10 @@ class CStatusPure : CStatusBase
 	{
 		removeDamageMod(this, @mod);
 	}
+	string getDisplayName()
+	{
+		return "Pure Blood";
+	}
 }
 
 class CStatusUnholy : CStatusBase
@@ -199,6 +214,10 @@ class CStatusUnholy : CStatusBase
 		if(algo)
 			return "Multiply movement speed by $GREEN$((power / 15) + 1)$GREEN$";
 		return "Multiply movement speed by $GREEN$" + formatFloat(this.get_u16("fxunholypower") / 15.0 + 1, "", 0, 1) + "$GREEN$";
+	}
+	string getDisplayName()
+	{
+		return "Corrupt Speed";
 	}
 }
 
@@ -249,6 +268,10 @@ class CStatusHoly : CStatusBase
 		return "Reduce non-corrupt damage taken by $GREEN$" + formatFloat(this.get_u16("fxholypower") / 7.5 + 1, "", 0, 1) + 
 		"\n$GREEN$Reduce movement speed by $RED$" + formatFloat(this.get_u16("fxholypower") / 10.0 + 1, "", 0, 1) + "$RED$";
 	}
+	string getDisplayName()
+	{
+		return "Holy Protection";
+	}
 }
 
 class CStatusGrav : CStatusBase
@@ -273,6 +296,10 @@ class CStatusGrav : CStatusBase
 		if(algo)
 			return "Reduce gravity by $GREEN$((power / 5) + 1)$GREEN$";
 		return "Reduce gravity by $GREEN$" + formatFloat(this.get_u16("fxgravpower") / 5.0 + 1, "", 0, 1) + "$GREEN$";
+	}
+	string getDisplayName()
+	{
+		return "Gravity Nullification";
 	}
 }
 
@@ -318,6 +345,10 @@ class CStatusRegen : CStatusBase
 			return "Regenerate $GREEN$(power * 0.01)$GREEN$";
 		return "Regenerate $GREEN$" + formatFloat(this.get_u16("fxregenpower") * 0.01, "", 0, 1) + "$GREEN$HP every half-second";
 	}
+	string getDisplayName()
+	{
+		return "Regeneration";
+	}
 }
 
 class CStatusLightFall : CStatusBase
@@ -353,6 +384,10 @@ class CStatusLightFall : CStatusBase
 	string getHoverText(CBlob@ this, bool algo)
 	{
 		return "$GREEN$Negate$GREEN$ fall damage and stun";
+	}
+	string getDisplayName()
+	{
+		return "Feather Fall";
 	}
 }
 
@@ -401,6 +436,10 @@ class CStatusGhostLike : CStatusBase
 	{
 		return "$GREEN$Allow$GREEN$ phasing through tiles";
 	}
+	string getDisplayName()
+	{
+		return "Ghostly";
+	}
 }
 
 class CStatusSpeed : CStatusBase
@@ -432,6 +471,10 @@ class CStatusSpeed : CStatusBase
 		if(algo)
 			return "Multiply walking speed by $GREEN$((power / 10.0) + 1)$GREEN$";
 		return "Multiply walking speed by $GREEN$" + formatFloat(this.get_u16("fxspeedpower") / 10.0 + 1, "", 0, 1) + "$GREEN$";
+	}
+	string getDisplayName()
+	{
+		return "Swiftness";
 	}
 }
 
@@ -475,6 +518,10 @@ class CStatusLeap : CStatusBase
 			return "Multiply jumping power by $GREEN$((power / 7.5) + 1)$GREEN$";
 		return "Multiply jumping power by $GREEN$" + formatFloat(this.get_u16("fxleappower") / 7.5 + 1, "", 0, 1) + "$GREEN$";
 	}
+	string getDisplayName()
+	{
+		return "Leaping";
+	}
 }
 
 class CStatusPoison : CStatusBase
@@ -511,6 +558,49 @@ class CStatusPoison : CStatusBase
 			return "Lose $RED$(power * 0.01)$RED$HP every half-second";
 		return "Lose $RED$" + formatFloat(this.get_u16("fxpoisonpower") * 0.01, "", 0, 1) + "$RED$HP every half-second";
 	}
+	string getDisplayName()
+	{
+		return "Poison";
+	}
+}
+
+class CStatusHealthBoost : CStatusBase
+{
+	void onTick(CBlob@ this)
+	{
+		
+	}
+	void onApply(CBlob@ this)
+	{
+		this.Tag("recalchp");
+	}
+
+	void onRemove(CBlob@ this)
+	{
+		this.Tag("recalchp");
+		this.set_u16("fxhpboostpower", 0); //Equipment User will recalc based on this value BASE HP IS 3 OR 6 HEARTS
+	}
+	string getFxName()
+	{
+		return "fxhpboost";
+	}
+	void renderIcon(Vec2f pos, CBlob@ this)
+	{
+		GUI::DrawIcon("EffectIcons.png", 12, Vec2f(16, 16), pos);
+		GUI::DrawTextCentered("" + this.get_u16("fxhpboosttime") / 30, pos + Vec2f(16, 32), SColor(255, 50, 255, 50));
+		GUI::DrawTextCentered("" + this.get_u16("fxhpboostpower"), pos + Vec2f(16, -8), SColor(255, 50, 255, 50));
+	}
+	//Implement the rest later
+	string getHoverText(CBlob@ this, bool algo)
+	{
+		if(algo)
+			return "Boost max health by $GREEN$(power * 0.3)$GREEN$HP ";
+		return "Boost max health by $GREEN$" + formatFloat(this.get_u16("fxhpboostpower") * 0.3, "", 0, 1) + "$GREEN$HP";
+	}
+	string getDisplayName()
+	{
+		return "Healthy";
+	}
 }
 
 
@@ -540,7 +630,8 @@ array<IStatusEffect@> effectlist = {
 	cast<IStatusEffect@>(@CStatusGhostLike()),		//8
 	cast<IStatusEffect@>(@CStatusSpeed()),			//9
 	cast<IStatusEffect@>(@CStatusLeap()),			//10
-	cast<IStatusEffect@>(@CStatusPoison())			//11
+	cast<IStatusEffect@>(@CStatusPoison()),			//11
+	cast<IStatusEffect@>(@CStatusHealthBoost())		//12
 };
 
 Vec2f getEffectIconCenter(int i)
