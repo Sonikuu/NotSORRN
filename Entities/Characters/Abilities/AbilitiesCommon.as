@@ -386,6 +386,10 @@ class CSelfDestruct : CAbilityBase
 
 	void onInit() override
 	{
+		if(blob is null){
+			error("Blob was null in CSelfDestruct::onInit()");
+			return;
+		}
 		blob.SetLightColor(SColor(255, 252, 86, 10));
         blob.SetLightRadius(24.0f);
 	    blob.SetLight(true);
