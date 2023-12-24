@@ -312,7 +312,7 @@ void onAddToInventory(CBlob@ this, CBlob@ blob)
 	array<string>@ ingcache;
 	this.get("ingcache", @ingcache);
 
-	if(ingcache.find(blob.getConfig()) < 0)
+	if(getIngredientData(blob.getName()) !is null && ingcache.find(blob.getConfig()) < 0)
 		ingcache.push_back(blob.getConfig());
 }
 
@@ -370,6 +370,9 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 	caller.ClearGridMenus();
 	Vec2f screenmid(getScreenWidth() / 2, getScreenHeight() / 2);
 	u8 currentrecipe = this.get_u8("currrecipe");
+
+	array<string>@ storedingredients;
+	this.get("ingcache", @storedingredients);
 	//First, we make a list of all available recipes
 	CGridMenu@ selrec = CreateGridMenu(screenmid - Vec2f(256, 0), this, Vec2f(1, recipelist.size()), "Recipes");
 	for(int i = 0; i < recipelist.size(); i++)
@@ -393,7 +396,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 		CInventory@ inv = this.getInventory();
 		//Now, lets get all valid recipe items from storage
 		//And cache names in the array
-		array<string> storedingredients;
+		/*array<string> storedingredients;
 		for(int i = 0; i < inv.getItemsCount(); i++)
 		{
 			CBlob@ item = inv.getItem(i);
@@ -402,7 +405,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 				storedingredients.push_back(item.getName());
 				//print(item.getName());	//Havent tested yet, i have a feeling ill need this
 			}
-		}
+		}*/
 
 		//Okay, now that thats done
 		//Lets make the gui for each ingredient selector
@@ -438,7 +441,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 			//-------------------TXT
 			for(int j = 0; j < valids.size(); j++)
 			{
-				CBlob@ datblob = inv.getItem(valids[j]);
+				CBlob@ datblob = getBlobByName(valids[j]);
 				if(datblob !is null)
 				{
 					CBitStream params;
@@ -449,6 +452,22 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 					if(this.get_string("selingredient" + i) == valids[j])
 					{
 						butt.SetSelected(1);
+					}
+				}
+				else
+				{
+					CIngredientData@ displaying = getIngredientData(valids[j]);
+					if(displaying !is null)
+					{
+						CBitStream params;
+						params.write_u16(caller.getNetworkID());
+						params.write_u8(i);	//Ing slot
+						params.write_string(valids[j]); //The ingredient to select
+						CGridButton@ butt = seling.AddButton(displaying.friendlyname + ".png", 0, Vec2f(8, 8), displaying.friendlyname, this.getCommandID("selingredient"), Vec2f(1, 1), params);
+						if(this.get_string("selingredient" + i) == valids[j])
+						{
+							butt.SetSelected(1);
+						}
 					}
 				}
 			}
@@ -493,7 +512,7 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 			}
 			for(int j = 0; j < valids.size(); j++)
 			{
-				CBlob@ datblob = inv.getItem(valids[j]);
+				CBlob@ datblob = getBlobByName(valids[j]);
 				if(datblob !is null)
 				{
 					CBitStream params;
@@ -504,6 +523,22 @@ void openRecipeMenu(CBlob@ this, CBlob@ caller)
 					if(this.get_string("selingredient" + (i + recipedata.ingredientlist.size())) == valids[j])
 					{
 						butt.SetSelected(1);
+					}
+				}
+				else
+				{
+					CIngredientData@ displaying = getIngredientData(valids[j]);
+					if(displaying !is null)
+					{
+						CBitStream params;
+						params.write_u16(caller.getNetworkID());
+						params.write_u8(i + recipedata.ingredientlist.size());	//Ing slot
+						params.write_string(valids[j]); //The ingredient to select
+						CGridButton@ butt = seling.AddButton(displaying.friendlyname + ".png", 0, Vec2f(8, 8), displaying.friendlyname, this.getCommandID("selingredient"), Vec2f(1, 1), params);
+						if(this.get_string("selingredient" + (i + recipedata.ingredientlist.size())) == valids[j])
+						{
+							butt.SetSelected(1);
+						}
 					}
 				}
 			}

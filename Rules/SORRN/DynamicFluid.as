@@ -19,20 +19,25 @@ void onRestart(CRules@ this)
 	{
 		array<array<CWaterTile>>@ waterdata;
 		array<bool>@ activelayers;
+		array<bool>@ activecolumns;
 
 		map.get("waterdata", @waterdata);
 		map.get("activelayers", @activelayers);
+		map.get("activecolumns", @activecolumns);
 
+		//NOTE: This usually does not run due to the vars being set in maploader
 		if(waterdata is null || waterdata.size() != map.tilemapwidth || waterdata[0].size() != map.tilemapheight)
 		{
 			@waterdata = @array<array<CWaterTile>>(map.tilemapwidth, array<CWaterTile>(map.tilemapheight, CWaterTile()));
 			@activelayers = @array<bool>(map.tilemapheight, false);
+			@activecolumns = @array<bool>(map.tilemapwidth, false);
 		}
 	
 		map.AddScript("DynamicFluid.as");
 		
 		map.set("waterdata", @waterdata);
 		map.set("activelayers", @activelayers);
+		map.set("activecolumns", @activecolumns);
 	}
 }
 
@@ -42,9 +47,11 @@ void onSetTile(CMap@ this, u32 index, TileType newtile, TileType oldtile)
 	{
 		array<array<CWaterTile>>@ waterdata;
 		array<bool>@ activelayers;
+		array<bool>@ activecolumns;
 
 		this.get("waterdata", @waterdata);
 		this.get("activelayers", @activelayers);
+		this.get("activecolumns", @activecolumns);
 
 		if(waterdata is null || activelayers is null)
 			return;
@@ -61,6 +68,7 @@ void onSetTile(CMap@ this, u32 index, TileType newtile, TileType oldtile)
 			waterdata[pos.x][pos.y - 1].a = true;
 
 		activelayers[pos.y] = true;
+		activecolumns[pos.x] = true;
 		if(pos.y > 0)
 			activelayers[pos.y - 1] = true;
 		if(pos.y < this.tilemapheight)
@@ -74,8 +82,10 @@ void onTick(CRules@ this)
 	CMap@ map = getMap();
 	array<array<CWaterTile>>@ waterdata;
 	array<bool>@ activelayers;
+	array<bool>@ activecolumns;
 	map.get("waterdata", @waterdata);
 	map.get("activelayers", @activelayers);
+	map.get("activecolumns", @activecolumns);
 
 	if(!isServer())
 	{
@@ -117,6 +127,7 @@ void onTick(CRules@ this)
 				waterdata[pos.x][pos.y].f = true;
 				waterdata[pos.x][pos.y].a = true;
 				activelayers[pos.y] = true;
+				activecolumns[pos.x] = true;
 
 				CBitStream params;
 				params.write_Vec2f(pos);
@@ -142,6 +153,7 @@ void onTick(CRules@ this)
 	int actc = 0;
 	if(waterdata is null)
 		return;
+	array<bool> columnkeepactive(map.tilemapwidth, false);
 	for(int y = 0; y < waterdata[0].size(); y++)
 	{
 		if(!activelayers[y])
@@ -150,6 +162,8 @@ void onTick(CRules@ this)
 		bool keepactive = false;
 		for(int x = 0; x < waterdata.size(); x++)
 		{
+			if(!activecolumns[x])
+				continue;
 			CWaterTile@ bw = @waterdata[x][y];
 			if(bw.b && bw.a)//If water exists there basically
 			{
@@ -158,6 +172,7 @@ void onTick(CRules@ this)
 				{
 					bw.u = 0;
 					keepactive = true;
+					columnkeepactive[x] = true;
 					continue;
 				}
 				int tempunused = bw.u;
@@ -194,6 +209,7 @@ void onTick(CRules@ this)
 								activelayers[y - 1] = true;
 							}
 							keepactive = true;
+							columnkeepactive[x] = true;
 						}
 					}
 				}
@@ -210,45 +226,54 @@ void onTick(CRules@ this)
 								diff = Maths::Min(diff, bw.d - bw.u);
 								mdt = true;
 								
-								if((XORRandom(2) == 0 || Maths::Ceil(diff) != 1) && diff > 0)
+								if(diff > 0)
 								{
-									float divvor = 2.0;
-									if(!map.isTileSolid(Vec2f(x - 1, y) * 8) && x - 1 >= 0 && !waterdata[x - 1][y].f && bw.d - waterdata[x - 1][y].d > 0)
+									if((XORRandom(2) == 0 || Maths::Ceil(diff) != 1))
 									{
-										//diff = Maths::Ceil(diff / 3.0);
-										//print("tridiv");
-										divvor = 3.0;
-									}
-									else
-									{
-										//diff = Maths::Ceil(diff / 2.0);
-									}
-									
-									bw.f = false;
-									bw.d -= Maths::Ceil(diff / divvor);
-									if(bw.d == 0)
-										bw.b = false;
-									else if(bw.d > 15)
-										print("AASDASD" + diff);
-									waterdata[x + 1][y].d += Maths::Ceil(diff / divvor);
-									waterdata[x + 1][y].b = true;
-									//waterdata[x + 1][y].u += diff;
-									//if(diff == 1)
-										//waterdata[x + 1][y].u = 15;
-									if(waterdata[x + 1][y].d >= 15)
-										waterdata[x + 1][y].f = true;
-									
-									if(x > 0)
-										waterdata[x - 1][y].a = true;
-									if(x + 1 < waterdata.size())
-										waterdata[x + 1][y].a = true;
-									if(y > 0)
-									{
-										waterdata[x][y - 1].a = true;
-										activelayers[y - 1] = true;
-									}
+										float divvor = 2.0;
+										if(!map.isTileSolid(Vec2f(x - 1, y) * 8) && x - 1 >= 0 && !waterdata[x - 1][y].f && bw.d - waterdata[x - 1][y].d > 0)
+										{
+											//diff = Maths::Ceil(diff / 3.0);
+											//print("tridiv");
+											divvor = 3.0;
+										}
+										else
+										{
+											//diff = Maths::Ceil(diff / 2.0);
+										}
+										
+										bw.f = false;
+										bw.d -= Maths::Ceil(diff / divvor);
+										if(bw.d == 0)
+											bw.b = false;
+										else if(bw.d > 15)
+											print("AASDASD" + diff);
+										waterdata[x + 1][y].d += Maths::Ceil(diff / divvor);
+										waterdata[x + 1][y].b = true;
+										activecolumns[x + 1] = true;
+										activecolumns[x - 1] = true;
+										//waterdata[x + 1][y].u += diff;
+										//if(diff == 1)
+											//waterdata[x + 1][y].u = 15;
+										if(waterdata[x + 1][y].d >= 15)
+											waterdata[x + 1][y].f = true;
+										
+										if(x > 0)
+											waterdata[x - 1][y].a = true;
+										if(x + 1 < waterdata.size())
+											waterdata[x + 1][y].a = true;
+										if(y > 0)
+										{
+											waterdata[x][y - 1].a = true;
+											activelayers[y - 1] = true;
+										}
 
+									
+									}
 									keepactive = true;
+									columnkeepactive[x] = true;
+									columnkeepactive[x + 1] = true;
+									columnkeepactive[x - 1] = true;
 								}
 							}
 						}
@@ -277,6 +302,8 @@ void onTick(CRules@ this)
 											//waterdata[x + 1][y].u = 15;
 									waterdata[x - 1][y].d += Maths::Ceil(diff / 2.0);
 									waterdata[x - 1][y].b = true;
+									activecolumns[x - 1] = true;
+									activecolumns[x + 1] = true;
 
 									if(waterdata[x - 1][y].d >= 15)
 										waterdata[x - 1][y].f = true;
@@ -291,6 +318,8 @@ void onTick(CRules@ this)
 										activelayers[y - 1] = true;
 									}
 									keepactive = true;
+									columnkeepactive[x] = true;
+									columnkeepactive[x - 1] = true;
 								}
 							}
 						}
@@ -309,7 +338,10 @@ void onTick(CRules@ this)
 			}
 			bw.u = 0;
 			if(bw.a && bw.b)
+			{
 				keepactive = true;
+				columnkeepactive[x] = true;
+			}
 		}
 		if(!keepactive)
 		{
@@ -317,6 +349,12 @@ void onTick(CRules@ this)
 			//print("Killed layer " + y);
 		}
 	}
+	for(int i = 0; i < columnkeepactive.size(); i++)
+	{
+		if(!columnkeepactive[i])
+			activecolumns[i] = false;
+	}
+
 	//print("" + actc);
 	if(getGameTime() % 1 == 0)
 	{
@@ -399,9 +437,11 @@ void onRender(CRules@ this)
 	CMap@ map = getMap();
 	array<array<CWaterTile>>@ waterdata;
 	array<bool>@ activelayers;
+	array<bool>@ activecolumns;
 
 	map.get("waterdata", @waterdata);
 	map.get("activelayers", @activelayers);
+	map.get("activecolumns", @activecolumns);
 
 	
 	if(waterdata is null)
@@ -456,19 +496,36 @@ void onRender(CRules@ this)
 			}
 		}
 
-		/*for(int y = 0; y < activelayers.size(); y++)
+		if(cont.isKeyPressed(KEY_KEY_P))
 		{
-			if(!activelayers[y])
-				continue;
-			float p = y * 8;
-			SColor c = SColor(200, 50, 200, 200);
-			//float dr = (15.0 - waterdata[x][y].d) / 15.0;
-			
-			vertlist.push_back(Vertex(0, p + 3, 0, 0, 0, c));
-			vertlist.push_back(Vertex(1000, p + 3, 0, 1, 0, c));
-			vertlist.push_back(Vertex(1000, p + 5, 0, 1, 1, c));
-			vertlist.push_back(Vertex(0, p + 5, 0, 0, 1, c));
-		}*/
+			for(int y = 0; y < activelayers.size(); y++)
+			{
+				if(!activelayers[y])
+					continue;
+				float p = y * 8;
+				SColor c = SColor(200, 50, 200, 200);
+				//float dr = (15.0 - waterdata[x][y].d) / 15.0;
+				
+				vertlist.push_back(Vertex(0, p + 3, 0, 0, 0, c));
+				vertlist.push_back(Vertex(5000, p + 3, 0, 1, 0, c));
+				vertlist.push_back(Vertex(5000, p + 5, 0, 1, 1, c));
+				vertlist.push_back(Vertex(0, p + 5, 0, 0, 1, c));
+			}
+
+			for(int x = 0; x < activecolumns.size(); x++)
+			{
+				if(!activecolumns[x])
+					continue;
+				float p = x * 8;
+				SColor c = SColor(200, 50, 200, 200);
+				//float dr = (15.0 - waterdata[x][y].d) / 15.0;
+				
+				vertlist.push_back(Vertex(p + 3, 0, 0, 0, 0, c));
+				vertlist.push_back(Vertex(p + 3, 1000, 0, 1, 0, c));
+				vertlist.push_back(Vertex(p + 5, 1000, 0, 1, 1, c));
+				vertlist.push_back(Vertex(p + 5, 0, 0, 0, 1, c));
+			}
+		}
 
 		
 		

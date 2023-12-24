@@ -60,6 +60,8 @@ void onTick(CSprite@ this)
     for(int i = 0; i < blobs.length; i++)
     {
         CBlob@ blob = blobs[i];
+        if(!hasTanks(blobs[i]))//Fix for console spam (Outside of bounds)
+            continue;
         CAlchemyTank@ tank = getTank(blob, 0);
 
         if(tank !is null)

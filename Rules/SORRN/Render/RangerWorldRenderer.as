@@ -55,7 +55,10 @@ void onRender(CRules@ this)
 	array<RenderList@>@ list;
 	this.get("RLrender", @list);
 	if(list is null)
+	{
+		print("Null list in onRender function");
 		return;
+	}
 	for(int i = 0; i < list.size(); i++)
 	{
 		if(list[i].timetodie <= 1)
@@ -80,6 +83,11 @@ void renderLists(int id)
 	array<RenderList@>@ list;
 	CRules@ rules = getRules();
 	rules.get("RLtick", @list);
+	if(list is null)
+	{
+		print("Null list in renderLists function");
+		return;
+	}
 	for(int i = 0; i < list.size(); i++)
 	{
 		//print("Rendering");
@@ -102,6 +110,11 @@ void renderGUI(int id)
 	CRules@ rules = getRules();
 	//GUI Rendering
 	rules.get("RLgui", @list);
+	if(list is null)
+	{
+		print("Null list in renderGUI function");
+		return;
+	}
 	for(int i = 0; i < list.size(); i++)
 	{
 		//print("Rendering");

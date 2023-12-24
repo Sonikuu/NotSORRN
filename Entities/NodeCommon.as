@@ -1008,6 +1008,17 @@ void addNodeController(CBlob@ blob)
 	blob.set("nodecontroller", @controller);
 }
 
+bool hasTanks(CBlob@ blob)
+{
+	CNodeController@ controller;
+	blob.get("nodecontroller", @controller);
+	if(controller is null)
+		return false;
+	if(controller.tanks.size() == 0)
+		return false;
+	return true;
+}
+
 CAlchemyTank@ addTank(CBlob@ blob, string name, bool input, Vec2f offset)
 {
 	CNodeController@ controller;

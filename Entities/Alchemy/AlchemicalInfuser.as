@@ -228,9 +228,12 @@ void onInit(CBlob@ this)
 void onInit(CSprite@ this)
 {
 	CSpriteLayer@ layer = this.addSpriteLayer("runes");
+	CSpriteLayer@ woodlayer = this.addSpriteLayer("bgwood");
 	CSpriteLayer@ itemlayer = this.addSpriteLayer("item");
 	layer.SetRelativeZ(1);
 	layer.SetFrame(1);
+	woodlayer.SetRelativeZ(-10);
+	woodlayer.SetFrame(2);
 	//layer.setRenderStyle(RenderStyle::light);
 	layer.SetLighting(false);
 	itemlayer.SetVisible(false);

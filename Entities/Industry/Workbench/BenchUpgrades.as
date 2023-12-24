@@ -20,6 +20,10 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 			caller.CreateGenericButton("$upgrade_fireplace$", Vec2f(0, -6), this, this.getCommandID("upgrade"), "Turn into decor bench", params);
 		else if(held.getConfig() == "mat_stone" && held.getQuantity() >= 100)
 			caller.CreateGenericButton("$upgrade_fireplace$", Vec2f(0, -6), this, this.getCommandID("upgrade"), "Turn into armory bench", params);
+		else if(held.getConfig() == "mat_component" && held.getQuantity() >= 8)
+			caller.CreateGenericButton("$upgrade_fireplace$", Vec2f(0, -6), this, this.getCommandID("upgrade"), "Turn into crossbow bench", params);
+		else if(held.getConfig() == "mat_metal" && held.getQuantity() >= 8)
+			caller.CreateGenericButton("$upgrade_fireplace$", Vec2f(0, -6), this, this.getCommandID("upgrade"), "Turn into gun bench", params);
 	}
 }
 
@@ -41,7 +45,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 					if(held.getQuantity() <= 0)
 						held.server_Die();
 				}
-				if(held.getConfig() == "lantern")
+				else if(held.getConfig() == "lantern")
 				{
 					server_CreateBlob("decorbench", caller.getTeamNum(), this.getPosition());
 					this.server_Die();
@@ -49,11 +53,27 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 					if(held.getQuantity() <= 0)
 						held.server_Die();
 				}
-				if(held.getConfig() == "mat_stone" && held.getQuantity() >= 100)
+				else if(held.getConfig() == "mat_stone" && held.getQuantity() >= 100)
 				{
 					server_CreateBlob("armorbench", caller.getTeamNum(), this.getPosition());
 					this.server_Die();
 					held.server_SetQuantity(held.getQuantity() - 100);
+					if(held.getQuantity() <= 0)
+						held.server_Die();
+				}
+				else if(held.getConfig() == "mat_component" && held.getQuantity() >= 8)
+				{
+					server_CreateBlob("crossbowbench", caller.getTeamNum(), this.getPosition());
+					this.server_Die();
+					held.server_SetQuantity(held.getQuantity() - 8);
+					if(held.getQuantity() <= 0)
+						held.server_Die();
+				}
+				else if(held.getConfig() == "mat_metal" && held.getQuantity() >= 8)
+				{
+					server_CreateBlob("gunbench", caller.getTeamNum(), this.getPosition());
+					this.server_Die();
+					held.server_SetQuantity(held.getQuantity() - 8);
 					if(held.getQuantity() <= 0)
 						held.server_Die();
 				}

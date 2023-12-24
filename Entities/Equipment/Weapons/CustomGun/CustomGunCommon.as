@@ -183,13 +183,13 @@ array<array<CGunPart>> gunparts = {
 //CORES
 {
 	//DAMAGE, FIRERATE, BULLET COUNT, SPREAD, RANGE, MOVE SPEED, RECOIL, MAXAMMO, RELOAD SPEED
-	CGunPart(false, 0.5, 8, 1, 2, 512, 1.5, 3, 15, 20, "Pistol").setBarrel(Vec2f(1, 0)).setStock(Vec2f(-2, 0)).setMag(Vec2f(0, 1)).setSemi(true).setTileDamageChance(1),//PISTOL
-	CGunPart(false, 0.4, 4, 1, 3, 512, 1.2, 6, 40, 30, "Assault Rifle").setBarrel(Vec2f(4, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(0, 2)).setTileDamageChance(0.7).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//ASSUALT RIFLE
-	CGunPart(false, 0.3, 2, 1, 4, 512, 1, 6, 60, 50, "Sprayer").setBarrel(Vec2f(2, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(1, 2)).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//SOMETHING, UZI MAYBE
-	CGunPart(false, 1.2, 30, 1, 1, 512, 1, 16, 10, 35, "Charge Rifle").setBarrel(Vec2f(3, 0)).setStock(Vec2f(-5, -2)).setMag(Vec2f(-4, -1)).setGuntype(1).setTileDamageChance(3).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//CHARGE RIFLE
-	CGunPart(false, 0.3, 25, 6, 30, 400, 1, 40, 10, 30, "Shotgun").setBarrel(Vec2f(5, -1)).setStock(Vec2f(-6, 0)).setMag(Vec2f(-1, 0)).setSemi(true).setTileDamageChance(1).setAmmoGUI("AmmoGUIShotgun.png", Vec2f(7, 14)),//SHOTGUN
-	CGunPart(false, 0.9, 20, 1, 1, 512, 1, 40, 10, 40, "Sniper Rifle").setBarrel(Vec2f(5, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-2, 0)).setSemi(true).setTileDamageChance(2.5).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//SNIPER RIFLE
-	CGunPart(false, 0.4, 10, 1, 5, 512, 0.9, 4, 100, 70, "Gatling").setBarrel(Vec2f(6, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-3, 3)).setGuntype(2).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8))//GATLING
+	CGunPart(false, 0.75, 8, 1, 2, 512, 1.5, 3, 15, 20, "Pistol").setBarrel(Vec2f(1, 0)).setStock(Vec2f(-2, 0)).setMag(Vec2f(0, 1)).setSemi(true).setTileDamageChance(1),//PISTOL
+	CGunPart(false, 0.6, 4, 1, 3, 512, 1.2, 6, 40, 30, "Assault Rifle").setBarrel(Vec2f(4, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(0, 2)).setTileDamageChance(0.7).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//ASSUALT RIFLE
+	CGunPart(false, 0.45, 2, 1, 4, 512, 1, 6, 60, 50, "Sprayer").setBarrel(Vec2f(2, 0)).setStock(Vec2f(-3, -1)).setMag(Vec2f(1, 2)).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8)),//SOMETHING, UZI MAYBE
+	CGunPart(false, 1.8, 30, 1, 1, 512, 1, 16, 10, 35, "Charge Rifle").setBarrel(Vec2f(3, 0)).setStock(Vec2f(-5, -2)).setMag(Vec2f(-4, -1)).setGuntype(1).setTileDamageChance(3).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//CHARGE RIFLE
+	CGunPart(false, 0.45, 25, 6, 30, 400, 1, 40, 10, 30, "Shotgun").setBarrel(Vec2f(5, -1)).setStock(Vec2f(-6, 0)).setMag(Vec2f(-1, 0)).setSemi(true).setTileDamageChance(1).setAmmoGUI("AmmoGUIShotgun.png", Vec2f(7, 14)),//SHOTGUN
+	CGunPart(false, 1.35, 20, 1, 1, 512, 1, 40, 10, 40, "Sniper Rifle").setBarrel(Vec2f(5, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-2, 0)).setSemi(true).setTileDamageChance(2.5).setAmmoGUI("AmmoGUIHeavy.png", Vec2f(7, 14)),//SNIPER RIFLE
+	CGunPart(false, 0.6, 10, 1, 5, 512, 0.9, 4, 100, 70, "Gatling").setBarrel(Vec2f(6, 0)).setStock(Vec2f(-6, -1)).setMag(Vec2f(-3, 3)).setGuntype(2).setTileDamageChance(0.5).setAmmoGUI("AmmoGUISmall.png", Vec2f(3, 8))//GATLING
 },
 //BARRELS
 {

@@ -22,6 +22,13 @@ void onTick(CMovement@ this)
 		return;
 	}
 
+	if (//(ultimately in charge of this blob's movement)
+		(blob.isMyPlayer()) ||
+		(blob.isBot() && isServer())
+	) {
+		HandleStuckAtTop(blob);
+	}
+
 	const bool left		= blob.isKeyPressed(key_left);
 	const bool right	= blob.isKeyPressed(key_right);
 	const bool up		= blob.isKeyPressed(key_up);
@@ -39,15 +46,15 @@ void onTick(CMovement@ this)
 	const f32 vellen = shape.vellen;
 	const bool onground = blob.isOnGround() || blob.isOnLadder();
 
-	if(down)
-		blob.getShape().checkCollisionsAgain = true;
+	//if(down)
+	//	blob.getShape().checkCollisionsAgain = true;
 
 	if (is_client && getGameTime() % 3 == 0)
 	{
 		const string fallscreamtag = "_fallingscream";
 		if (vel.y > 0.2f)
 		{
-			if (vel.y > BaseFallSpeed() * 1.8f)
+			if (vel.y > BaseFallSpeed() * 1.8f && !blob.isInInventory())
 			{
 				if (!blob.hasTag(fallscreamtag))
 				{
@@ -88,11 +95,16 @@ void onTick(CMovement@ this)
 		}*/
 	}
 
+	u8 crouch_through = blob.get_u8("crouch_through");
+	if (crouch_through > 0)
+	{
+		crouch_through--;
+		blob.set_u8("crouch_through", crouch_through);
+	}
+
 	if (onground || blob.isInWater())  //also reset when vaulting
 	{
 		moveVars.walljumped_side = Walljump::NONE;
-		moveVars.wallrun_start = pos.y;
-		moveVars.wallrun_current = pos.y;
 		moveVars.fallCount = -1;
 	}
 
@@ -237,7 +249,7 @@ void onTick(CMovement@ this)
 	}
 
 	if (!blob.isOnCeiling() && !isknocked &&
-	        !blob.isOnLadder() && (up || left || right))  //key pressed
+	        !blob.isOnLadder() && (up || left || right || down))  //key pressed
 	{
 		//check solid tiles
 		const f32 ts = map.tilesize;
@@ -268,6 +280,50 @@ void onTick(CMovement@ this)
 
 		const f32 slidespeed = 2.45f;
 
+		// crouch through platforms and crates
+		if (down && !onground && this.getVars().aircount > 2)
+		{
+			blob.set_u8("crouch_through", 3);
+		}
+
+		if (blob.isKeyJustPressed(key_down))
+		{
+			int touching = blob.getTouchingCount();
+			for (int i = 0; i < touching; i++)
+			{
+				CBlob@ b = blob.getTouchingByIndex(i);
+				if ((b.isPlatform() && b.getAngleDegrees() == 0.0f) || b.getName() == "crate")
+				{
+					b.getShape().checkCollisionsAgain = true;
+					blob.getShape().checkCollisionsAgain = true;
+					blob.set_u8("crouch_through", 3);
+				}
+			}
+
+			Vec2f pos = blob.getPosition() + Vec2f(0, 12);
+			CBlob@[] blobs;
+			if (getMap().getBlobsInRadius(pos, 4, blobs))
+			{
+				for (int i = 0; i < blobs.size(); i++)
+				{
+					CBlob@ b = blobs[i];
+					if ((b.isPlatform() && b.getAngleDegrees() == 0.0f) || b.getName() == "crate")
+					{
+						b.getShape().checkCollisionsAgain = true;
+						blob.getShape().checkCollisionsAgain = true;
+						blob.set_u8("crouch_through", 3);
+					}
+				}
+			}
+
+		}
+
+		// cancel any further walljump if not pressing up
+		if (!up)
+		{
+			moveVars.wallrun_count = 1000;
+		}
+ 
 		//wall jumping/running
 		if (up && surface && 									//only on surface
 		        moveVars.walljumped_side != Walljump::BOTH &&		//do nothing if jammed
@@ -281,54 +337,73 @@ void onTick(CMovement@ this)
 
 			bool dust = false;
 
-			if (moveVars.jumpCount > 5) //wait some time to be properly in the air
+			if (moveVars.jumpCount > 3) //wait some time to be properly in the air
 			{
 				//set contact point
 				bool set_contact = false;
+				bool set_contact_candidate = false;
+
+				// only initiate a contact IF the player is not going to waste boosting if it was the first walljump attempt
+				// this has the unfortunate side effect that when wanting to climb 2 air gap large towers the walljump
+				// would ideally be initiated earlier.
+
+				// players can avoid this by tapping up shortly to make a small jump, which will make them reach minimal
+				// velocity faster.
+
+				// to mitigate part of this we also ensure this is only done for the first jump.
+				// this should assist with newbies climbing walls, while letting more advanced players begin walljumps as
+				// early as they want
+
 				if (left && surface_left && (moveVars.walljumped_side == Walljump::RIGHT || jumpedRIGHT || wasNONE))
 				{
-					moveVars.walljumped_side = Walljump::LEFT;
-					moveVars.wallrun_start = pos.y;
-					moveVars.wallrun_current = pos.y + 1.0f;
-					set_contact = true;
+					set_contact_candidate = true;
 				}
 				if (right && surface_right && (moveVars.walljumped_side == Walljump::LEFT || jumpedLEFT || wasNONE))
 				{
-					moveVars.walljumped_side = Walljump::RIGHT;
-					moveVars.wallrun_start = pos.y;
-					moveVars.wallrun_current = pos.y + 1.0f;
+					set_contact_candidate = true;
+				}
+
+				if (set_contact_candidate)
+				{
+					// print("contact candidate @" + getGameTime() + ": side was " + moveVars.walljumped_side);
+
+					// are we starting to hit the wall?
+					// then we want our first climb to be a contact
+					moveVars.wallrun_count = 1000;
+				}
+
+				// set contact immediately if jumping at the wall from an angle; not immediately if hugging wall
+                if (set_contact_candidate && ((vel.y >= -0.0f && vel.y < slidespeed && Maths::Abs(blob.getOldVelocity().x) == 0) || Maths::Abs(blob.getOldVelocity().x) > 0 || !wasNONE))
+				{
+					// print("candidate passes, & our velocity is " + vel.y);
+
+					// ready to hit the wall, and conditions align?
+					// reset wallclimb counters and let's start
+					moveVars.walljumped_side = left ? Walljump::LEFT : Walljump::RIGHT;
+					moveVars.wallrun_count = 0;
 					set_contact = true;
 				}
 
-				//wallrun
-				if (!surface_above && vel.y < slidespeed &&
+				// wallrun: is the player still trying to climb up, and is he not falling too fast to allow it
+				if (vel.y < slidespeed &&
 				        ((left && surface_left && !jumpedLEFT) || (right && surface_right && !jumpedRIGHT) || set_contact))
 				{
-					//within range
-					if (set_contact ||
-					        (pos.y - 1.0f < moveVars.wallrun_current &&
-					         pos.y + 1.0f > moveVars.wallrun_start - map.tilesize * moveVars.wallrun_length))
+					// allow 1st climb "unconditionally" (there were checks above)
+					// allow next climbs depending on a velocity condition
+					const bool should_trigger_climb = set_contact || (!set_contact_candidate && vel.y >= -2.0f);
+
+					// limit climbs to an arbitrarily choosen number
+					if (should_trigger_climb && moveVars.wallrun_count < 2)
 					{
-						moveVars.wallrun_current = Maths::Min(pos.y - 1.0f, moveVars.wallrun_current - 1.0f);
+						vel.Set(0, -moveVars.jumpMaxVel * 1.4f);
+						blob.setVelocity(vel);
 
+						// reduce sound spam, especially when climbing 2 air gap large towers
+						if (!set_contact) { blob.getSprite().PlayRandomSound("/StoneJump"); }
+						dust = true;
+
+						++moveVars.wallrun_count;
 						moveVars.walljumped = true;
-						if (set_contact || getGameTime() % 5 == 0)
-						{
-							dust = true;
-
-							f32 wallrun_speed = moveVars.jumpMaxVel * 1.2f;
-
-							if (vel.y > -wallrun_speed || set_contact)
-							{
-								vel.Set(0, -wallrun_speed);
-								blob.setVelocity(vel);
-							}
-
-							if (!set_contact)
-							{
-								blob.getSprite().PlayRandomSound("/StoneJump");
-							}
-						}
 					}
 					else
 					{
@@ -356,6 +431,13 @@ void onTick(CMovement@ this)
 					{
 						moveVars.walljumped_side = Walljump::JUMPED_RIGHT;
 					}
+				}
+
+				if (surface_above)
+				{
+					// prevent any new walljump on that wall if a wall is blocking us above
+					// but allow one to happen (as the code above will have run)
+					moveVars.wallrun_count = 1000;
 				}
 			}
 
@@ -415,7 +497,6 @@ void onTick(CMovement@ this)
 
 	if (blob.isKeyPressed(key_up) && moveVars.canVault)
 	{
-
 		// boost over corner
 		Vec2f groundNormal = blob.getGroundNormal();
 		bool onMap = blob.isOnMap();
@@ -453,8 +534,7 @@ void onTick(CMovement@ this)
 				moveVars.jumpCount = -3;
 
 				moveVars.walljumped_side = Walljump::NONE;
-				moveVars.wallrun_start = pos.y;
-				moveVars.wallrun_current = pos.y;
+				moveVars.wallrun_count = 1000;
 			}
 		}
 	}
@@ -473,7 +553,7 @@ void onTick(CMovement@ this)
 			moveVars.jumpCount++;
 		}
 
-		if (up && vel.y > -moveVars.jumpMaxVel * moveVars.jumpFactor)
+		if (up && vel.y > -moveVars.jumpMaxVel)
 		{
 			moveVars.jumpStart = 0.7f;
 			moveVars.jumpMid = 0.2f;
@@ -751,16 +831,25 @@ bool checkForSolidMapBlob(CMap@ map, Vec2f pos, CBlob@ blob = null)
 		@_tempShape = _tempBlob.getShape();
 		if (_tempShape.isStatic())
 		{
-			if (_tempBlob.getName() == "wooden_platform")
+			if (blob !is null && (_tempBlob.getName() == "wooden_platform" || _tempBlob.getName() == "bridge"))
 			{
 				f32 angle = _tempBlob.getAngleDegrees();
-				if (angle > 180)
-					angle -= 360;
-				angle = Maths::Abs(angle);
-				if (angle < 30 || angle > 150)
+				Vec2f runnerPos = blob.getPosition();
+				Vec2f platPos = _tempBlob.getPosition();
+
+				if (angle == 90.0f && runnerPos.x > platPos.x && (blob.isKeyPressed(key_left) || blob.wasKeyPressed(key_left)))
 				{
-					return false;
+					// platform is facing right
+					return true;
+
 				}
+				else if(angle == 270.0f && runnerPos.x < platPos.x && (blob.isKeyPressed(key_right) || blob.wasKeyPressed(key_right)))
+				{
+					// platform is facing left
+					return true;
+				}
+
+				return false;
 			}
 
 			if (blob !is null && !blob.doesCollideWithBlob(_tempBlob))
@@ -773,4 +862,42 @@ bool checkForSolidMapBlob(CMap@ map, Vec2f pos, CBlob@ blob = null)
 	}
 
 	return false;
+}
+
+//move us if we're stuck at the top of the map
+void HandleStuckAtTop(CBlob@ this)
+{
+	Vec2f pos = this.getPosition();
+	//at top of map
+	if (pos.y < 16.0f)
+	{
+		CMap@ map = getMap();
+		float y = 2.5f * map.tilesize;
+		//solid underneath
+		if (map.isTileSolid(Vec2f(pos.x, y)))
+		{
+			//"stuck"; check left and right
+			int rad = 10;
+			bool found = false;
+			float tx = pos.x;
+			for (int i = 0; i < rad && !found; i++)
+			{
+				for (int dir = -1; dir <= 1 && !found; dir += 2)
+				{
+					tx = pos.x + (dir * i) * map.tilesize;
+					if (!map.isTileSolid(Vec2f(tx, y)))
+					{
+						found = true;
+					}
+				}
+			}
+			if (found)
+			{
+				Vec2f towards(tx - pos.x, -1);
+				towards.Normalize();
+				this.setPosition(pos + towards * 0.5f);
+				this.AddForce(towards * 10.0f);
+			}
+		}
+	}
 }

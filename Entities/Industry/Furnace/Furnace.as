@@ -146,34 +146,38 @@ void onTick(CBlob@ this)
 		if(this.get_f32("fuel") > 0)
 		{
 			CInventory@ inv = this.getInventory();
-			CBlob@ invitem = inv.getItem(0);
-			if(invitem !is null)
+			for(int i = 0; i < this.getInventory().getItemsCount(); i++)
 			{
-				CBurnableItem@ burnable = getBurnable(invitem.getConfig());
-				if(burnable !is null && invitem.getQuantity() >= burnable.inputquant)
+				CBlob@ invitem = inv.getItem(i);
+				if(invitem !is null)
 				{
-					this.add_u16("burnprogress", 1);
-					addToFuelVallue(this,-1,true);		
-					this.set_bool("active", true);
-					if(this.get_u16("burnprogress") >= burnable.burntime && getNet().isServer())
+					CBurnableItem@ burnable = getBurnable(invitem.getConfig());
+					if(burnable !is null && invitem.getQuantity() >= burnable.inputquant)
 					{
-						invitem.server_SetQuantity(invitem.getQuantity() - burnable.inputquant);
-						if(invitem.getQuantity() <= 0)
-							invitem.server_Die();
-						CBlob@ newblob = server_CreateBlob(burnable.output, this.getTeamNum(), this.getPosition());
-						newblob.server_SetQuantity(burnable.outputquant);
-						newblob.Tag("outputblob");
-						this.add_u16("burnprogress", -burnable.burntime);
-						CItemIO@ output = getItemIO(this, "Output");
-						if(output !is null && output.connection !is null)
+						this.add_u16("burnprogress", 1);
+						addToFuelVallue(this,-1,true);		
+						this.set_bool("active", true);
+						if(this.get_u16("burnprogress") >= burnable.burntime && getNet().isServer())
 						{
-							this.server_PutInInventory(newblob);
+							invitem.server_SetQuantity(invitem.getQuantity() - burnable.inputquant);
+							if(invitem.getQuantity() <= 0)
+								invitem.server_Die();
+							CBlob@ newblob = server_CreateBlob(burnable.output, this.getTeamNum(), this.getPosition());
+							newblob.server_SetQuantity(burnable.outputquant);
+							newblob.Tag("outputblob");
+							this.add_u16("burnprogress", -burnable.burntime);
+							CItemIO@ output = getItemIO(this, "Output");
+							if(output !is null && output.connection !is null)
+							{
+								this.server_PutInInventory(newblob);
+							}
 						}
+						
+						return;
 					}
-					
-					return;
 				}
 			}
+			
 		}
 		this.set_bool("active", false);
 	}

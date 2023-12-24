@@ -29,7 +29,7 @@ class CSwordEquipment : CEquipmentCore
 	CSwordEquipment(float damage, float range, float speed, float knockback, bool jabonly, int jabtime, int slashtime, float lungespeed)
 	{
 		super();
-		this.damage = damage;
+		this.damage = damage * 1.5;
 		this.range = range;
 		this.speed = speed;
 		this.knockback = knockback;

@@ -844,7 +844,7 @@ float sprayAer(int power, float aimdir, float spread, float range, CBlob@ spray,
 	float forcemult = Maths::Max(0, 3.0 - user.getVelocity().Length() / power);
 	float anglesim = (((user.getVelocity().getAngleDegrees() * -1 - (aimdir - 180)) + 540) % 360) - 180;
 	forcemult = Maths::Min(Maths::Max(forcemult, Maths::Abs(anglesim) / 90), 1.5);
-	print("" + forcemult + " " + anglesim);
+	//print("" + forcemult + " " + anglesim);
 	user.setVelocity(user.getVelocity() + Vec2f(1, 0).RotateBy(aimdir + 180) * power * 0.1 * forcemult);
 	return 2;
 }

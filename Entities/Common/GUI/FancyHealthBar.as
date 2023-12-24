@@ -42,19 +42,30 @@ void onRender(CSprite@ this)
 				if(blob.get_s16("hptimeout") > 2)
 				{
 					if(perc <= 0.25 && (getGameTime() % 30 == 0 || (getGameTime() + 2) % 30 == 0))
-						GUI::DrawRectangle(Vec2f(pos2d.x - dim.x + 4, pos2d.y + y + 4), Vec2f(pos2d.x - dim.x + perc * 2.0f * dim.x - 4, pos2d.y + y + dim.y + 0), SColor(0xffffffff));
+						GUI::DrawRectangle(Vec2f(pos2d.x - dim.x + 4, pos2d.y + y + 4), Vec2f(pos2d.x - dim.x + (perc * 2.0f * (dim.x - 4)) + 4, pos2d.y + y + dim.y + 0), SColor(0xffffffff));
 					else
-						GUI::DrawRectangle(Vec2f(pos2d.x - dim.x + 4, pos2d.y + y + 4), Vec2f(pos2d.x - dim.x + perc * 2.0f * dim.x - 4, pos2d.y + y + dim.y + 0), SColor(0xffac1512));
+						GUI::DrawRectangle(Vec2f(pos2d.x - dim.x + 4, pos2d.y + y + 4), Vec2f(pos2d.x - dim.x + (perc * 2.0f * (dim.x - 4)) + 4, pos2d.y + y + dim.y + 0), SColor(0xffac1512));
 				}
 			}
 		}
 	}
+
+	/*CControls@ cont = getControls();
+	if(cont !is null && blob.isMyPlayer())
+	{
+		Vec2f mousepos = cont.getMouseWorldPos() / 8;
+		Vec2f drawpos = cont.getMouseScreenPos();
+
+		{
+			GUI::DrawText("HP: " + blob.getHealth() + "/" + getMaxHealth(blob), drawpos, SColor(255, 255, 255, 255));
+		}
+	}*/
 }
 
 void onHealthChange(CBlob@ this, f32 oldHealth)
 {
 	this.set_s16("hptimeout", 95);
-	damageNumbers(this.getPosition(), (oldHealth - this.getHealth()) * 10, this.getTeamNum());
+	//damageNumbers(this.getPosition(), (oldHealth - this.getHealth()) * 10, this.getTeamNum());
 }
 
 void onTick(CBlob@ this)

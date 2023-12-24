@@ -58,8 +58,10 @@ class PNGLoader
 
 			array<array<CWaterTile>>@ waterdata = @array<array<CWaterTile>>(map.tilemapwidth, array<CWaterTile>(map.tilemapheight, CWaterTile()));
 			array<bool>@ activelayers = @array<bool>(map.tilemapheight, false);
+			array<bool>@ activecolumns = @array<bool>(map.tilemapwidth, false);
 			map.set("waterdata", @waterdata);
 			map.set("activelayers", @activelayers);
+			map.set("activecolumns", @activecolumns);
 
 			while(image.nextPixel())
 			{

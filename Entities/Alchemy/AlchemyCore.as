@@ -484,7 +484,7 @@ void connectSysRender(CBlob@ this)
 		if(fromcontroller !is null && fromcontroller.nodes.size() > hoveredtankid && cam !is null)
 		{
 			INodeCore@ fromtank = fromcontroller.nodes[hoveredtankid];
-			Vec2f drawpos = (fromtank.getWorldPosition(this) - this.getPosition()) / 0.5 * cam.targetDistance + this.getInterpolatedScreenPos();
+			Vec2f drawpos = (fromtank.getWorldPosition(this) - this.getPosition()) / 0.25 * cam.targetDistance + this.getInterpolatedScreenPos();
 			GUI::DrawCircle(drawpos, 8, SColor(255, 255, 255, 255));
 			GUI::SetFont("menu");
 			GUI::DrawTextCentered(fromtank.getName(), drawpos - Vec2f(0, 32), SColor(255, 255, 255, 255));
