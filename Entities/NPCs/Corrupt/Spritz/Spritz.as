@@ -37,8 +37,11 @@ void onTick(CBlob@ this)
 
 			if(closeid != -1)
 			{
-				CBlob@ new = server_CreateBlob("spritzbomb", this.getTeamNum(), this.getPosition());
-				new.set_Vec2f("target", blobs[closeid].getPosition());
+				if(isServer())
+				{
+					CBlob@ new = server_CreateBlob("spritzbomb", this.getTeamNum(), this.getPosition());
+					new.set_Vec2f("target", blobs[closeid].getPosition());
+				}
 				this.set_u16("sporecooldown", 20 + XORRandom(10));
 			}
 			else 

@@ -208,12 +208,12 @@ class PNGLoader
 			switch (pixel.color)
 			{
 			// Tiles
-			case map_colors::tile_ground:           map.SetTile(offset, CMap::tile_ground);           break;
+			case map_colors::tile_ground:           map.SetTile(offset, CMap::tile_ground);           if(XORRandom(500) == 0) spawnBlob(map, "sourcenode", offset, 255, true);	break;
 			case map_colors::tile_ground_back:      map.SetTile(offset, CMap::tile_ground_back);      break;
-			case map_colors::tile_stone:            map.SetTile(offset, CMap::tile_stone);            break;
-			case map_colors::tile_thickstone:       map.SetTile(offset, CMap::tile_thickstone);       break;
+			case map_colors::tile_stone:            map.SetTile(offset, CMap::tile_stone);            if(XORRandom(500) == 0) spawnBlob(map, "sourcenode", offset, 255, true);	break;
+			case map_colors::tile_thickstone:       map.SetTile(offset, CMap::tile_thickstone);       if(XORRandom(500) == 0) spawnBlob(map, "sourcenode", offset, 255, true);	break;
 			case map_colors::tile_bedrock:          map.SetTile(offset, CMap::tile_bedrock);          break;
-			case map_colors::tile_gold:             map.SetTile(offset, CMap::tile_gold);             break;
+			case map_colors::tile_gold:             map.SetTile(offset, CMap::tile_gold);             if(XORRandom(20) == 0) spawnBlob(map, "sourcenode", offset, 255, true); break;
 			case map_colors::tile_castle:           map.SetTile(offset, CMap::tile_castle);           break;
 			case map_colors::tile_castle_back:      map.SetTile(offset, CMap::tile_castle_back);      break;
 			case map_colors::tile_castle_moss:      map.SetTile(offset, CMap::tile_castle_moss);      break;

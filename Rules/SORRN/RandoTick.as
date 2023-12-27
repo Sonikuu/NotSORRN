@@ -145,9 +145,9 @@ void onTick(CRules@ this)
 
 		int xpos = XORRandom(map.tilemapwidth - 20) + 10;
 		bool validspawn = true;
-		for(int x = xpos - 8; x < xpos + 8; x++)//5 is clearance width
+		for(int x = xpos - 8; x < xpos + 8; x++)//8 is clearance width
 		{
-			for(int y = 0; y < 10; y++)//10 here is the clearance we require to spawn
+			for(int y = 0; y < 10; y++)//10 here is the vertical clearance we require to spawn
 			{
 				if(map.isTileSolid(Vec2f(x, y) * 8))
 				{

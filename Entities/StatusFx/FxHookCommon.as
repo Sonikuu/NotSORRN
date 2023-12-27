@@ -606,6 +606,64 @@ class CStatusHealthBoost : CStatusBase
 
 
 
+class CStatusWebbed : CStatusBase
+{
+	void onTick(CBlob@ this)
+	{
+		float movemult = this.get_u16("fxwebbedpower") / 10.0 + 1;
+		RunnerMoveVars@ moveVars;
+		if (!this.get("moveVars", @moveVars))
+		{
+			return;
+		}
+		moveVars.walkFactor /= movemult;
+		moveVars.jumpFactor /= movemult;
+	}
+	string getFxName()
+	{
+		return "fxwebbed";
+	}
+	void renderIcon(Vec2f pos, CBlob@ this)
+	{
+		GUI::DrawIcon("EffectIcons.png", 13, Vec2f(16, 16), pos);
+		GUI::DrawTextCentered("" + this.get_u16("fxwebbedtime") / 30, pos + Vec2f(16, 32), SColor(255, 50, 255, 50));
+		GUI::DrawTextCentered("" + this.get_u16("fxwebbedpower"), pos + Vec2f(16, -8), SColor(255, 50, 255, 50));
+	}
+
+	void onApply(CBlob@ this)
+	{
+		if(isClient())
+		{
+			CSpriteLayer@ l = this.getSprite().addSpriteLayer("fxwebbed", "Webbed.png", 16, 16);
+			//l.TranslateBy(Vec2f(0, 0));
+			l.SetIgnoreParentFacing(true);
+			l.SetRelativeZ(1);
+		}
+	}
+
+	void onRemove(CBlob@ this)
+	{
+		if(isClient())
+		{
+			this.getSprite().RemoveSpriteLayer("fxwebbed");
+		}
+	}
+	
+	string getHoverText(CBlob@ this, bool algo)
+	{
+		if(algo)
+			return "Reduce walking speed and jump height by $RED$((power / 10.0) + 1)$RED$";
+		return "Reduce walking speed and jump height by $RED$" + formatFloat(this.get_u16("fxwebbedpower") / 10.0 + 1, "", 0, 1) + "$RED$";
+	}
+	string getDisplayName()
+	{
+		return "Webbed";
+	}
+}
+
+
+
+
 
 //----------------------------------END CLASS DEFINITIONS---------------------------------------
 
@@ -631,7 +689,8 @@ array<IStatusEffect@> effectlist = {
 	cast<IStatusEffect@>(@CStatusSpeed()),			//9
 	cast<IStatusEffect@>(@CStatusLeap()),			//10
 	cast<IStatusEffect@>(@CStatusPoison()),			//11
-	cast<IStatusEffect@>(@CStatusHealthBoost())		//12
+	cast<IStatusEffect@>(@CStatusHealthBoost()),	//12
+	cast<IStatusEffect@>(@CStatusWebbed())			//13
 };
 
 Vec2f getEffectIconCenter(int i)

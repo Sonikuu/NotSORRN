@@ -4,7 +4,7 @@
 void onInit(CBlob@ this)
 {
 	this.Tag("flesh");
-	//this.Tag("corrupt");
+	this.Tag("corrupt");
 	this.addCommandID("spit");
 	CShape@ shape = this.getShape();
 	shape.SetRotationsAllowed(false);
@@ -26,45 +26,28 @@ void onInit(CBlob@ this)
 
 void onInit(CSprite@ this)
 {
-	/*
-	for(int i = 0; i < 8; i++)
-	{
-		CSpriteLayer@ thigh = this.addSpriteLayer("legupper" + i, 16, 40);
-		thigh.SetFrame(3);
-		//CSpriteLayer@ calf = addSpriteLayer("leglower" + i, 16, 40);
-		//calf.SetFrame(4);
-		Vec2f legmid = Vec2f_lengthdir_deg(20, legmounts[i].getAngleDegrees() * -1) + legmounts[i];
-		float legrot = legmounts[i].getAngleDegrees() * -1;
-		
-		thigh.SetOffset(legmounts[i]);
-		thigh.RotateByDegrees((legrot - 90) * -1, Vec2f_zero);
-	}
-	*/
+
+	this.addSpriteLayer("bod");
+	this.SetVisible(false);
 }
 
 void onTick(CSprite@ this)
 {
-	/*
 	CBlob@ blob = this.getBlob();
-	for(int i = 0; i < 8; i++)
+	if(blob.getAngleDegrees() >= 90 && blob.getAngleDegrees() <= 270)
 	{
-		if(!isLegAttached(blob, i))
-			continue;
-		CSpriteLayer@ thigh = this.getSpriteLayer("legupper" + i);
-
-		float angle = calcJointAngle(blob, i);
-		Vec2f legmid = Vec2f_lengthdir_rad(20, (i >= 4 ? angle : -angle) + Maths::Pi / 2.0) + legmounts[i];
-		float legrot = calcJointAngle(blob, i);
-		if(i < 4)
-			legrot *= -1;
-
-		thigh.ResetTransform();
-		//thigh.SetOffset(legmounts[i]);
-		
-		thigh.RotateByRadians((legrot - legmounts[i].getAngleRadians()), Vec2f_zero);
-		thigh.TranslateBy(Vec2f(0, 20));
-		
-	}*/
+		if(blob.isKeyPressed(key_left))
+			this.getSpriteLayer("bod").SetFacingLeft(false);
+		else if(blob.isKeyPressed(key_right))
+			this.getSpriteLayer("bod").SetFacingLeft(true);
+	}
+	else
+	{
+		if(blob.isKeyPressed(key_left))
+			this.getSpriteLayer("bod").SetFacingLeft(true);
+		else if(blob.isKeyPressed(key_right))
+			this.getSpriteLayer("bod").SetFacingLeft(false);
+	}
 }
 
 //Leggies
@@ -308,7 +291,8 @@ void onTick(CBlob@ this)
 {
 	//if(this.getTickSinceCreated() == 1)
 		//initLegs(this);
-
+	if(getGameTime() % 30 == 0)
+		this.server_Heal(0.25);
 
 
 	if(this.getPlayer() !is null && this.getBrain() !is null)
@@ -316,17 +300,34 @@ void onTick(CBlob@ this)
 	else if(this.getBrain() !is null)
 		this.getBrain().server_SetActive(true);
 
-	/*if(this.isKeyPressed(key_left))
-		this.SetFacingLeft(true);
-	else if(this.isKeyPressed(key_right))
-		this.SetFacingLeft(false);*/
+
+	if(this.get_u16("ramcoold") != 0)
+		this.sub_u16("ramcoold", 1);
+
+	if(this.get_u8("ramtime") != 0)
+		this.sub_u8("ramtime", 1);
+	
+	if(this.isKeyPressed(key_action1) && this.get_u16("ramcoold") == 0 && anyLegAttached(this))
+	{
+		this.set_u16("ramcoold", 30 * 1); //3 sec
+		Vec2f norm = this.getAimPos() - this.getPosition();
+		norm.Normalize();
+
+		this.setVelocity(this.getVelocity() + norm * 10);
+
+		this.set_u8("ramtime", 30);
+
+		this.getShape().checkCollisionsAgain = true;
+	}
+
+
 	if(this.get_u8("spitcoold") != 0)
 		this.sub_u8("spitcoold", 1);
 	
 	if(isServer() && this.isKeyPressed(key_action2) && this.get_u8("spitcoold") == 0)
 	{
-		this.set_u8("spitcoold", 1);
-		CBlob@ b = server_CreateBlob("spit", this.getTeamNum(), this.getPosition());
+		this.set_u8("spitcoold", 15);
+		CBlob@ b = server_CreateBlob("webshot", this.getTeamNum(), this.getPosition());
 		Vec2f norm = this.getAimPos() - this.getPosition();
 		norm.Normalize();
 		b.setVelocity(norm * 8);
@@ -343,6 +344,13 @@ void onDie(CBlob@ this)
 		blob.Tag("custom quantity");
 		blob.server_SetQuantity(1);
 		blob.Init();
+	}
+
+
+	float range = this.getShape().getConsts().radius;
+	for (f32 count = 0.0f ; count < this.getInitialHealth(); count += 0.5f)
+	{
+		ParticleBloodSplat(Vec2f(XORRandom(range) - range / 2.0, XORRandom(range) - range / 2.0) + getRandomVelocity(0, 0.75f + 1.0 * 2.0f * XORRandom(2), 360.0f), false);
 	}
 }
 
@@ -403,6 +411,40 @@ void onCollision(CBlob@ this, CBlob@ blob, bool solid)
 			this.Untag("attacking");
 		}
 	}*/
+
+	if(this.get_u8("ramtime") > 0 && this.getOldVelocity().Length() >= 0)
+	{
+		if(blob !is null)
+			if(solid || blob.hasTag("flesh"))
+				this.server_Hit(blob, (blob.getPosition() + this.getPosition()) / 2.0, this.getOldVelocity(), 3, 10);
+			else
+				return;
+		else
+		{
+			Vec2f norm = this.getOldVelocity();
+			norm.Normalize();
+			Vec2f endpoint = norm * 16.0 + this.getPosition();
+
+			CMap@ map = getMap();
+			if(map !is null)
+			{
+				for(int x = -3; x <= 3; x++)
+				{
+					for(int y = -3; y <= 3; y++)
+					{
+						int count = XORRandom(3) + 1;
+						for(int i = 0; i < count; i++)
+							map.server_DestroyTile(endpoint + Vec2f(x, y) * 8, 1, this);
+					}
+				}
+			}
+		}
+		Vec2f norm = this.getOldVelocity();
+		norm.Normalize();
+		norm *= -1;
+		this.set_u8("ramtime", 0);
+		this.setVelocity(this.getOldVelocity() + norm * 8);
+	}
 }
 
 f32 onHit(CBlob@ this, Vec2f worldPoint, Vec2f velocity, f32 damage, CBlob@ hitterBlob, u8 customData)

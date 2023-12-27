@@ -126,6 +126,25 @@ void corruptTick(Vec2f tilepos, CMap@ map)
 					server_CreateBlob("spritz", -1, (tilepos - Vec2f(0, 1)) * map.tilesize);
 			}
 		}
+		if(XORRandom(1000) == 0)
+		{
+			if(!map.isTileSolid(map.getTileFromTileSpace(tilepos + Vec2f(0, -1))) && map.isTileSolid(map.getTileFromTileSpace(tilepos)))
+			{
+				CBlob@[] blobs;
+				map.getBlobsInRadius(tilepos * map.tilesize, 1024, @blobs);
+				bool dospawn = true;
+				for(int i = 0; i < blobs.size(); i++)
+				{
+					if(blobs[i].getConfig() == "drizz" || blobs[i].getConfig() == "drizzegg")
+					{
+						dospawn = false;
+						break;
+					}
+				}
+				if(dospawn)
+					server_CreateBlob("drizzegg", -1, (tilepos - Vec2f(0, 1)) * map.tilesize);
+			}
+		}
 	}
 }
 

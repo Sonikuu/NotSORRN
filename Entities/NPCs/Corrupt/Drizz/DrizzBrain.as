@@ -36,22 +36,50 @@ void onTick(CBrain@ this)
 				else
 					blob.setKeyPressed(key_left, true);
 					
-				if(map.isTileSolid(map.getTile(blob.getPosition() + Vec2f(blob.isFacingLeft() ? -10 : 10, 0))) && diff.y < 0)
-					blob.setKeyPressed(key_up, false);
+				if(/*map.isTileSolid(map.getTile(blob.getPosition() + Vec2f(blob.isFacingLeft() ? -10 : 10, 0)))*/ diff.y < 32)
+					blob.setKeyPressed(key_down, true);
+
+				if(/*map.isTileSolid(map.getTile(blob.getPosition() + Vec2f(blob.isFacingLeft() ? -10 : 10, 0)))*/ diff.y > -32)
+					blob.setKeyPressed(key_up, true);
 				
-				if(64.0 > (blob.getPosition() - target.getPosition()).Length())
+				if(64.0 > (blob.getPosition() - target.getPosition()).Length() || map.rayCastSolidNoBlobs(blob.getPosition(), target.getPosition()))
 				{
 					if(/*Maths::Abs(diff.y) < 16 && */getGameTime() % 2 == 0)
 					{
-						blob.setKeyPressed(key_action2, true);
+						blob.setKeyPressed(key_action1, true);
+
+						
+					}
+
+					if(blob.get_u16("ramcoold") != 0 && map.rayCastSolidNoBlobs(blob.getPosition(), blob.getPosition() + Vec2f_lengthdir(32, (target.getPosition() - blob.getPosition()).AngleRadians())))
+					{
+						if(blob.isKeyPressed(key_right))
+						{
+							blob.setKeyPressed(key_right, false);
+							blob.setKeyPressed(key_left, true);
+						}
+						else if(blob.isKeyPressed(key_left))
+						{
+							blob.setKeyPressed(key_right, true);
+							blob.setKeyPressed(key_left, false);
+						}
 					}
 					//else if(Maths::Abs(diff.x) < 8)
 					//{
 					//	blob.setKeyPressed(key_up, true);
 					//}
 				}
+
+				if(128.0 > (blob.getPosition() - target.getPosition()).Length() && !map.rayCastSolidNoBlobs(blob.getPosition(), target.getPosition()))
+				{
+					if(getGameTime() % 2 == 0)
+					{
+						blob.setKeyPressed(key_action2, true);
+					}
+				}
+
 			}
-			if(target !is null && ((blob.getPosition() - target.getPosition()).Length() > 256 || target.hasTag("dead") || (target.getPosition() - blob.get_Vec2f("patrol")).Length() > 1024))
+			if(target !is null && ((blob.getPosition() - target.getPosition()).Length() > 512 || target.hasTag("dead") || (target.getPosition() - blob.get_Vec2f("patrol")).Length() > 4096))
 			{
 				this.SetTarget(null);
 			}
