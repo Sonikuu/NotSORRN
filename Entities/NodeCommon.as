@@ -86,6 +86,259 @@ bool switchInsertion(CBlob@ toblob, CBlob@ item, bool probe, CBlob@ fromblob)
 
 array<Vec2f> routingroute;
 
+
+
+class CLogicPlug : INodeCore
+{
+	string name;
+	bool input;
+	Vec2f offset;
+	INodeCore@ connection;
+	u16 connectionid;
+	bool onlymovetagged;
+
+	bool dynamictank;
+	bool dynamicconnection;
+
+	bool logicstate;
+
+	insertionFunc@ insertfunc;
+	u8 transfercooldown;
+	u8 nodeid;
+	u16 thisnetid;
+	array<CLogicPlug@> routingcache;
+	array<Vec2f> localroutingroute;
+	
+	CLogicPlug(string name, bool input, Vec2f offset)
+	{
+		this.name = name;
+		this.input = input;
+		this.offset = offset;
+		//@storage = @CElementalCore();
+		@connection = null;
+		//lasttransfer = -1;
+		dynamictank = false;
+		@insertfunc = null;
+
+		//singleelement = false;
+		//maxelements = 100;
+		//unmixedstorage = false;
+		//onlyele = 255;
+		//tankid = 0;
+		onlymovetagged = false;
+		transfercooldown = 60;
+		nodeid = 0;
+		dynamicconnection = false;
+		logicstate = false;
+	}
+
+	bool isConnectable(INodeCore@ output, CBlob@ blob, CBlob@ toblob)
+	{
+		CBlob@ inputblob = @toblob;
+		CBlob@ outputblob = @blob;
+
+		return (this !is cast<CLogicPlug>(output) && output.isInput() && !this.input && inputblob !is outputblob && (output.getWorldPosition(inputblob) - getWorldPosition(outputblob)).Length() < maxrange && (isSame(output) || true));
+			return true;
+		return false;
+	}
+
+	void connectTo(INodeCore@ node, CBlob@ blob, CBlob@ toblob)
+	{
+		if(isConnectable(node, blob, toblob))
+		{
+			@connection = cast<INodeCore@>(node); 
+			print("did connec");
+		}
+		else
+			print("oof :(");
+	}
+
+
+	void disconnectFrom(INodeCore@ node, CBlob@ blob, CBlob@ toblob)
+	{
+		if(node is connection)
+		{
+			disconnectAll(blob);
+		}
+	}
+
+	void disconnectAll(CBlob@ blob)
+	{
+		@connection = null;
+			
+		CSprite@ sprite = blob.getSprite();
+					
+		if(sprite !is null)
+		{
+			sprite.RemoveSpriteLayer("pipe" + formatInt(nodeid, ""));
+			sprite.RemoveSpriteLayer("pipestart" + formatInt(nodeid, ""));
+			sprite.RemoveSpriteLayer("pipeend" + formatInt(nodeid, ""));
+		}
+
+	}
+
+	void update(CBlob@ blob, int recursionsleft)
+	{
+		bool moving = false;
+		if(connection !is null)
+		{
+			CBlob@ toblob = getBlobByNetworkID(connectionid);
+			//CBlob@ thisblob = getBlobByNetworkID(thisnetid);
+			if(blob is null)
+				return; 
+			if(toblob is null)
+			{
+				if(isServer())
+				{
+					//Detach on death
+					CBitStream params;
+					params.write_u8(nodeid);
+					blob.SendCommand(blob.getCommandID("disconnect"), params);
+				}
+			}
+			else
+			{
+				if((getWorldPosition(blob) - connection.getWorldPosition(toblob)).Length() > maxrange)
+				{
+					if(isServer())
+					{
+						//Detach out of range
+						CBitStream params;
+						params.write_u8(nodeid);
+						blob.SendCommand(blob.getCommandID("disconnect"), params);
+					}
+				}
+				else if(toblob.isInInventory() || blob.isInInventory())
+				{
+					if(isServer())
+					{
+						//Detach if in inv
+						CBitStream params;
+						params.write_u8(nodeid);
+						blob.SendCommand(blob.getCommandID("disconnect"), params);
+					}
+				}
+				else
+				{
+					//Node logic here
+					connection.setState(getState());
+				}
+			}
+		}
+		return;
+	}
+
+	void onRender(CBlob@ blob)
+	{
+		
+		
+		if(blob.getInventory() !is null && connection !is null)
+		{
+
+		}
+	}
+
+	void writeSyncData(CBlob@ blob, CPlayer@ toplayer)
+	{
+		if(connection !is null)
+		{
+			CBlob@ toblob = getBlobByNetworkID(connectionid);
+			if(toblob !is null)
+			{
+				CNodeController@ targcontroll = getNodeController(toblob);
+				CBitStream newparams;
+				newparams.write_u16(0xFFFF);//Shouldnt matter much
+				newparams.write_u8(connection.getID());
+				newparams.write_u16(blob.getNetworkID());
+				newparams.write_u8(nodeid);
+				toblob.server_SendCommandToPlayer(toblob.getCommandID("connect"), newparams, toplayer);
+			}
+		}
+	}
+
+	void readSyncData(CBlob@ blob, CBitStream@ params)
+	{
+		//Nada, for now
+	}
+
+	bool isInput(){return input;}
+	string getName(){return name;}
+	Vec2f getOffset(){return offset;}
+	int getID(){return nodeid;}
+	string getPipeSprite(){return "LogicWire.png";}
+
+	bool isSame(INodeCore@ node)
+	{
+		if(cast<CLogicPlug@>(node) !is null)
+			return true;
+		return false;
+	}	
+
+	void setState(bool newstate)
+	{
+		logicstate = newstate;
+	}
+
+	bool getState()
+	{
+		return logicstate;
+		//You know whats up
+	}
+
+	Vec2f getWorldPosition(CBlob@ blob)
+	{
+		Vec2f tempoffset = offset; 
+		Vec2f topos = blob.getPosition() + tempoffset.RotateBy(blob.getAngleDegrees());
+			
+			
+		if(blob.get_bool("equipped"))
+		{
+			CBlob@ equipper = getBlobByNetworkID(blob.get_u16("equipper"));
+			if(equipper !is null)
+				topos = equipper.getPosition();
+		}
+		
+		return topos;
+	}
+
+	
+
+	void updateSprite(CBlob@ blob, CSprite@ sprite)
+	{
+		{
+			
+			CSpriteLayer@ pipe = sprite.getSpriteLayer("pipe" + nodeid);
+			CSpriteLayer@ pipestart = sprite.getSpriteLayer("pipestart" + nodeid);
+			CSpriteLayer@ pipeend = sprite.getSpriteLayer("pipeend" + nodeid);
+			
+			//MODIFY LATER FOR CUSTOM PIPE COLORING
+			//OR OTHER FANCY EFFECTS
+			if(pipe !is null)
+			{
+				if(!logicstate && pipe.getFrame() == 1)
+				{
+					pipe.SetFrame(4);
+					pipestart.SetFrame(3);
+					pipeend.SetFrame(5);
+				}
+				else if(logicstate && pipe.getFrame() == 4)
+				{
+					pipe.SetFrame(1);
+					pipestart.SetFrame(0);
+					pipeend.SetFrame(2);
+				}
+			}
+		}
+		
+		if(connection !is null && (dynamicconnection))
+		{
+			CBlob@ toblob = getBlobByNetworkID(connectionid);
+			if(toblob !is null)
+				updateSpriteNode(blob, toblob, cast<INodeCore@>(this), cast<INodeCore@>(connection), false);
+		}
+	}
+}
+
 class CItemIO : INodeCore
 {
 	string name;
@@ -904,6 +1157,7 @@ class CNodeController
 {
 	array<CAlchemyTank@> tanks;
 	array<CItemIO@> itemios;
+	array<CLogicPlug@> plugs;
 	array<INodeCore@> nodes;//Backwards compat be like
 	u16 blobnetid;
 	
@@ -933,6 +1187,30 @@ class CNodeController
 		itemios.push_back(@newitemio);
 		nodes.push_back(@newitemio);
 		return @newitemio;
+	}
+
+	CLogicPlug@ addLogicPlug(string name, bool input, Vec2f offset)
+	{
+		CLogicPlug newplug(name, input, offset);
+		//newitemio.tankid = tanks.size();
+		newplug.nodeid = nodes.size();
+		newplug.thisnetid = blobnetid;
+		plugs.push_back(@newplug);
+		nodes.push_back(@newplug);
+		return @newplug;
+	}
+
+
+	CLogicPlug@ getLogicPlug(string name)
+	{
+		for (int i = 0; i < plugs.length; i++)
+		{
+			if(plugs[i].name == name)
+			{
+				return @plugs[i];
+			}
+		}
+		return null;
 	}
 
 	CItemIO@ getItemIO(string name)
@@ -981,15 +1259,25 @@ class CNodeController
 		if(id < tanks.length && id >= 0)
 			return tanks[id];
 		else
-			print("Outside of bounds");
+			print("Outside of bounds - Tanks");
 		return null;
 	}
+
+	CLogicPlug@ getLogicPlug(int id)
+	{
+		if(id < plugs.length && id >= 0)
+			return plugs[id];
+		else
+			print("Outside of bounds - Logic");
+		return null;
+	}
+
 	INodeCore@ getNode(int id)
 	{
 		if(id < nodes.length && id >= 0)
 			return nodes[id];
 		else
-			print("Outside of bounds");
+			print("Outside of bounds - Nodes");
 		return null;
 	}
 }
@@ -1037,6 +1325,23 @@ CItemIO@ addItemIO(CBlob@ blob, string name, bool input, Vec2f offset)
 	return @controller.addItemIO(name, input, offset);
 }
 
+CLogicPlug@ addLogicPlug(CBlob@ blob, string name, bool input, Vec2f offset)
+{
+	CNodeController@ controller;
+	blob.get("nodecontroller", @controller);
+	if(controller is null)
+		return null;
+	return @controller.addLogicPlug(name, input, offset);
+}
+
+CLogicPlug@ getLogicPlug(CBlob@ blob, string name)
+{
+	CNodeController@ controller;
+	blob.get("nodecontroller", @controller);
+	if(controller is null)
+		return null;
+	return @controller.getLogicPlug(name);
+}
 
 CItemIO@ getItemIO(CBlob@ blob, string name)
 {
@@ -1063,6 +1368,15 @@ CAlchemyTank@ getTank(CBlob@ blob, int id)
 	if(controller is null)
 		return null;
 	return @controller.getTank(id);
+}
+
+CLogicPlug@ getLogicPlug(CBlob@ blob, int id)
+{
+	CNodeController@ controller;
+	blob.get("nodecontroller", @controller);
+	if(controller is null)
+		return null;
+	return @controller.getLogicPlug(id);
 }
 
 INodeCore@ getNode(CBlob@ blob, int id)

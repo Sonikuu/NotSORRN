@@ -257,6 +257,22 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 								updateSpriteNode(connecttank, this, cast<INodeCore@>(tfromtank), cast<INodeCore@>(ttotank));
 						}
 					}
+					else if(cast<CLogicPlug@>(fromtank) !is null)
+					{
+						CLogicPlug@ tfromtank = cast<CLogicPlug@>(fromtank);
+						CLogicPlug@ ttotank = cast<CLogicPlug@>(totank);
+						if(tfromtank.connection !is ttotank)
+						{
+							tfromtank.connectTo(ttotank, this, connecttank);
+							tfromtank.connectionid = isequipcmd ? connecttank.getNetworkID() : this.getNetworkID();
+							tfromtank.dynamicconnection = ttotank.dynamictank || tfromtank.dynamictank;
+							
+							if(isequipcmd)
+								updateSpriteNode(this, connecttank, cast<INodeCore@>(ttotank), cast<INodeCore@>(tfromtank));
+							else
+								updateSpriteNode(connecttank, this, cast<INodeCore@>(tfromtank), cast<INodeCore@>(ttotank));
+						}
+					}
 				}
 				if(caller !is null)
 					caller.set_bool("connectingalchemy", false);
@@ -366,7 +382,8 @@ void manageConnectSys(CBlob@ this)
 			((!local.isKeyPressed(key_action1) || local.isKeyJustPressed(key_action1)) && !controller.nodes[i].isInput() && !local.isKeyJustReleased(key_action1))))
 			{
 				if((currmode == 1 && cast<CAlchemyTank@>(controller.nodes[i]) !is null) || 
-				(currmode == 2 && cast<CItemIO@>(controller.nodes[i]) !is null))
+				(currmode == 2 && cast<CItemIO@>(controller.nodes[i]) !is null) ||
+				(currmode == 3 && cast<CLogicPlug@>(controller.nodes[i]) !is null))
 				{
 					nearesttank = i;
 					nearestdist = (thistankpos - mousepos).Length();

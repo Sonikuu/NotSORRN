@@ -43,7 +43,7 @@ void onTick(CBlob@ this)
 			menu.entries.clear();
 			menu.option_notice = "Select Wiring";
 			//CInventory@ inv = this.getInventory();
-			for (uint i = 0; i < 3; i++)
+			for (uint i = 0; i < 4; i++)
 			{
 				{
 					IconWheelMenuEntry entry("wiring" + i);
@@ -125,7 +125,7 @@ void onCreateInventoryMenu(CBlob@ this, CBlob@ forBlob, CGridMenu @gridmenu)
 		{
 			CBitStream params;
 			params.write_u8(3);
-            CGridButton@ button = menu.AddButton("$logic_wire$", "Coming Soon :tm:", this.getCommandID("setwiringmode"), params);
+            CGridButton@ button = menu.AddButton("$logic_wire$", "Logic Wiring", this.getCommandID("setwiringmode"), params);
 			if(this.get_u8("wiringmode") == 3)
 				button.SetSelected(1);
         }

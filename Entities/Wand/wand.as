@@ -296,7 +296,6 @@ void onRender(CSprite@ this)
 	Vec2f[]@ lines;
 	b.get("lines",@lines);
 	
-
 	for(int i = 0; i < lines.size(); i+= 2)
 	{
 		f32 angle = (lines[i] - lines[i+1]).Angle();
@@ -306,8 +305,8 @@ void onRender(CSprite@ this)
 		Vec2f start = lines[i];
 		Vec2f end = lines[i + 1];
 		//Uncomment this to see values when making new spells
-		// GUI::DrawLine2D(lines[i],lines[i+1], SColor(255,255,0,0));
-		// GUI::DrawTextCentered(angle + "\n\n" + valid, (lines[i] + lines[i+1])/2, SColor(255,255,255,255));
+		 GUI::DrawLine2D(lines[i],lines[i+1], SColor(255,255,0,0));
+		 GUI::DrawTextCentered(angle + "\n\n" + valid, (lines[i] + lines[i+1])/2, SColor(255,255,255,255));
 	}
 }
 
