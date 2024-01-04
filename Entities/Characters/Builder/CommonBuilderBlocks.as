@@ -531,7 +531,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 		}
 		{
 			BuildBlock b(0, "itemrelay", "$itemrelay$", "Item Relay\nAll items received by this will automatically and instantly be moved to the next connected structure");
-			AddRequirement(b.reqs, "blob", "mat_component", "Components", 2);
+			AddRequirement(b.reqs, "blob", "mat_component", "Components", 1);
 			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 25);
 			b.buildOnGround = false;
 			b.size.Set(8, 8);
@@ -565,6 +565,38 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			blocks[2].push_back(b);
 			AddIconToken("$itemswitch$", "ItemSwitch.png", Vec2f(24, 8), 0);
 		}
+		
+
+
+		//Logic past this point
+		{
+			BuildBlock b(0, "logiclever", "$logiclever$", "Logic Lever\nCan be toggled on and off");
+			//AddRequirement(b.reqs, "blob", "mat_component", "Components", 4);
+			//AddRequirement(b.reqs, "blob", "mat_wood", "Stone", 75);
+			b.buildOnGround = false;
+			b.size.Set(8, 8);
+			blocks[2].push_back(b);
+			AddIconToken("$logiclever$", "LogicLever.png", Vec2f(8, 8), 0);
+		}
+		{
+			BuildBlock b(0, "logicrelay", "$logicrelay$", "Logic Relay\nSends input to output\nConnect multiple wires to the input to function as an OR gate");
+			//AddRequirement(b.reqs, "blob", "mat_component", "Components", 4);
+			//AddRequirement(b.reqs, "blob", "mat_wood", "Stone", 75);
+			b.buildOnGround = false;
+			b.size.Set(8, 8);
+			blocks[2].push_back(b);
+			AddIconToken("$logicrelay$", "LogicRelay.png", Vec2f(8, 8), 0);
+		}
+		{
+			BuildBlock b(0, "logicsplitter", "$logicsplitter$", "Logic Splitter\nSends input to both outputs");
+			//AddRequirement(b.reqs, "blob", "mat_component", "Components", 4);
+			//AddRequirement(b.reqs, "blob", "mat_wood", "Stone", 75);
+			b.buildOnGround = false;
+			b.size.Set(24, 8);
+			blocks[2].push_back(b);
+			AddIconToken("$logicsplitter$", "LogicSplitter.png", Vec2f(24, 8), 0);
+		}
+
 		BuildBlock[] page_3;
 		blocks.push_back(page_3);
 	}

@@ -3,17 +3,21 @@
 void onInit(CBlob@ this)
 {	
 	//Setup tanks
-	CLogicPlug@ output = addLogicPlug(this, "Output", false, Vec2f(0, 0));
 	CLogicPlug@ input = addLogicPlug(this, "Input", true, Vec2f(0, 0));
+	CLogicPlug@ output = addLogicPlug(this, "Output1", false, Vec2f(-8, 0));
+	CLogicPlug@ output2 = addLogicPlug(this, "Output2", false, Vec2f(8, 0));
+	
 }
 
 void onTick(CBlob@ this)
 {
-	CLogicPlug@ o = getLogicPlug(this, 0);
-	CLogicPlug@ i = getLogicPlug(this, 1);
-	if(i !is null && o !is null)
+	CLogicPlug@ i = getLogicPlug(this, 0);
+	CLogicPlug@ o1 = getLogicPlug(this, 1);
+	CLogicPlug@ o2 = getLogicPlug(this, 2);
+	//if(i !is null && o1 !is null && o2 !is null)
 	{
-		o.setState(i.getState());
+		o1.setState(i.getState());
+		o2.setState(i.getState());
 	}
 }
 
@@ -26,8 +30,6 @@ void onTick(CSprite@ this)
 	else if(!i.getState() && this.getFrame() == 1)
 		this.SetFrame(0);
 }
-
-
 
 
 

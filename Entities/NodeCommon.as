@@ -96,11 +96,14 @@ class CLogicPlug : INodeCore
 	INodeCore@ connection;
 	u16 connectionid;
 	bool onlymovetagged;
+	u32 laststatecheck;
+	u32 lasttrueset;
 
 	bool dynamictank;
 	bool dynamicconnection;
 
 	bool logicstate;
+	bool oldstate;
 
 	insertionFunc@ insertfunc;
 	u8 transfercooldown;
@@ -130,6 +133,7 @@ class CLogicPlug : INodeCore
 		nodeid = 0;
 		dynamicconnection = false;
 		logicstate = false;
+		oldstate = false;
 	}
 
 	bool isConnectable(INodeCore@ output, CBlob@ blob, CBlob@ toblob)
@@ -147,10 +151,7 @@ class CLogicPlug : INodeCore
 		if(isConnectable(node, blob, toblob))
 		{
 			@connection = cast<INodeCore@>(node); 
-			print("did connec");
 		}
-		else
-			print("oof :(");
 	}
 
 
@@ -179,7 +180,12 @@ class CLogicPlug : INodeCore
 
 	void update(CBlob@ blob, int recursionsleft)
 	{
-		bool moving = false;
+		//Realizing now that all nodes run this, but only output nodes really ever do anything lmao
+		//Works for me
+		oldstate = logicstate;
+		laststatecheck = getGameTime();
+		if(lasttrueset < getGameTime() - 2 && input)
+			setState(false);
 		if(connection !is null)
 		{
 			CBlob@ toblob = getBlobByNetworkID(connectionid);
@@ -276,13 +282,22 @@ class CLogicPlug : INodeCore
 
 	void setState(bool newstate)
 	{
-		logicstate = newstate;
+		if(!newstate && lasttrueset != getGameTime())
+			logicstate = newstate;
+		if(newstate)
+		{
+			lasttrueset = getGameTime();
+			logicstate = newstate;
+		}
+			
+		
 	}
 
 	bool getState()
 	{
+		if(laststatecheck != getGameTime())
+			return oldstate;
 		return logicstate;
-		//You know whats up
 	}
 
 	Vec2f getWorldPosition(CBlob@ blob)

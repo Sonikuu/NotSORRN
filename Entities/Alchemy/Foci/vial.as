@@ -1,13 +1,19 @@
 #include "NodeCommon.as"
 
+int BASE_VIAL_MAX = 100;
+float VIAL_COMPACT_BOOST = 2.5;
+
 void onInit(CBlob@ this)
 {
     CAlchemyTank@ tank = addTank(this, "Input", true, Vec2f(0, 0));
-	tank.maxelements = 100;
+	tank.maxelements = BASE_VIAL_MAX;
+	if(this.hasTag("compact"))
+		tank.maxelements *= VIAL_COMPACT_BOOST;
 	tank.singleelement = true;
 	tank.dynamictank = true;
 
-    this.getShape().getConsts().mapCollisions = true;//good code sonic
+    this.getShape().getConsts().mapCollisions = true;//good code sonic  //rood
+    this.addCommandID("upgrade");
 }
 
 void onInit(CSprite@ this)
@@ -21,7 +27,23 @@ void onTick(CBlob@ this)
 {
     CAlchemyTank@ tank = getTank(this, 0);
     int id = firstId(tank);
-    this.setInventoryName(id > -1 ? ("Vial of " + elementlist[id].visiblename) : "Empty Vial");
+	bool enh = this.hasTag("enhanced");
+	bool comp = this.hasTag("compact");
+	string vialname = "";
+	if(id > -1)
+	{
+		if(enh)
+			vialname += "Enhanced ";
+		if(comp)
+			vialname += enh ? "compact " : "Compact ";
+		if(!enh && !comp)
+			vialname += "Vial of " + elementlist[id].visiblename;
+		else
+			vialname += "vial of " + elementlist[id].visiblename;
+	}
+	else
+		vialname = "Empty Vial";
+    this.setInventoryName(vialname);
 }
 
 void onTick(CSprite@ this)
@@ -68,15 +90,59 @@ void onCollision( CBlob@ this, CBlob@ blob, bool solid )
     }
 }
 
+void GetButtonsFor(CBlob@ this, CBlob@ caller)
+{
+	CBitStream params;
+	params.write_u16(caller.getNetworkID());
+    CBlob@ held = caller.getCarriedBlob();
+    if(held !is null)
+    {
+        if((held.getConfig() == "lantern" && !this.hasTag("enhanced")) || (held.getConfig() == "heart" && !this.hasTag("compact")))
+            caller.CreateGenericButton(5, Vec2f_zero, this, this.getCommandID("upgrade"), "Upgrade Vial", params);
+    }
+	
+}
+
+void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
+{
+	if(cmd == this.getCommandID("upgrade"))
+	{  
+        CBlob@ caller = getBlobByNetworkID(params.read_u16());
+		if(caller !is null)
+        {
+            CBlob@ held = caller.getCarriedBlob();
+            if(held !is null)
+            {
+                if(held.getConfig() == "lantern")
+                {
+                    held.server_Die();
+                    this.Tag("enhanced");
+                }
+                else if(held.getConfig() == "heart")
+                {
+                    held.server_Die();
+                    this.Tag("compact");
+                    getTank(this, 0).maxelements *= VIAL_COMPACT_BOOST;
+                }
+            }
+        }
+	}
+}
+
 void onDie(CBlob@ this)
 {
-    Sound::Play("shatter.ogg", this.getPosition(),1, 0.75 + (XORRandom(25)/100.0));
+    Sound::Play("Shatter.ogg", this.getPosition(),1, 0.75 + (XORRandom(25)/100.0));
 
     CAlchemyTank@ tank = getTank(this, 0);
     int id = firstId(tank);
     if(id <= -1){return;}
     f32 ammount = tank.storage.getElement(id);
-    f32 power = ammount/(tank.maxelements * 2); //less stronk than drinking
+    f32 power = ammount / (BASE_VIAL_MAX * 2); //less stronk than drinking
+
+    //For ref: base power: 0.5 | compact boost: * 2.5 | Enhanced: * 2 | Total: 2.5 power
+	
+	if(this.hasTag("enhanced"))
+		power *= 2;
 
     elementlist[id].vialSplashbehavior(this,power);
 

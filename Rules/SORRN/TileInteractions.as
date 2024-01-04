@@ -1,6 +1,7 @@
 //This will store functions that say what a tile does when ticked, or how to convert a tile
 
 #include "CHitters.as";
+#include "LoaderColors.as";
 
 void corruptTile(Vec2f tilepos, CMap@ map)
 {
@@ -162,3 +163,38 @@ bool purifyTile(Vec2f tilepos, CMap@ map)
 	return false;
 }
 
+
+void mapRegenEffect(Vec2f mappos, float power, bool always = false)
+{
+	CMap@ map = getMap();
+	string currmap = map.getMapName();
+	Vec2f worldpos = mappos * map.tilesize;
+	
+	//if(!Texture::exists(currmap + "zzz"))
+		//Texture::createFromFile(currmap + "zzz", currmap);
+	CFileImage@ mapdata = @CFileImage(currmap);
+	
+	//Random rando(XORRandom(0x7FFFFFFF));
+	
+	if(mapdata !is null)
+	{
+		Tile tile = map.getTileFromTileSpace(mappos);
+		if((tile.type == 0 || tile.type == CMap::tile_ground_back || (tile.type >= 406 && tile.type <= 408)) && map.getSectorAtPosition(worldpos, "no build") is null)
+		{
+			mappos.x = int(mappos.x);
+			mappos.y = int(mappos.y);
+			mapdata.setPixelPosition(mappos);
+			SColor tilecol = mapdata.readPixel();
+			//printVec2f("Pos: ", mapdata.getPixelPosition());
+			//print("Col: R:" + tilecol.getRed() + " G:" + tilecol.getGreen() + " B:" + tilecol.getBlue());
+			if(tilecol == map_colors::tile_ground)
+				map.server_SetTile(worldpos, CMap::tile_ground);
+			else if(tilecol == map_colors::tile_stone && (getGameTime() % (10 / power) == 0 || always))
+				map.server_SetTile(worldpos, CMap::tile_stone);
+			else if(tilecol == map_colors::tile_thickstone && (getGameTime() % (15 / power)  == 0 || always))
+				map.server_SetTile(worldpos, CMap::tile_thickstone);
+			else if(tilecol == map_colors::tile_gold && (getGameTime() % (30 / power) == 0 || always))
+				map.server_SetTile(worldpos, CMap::tile_gold);
+		}
+	}
+}

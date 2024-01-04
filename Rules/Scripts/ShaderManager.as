@@ -4,7 +4,8 @@ enum EShaderLayer
 {
     testShader = 2,//game doesn't like it if you don't start at 2 :v
     GolemiteVision,
-    disoriented
+    disoriented,
+	Fog
 }
 
 void onInit(CRules@ this)
@@ -22,6 +23,8 @@ void onInit(CRules@ this)
     }
 
     getDriver().AddShader("disoriented",EShaderLayer::disoriented);
+	getDriver().AddShader("Fog", EShaderLayer::Fog);
+	getDriver().SetShader("Fog",true);
     
 }
 
@@ -76,4 +79,18 @@ void onTick(CRules@ this)
     {
         getDriver().SetShader("disoriented",false);
     }
+	
+	Vec2f center = getLocalPlayerBlob() is null ? Vec2f(getScreenWidth() / 2.0, getScreenHeight() / 2.0) : getLocalPlayerBlob().getScreenPos(); 
+
+    center /= Vec2f(getScreenWidth(), getScreenHeight());
+        center.y = 1.0 - center.y; 
+	getDriver().SetShaderFloat("Fog", "centerposx", center.x);
+	getDriver().SetShaderFloat("Fog", "centerposy", center.y);
+    getDriver().SetShaderFloat("Fog", "zoomlevel", 1.0 / getCamera().targetDistance);
+    getDriver().SetShaderFloat("Fog", "gametime", getGameTime() / 1.0);
+    getDriver().SetShaderFloat("Fog", "density", this.get_f32("rainratio") * 2.0);
+
+    getDriver().SetShaderFloat("Fog", "screenWidth", getScreenWidth());
+    getDriver().SetShaderFloat("Fog", "screenHeight", getScreenHeight());
+	
 }

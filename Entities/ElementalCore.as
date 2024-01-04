@@ -201,7 +201,7 @@ const array<CElementSetup> elementlist =
 	@vialIngestPurity,
 	@vialSplashPurity),
 	
-	CElementSetup//12
+	CElementSetup//12		//I don't think anything is really added by holy and unholy, might remove
 	("unholy",
 	SColor(255, 150, 0, 100),
 	"Unholy",

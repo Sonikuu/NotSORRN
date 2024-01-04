@@ -194,7 +194,7 @@ void InitWorkshop(CBlob@ this)
 		AddIconToken("$mat_component1$", "MaterialComponents.png", Vec2f(16, 16), 1);
 	}
 	{
-		ShopItem@ s = addShopItem(this,  "Element Vial", "$vial$", "vial", "An element holding vial, looks fragile but sturdy enough to drink from ", false);
+		ShopItem@ s = addShopItem(this,  "Element Vial", "$vial$", "vial", "An element holding vial, looks fragile but sturdy enough to drink from\nCan be upgraded with a heart and a lantern (Temporary recipe!)", false);
 		AddRequirement(s.requirements, "blob", "mat_glass", "Glass", 30);
 		
 		AddIconToken("$vial$", "vial.png", Vec2f(8, 8), 0);

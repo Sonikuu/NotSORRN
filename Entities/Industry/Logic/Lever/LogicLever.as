@@ -35,4 +35,14 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 	}
 }
 
+void onTick(CSprite@ this)
+{
+	CLogicPlug@ o = getLogicPlug(this.getBlob(), 0);
+	if(o.getState() && this.getFrame() == 0)
+		this.SetFrame(1);
+	else if(!o.getState() && this.getFrame() == 1)
+		this.SetFrame(0);
+}
+
+
 

@@ -1122,39 +1122,11 @@ float sprayTerra(int power, float aimdir, float spread, float range, CBlob@ spra
 {
 	CMap@ map = getMap();
 	
-	
-	string currmap = map.getMapName();
-	//if(!Texture::exists(currmap + "zzz"))
-		//Texture::createFromFile(currmap + "zzz", currmap);
-	CFileImage@ mapdata = @CFileImage(currmap);
-	
-	//Random rando(XORRandom(0x7FFFFFFF));
-	
-	if(mapdata !is null)
-	{
-		Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * ((XORRandom(800) / 1000.0) + 0.2) + user.getPosition();
-		Vec2f mappos = pos / map.tilesize;
+	Vec2f pos = Vec2f(1, 0).RotateBy(aimdir + (XORRandom(1000) / 500.0 - 1.0) * (spread / 2)) * range * ((XORRandom(800) / 1000.0) + 0.2) + user.getPosition();
+	Vec2f mappos = pos / map.tilesize;
 
-		Tile tile = map.getTileFromTileSpace(mappos);
-		if((tile.type == 0 || tile.type == CMap::tile_ground_back || (tile.type >= 406 && tile.type <= 408)) && map.getSectorAtPosition(pos, "no build") is null)
-		{
-			mappos.x = int(mappos.x);
-			mappos.y = int(mappos.y);
-			mapdata.setPixelPosition(mappos);
-			SColor tilecol = mapdata.readPixel();
-			//printVec2f("Pos: ", mapdata.getPixelPosition());
-			//print("Col: R:" + tilecol.getRed() + " G:" + tilecol.getGreen() + " B:" + tilecol.getBlue());
-			if(tilecol == map_colors::tile_ground)
-				map.server_SetTile(pos, CMap::tile_ground);
-			else if(tilecol == map_colors::tile_stone && getGameTime() % (10 / power) == 0)
-				map.server_SetTile(pos, CMap::tile_stone);
-			else if(tilecol == map_colors::tile_thickstone && getGameTime() % (15 / power) == 0)
-				map.server_SetTile(pos, CMap::tile_thickstone);
-			else if(tilecol == map_colors::tile_gold && getGameTime() % (30 / power) == 0)
-				map.server_SetTile(pos, CMap::tile_gold);
-		}
-	}
-	
+	mapRegenEffect(mappos, power);
+
 	if(getNet().isClient())
 	{
 		for (int i = 0; i < 8; i++)
@@ -1485,7 +1457,7 @@ bool vialSplashForce(CBlob@ vial, f32 power)
 		Vec2f dif = thisPos - otherPos;
 		dif.Normalize();
 
-		blob.setVelocity(blob.getVelocity() + (-dif * power * 32) );
+		blob.setVelocity(blob.getVelocity() + (-dif * power * 15) );
 	}
 	return true;
 }
@@ -1503,7 +1475,7 @@ bool vialSplashAer(CBlob@ vial, f32 power)
 		Vec2f dif = thisPos - otherPos;
 		dif.Normalize();
 
-		blob.setVelocity(blob.getVelocity() + (dif * power * 32) );
+		blob.setVelocity(blob.getVelocity() + (dif * power * 15) );
 	}
 	return true;
 }
@@ -1518,29 +1490,59 @@ bool vialSplashIgnis(CBlob@ vial, f32 power)
 		if(map.rayCastSolidNoBlobs(vial.getPosition(),blob.getPosition())){continue;}
 		vial.server_Hit(blob,blob.getPosition(), Vec2f(0,0),1,Hitters::fire,true);
 	}
+	power *= 4;
+	int range = power;
+	Vec2f tilepos = vial.getPosition() / map.tilesize;
+	for(int i = 0; i < power * power * 3; i++)
+	{
+		map.server_setFireTilespace(tilepos.x + XORRandom(range * 2) - range, tilepos.y + XORRandom(range * 2) - range, true);
+	}
 	return true;
 }
 bool vialSplashTerra(CBlob@ vial, f32 power)
 {
-	for(int i = 0; i < 50 * power; i++)
+	CMap@ map = getMap();
+	power *= 16;
+	int range = Maths::FastSqrt(power);	//Fast squirt lets us increase tiles affected linearly instead of just range
+	Vec2f tilepos = vial.getPosition() / map.tilesize;
+
+	for(int x = -range; x < range; x++)
 	{
-		sprayTerra(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+		for(int y = -range; y < range; y++)
+		{
+			if(Vec2f(x, y).Length() < range)
+				mapRegenEffect(tilepos + Vec2f(x, y), 999);	//999 lol
+		}
 	}
 	return true;
 }
 bool vialSplashOrder(CBlob@ vial, f32 power)
 {
-	for(int i = 0; i < 50 * power; i++)
+	float range = Maths::FastSqrt(power * 24);
+	Vec2f pos = vial.getPosition();
+	CMap@ map = getMap();
+	for(int x = -range; x < range; x++)
 	{
-		sprayOrder(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+		for(int y = -range; y < range; y++)
+		{
+			for(int i = 0; i < power + 1 + XORRandom(2); i++)
+				orderEffect(map, pos + Vec2f(x, y) * 8);
+		}
 	}
 	return true;
 }
 bool vialSplashEntropy(CBlob@ vial, f32 power)
 {
-	for(int i = 0; i < 50 * power; i++)
+	float range = Maths::FastSqrt(power * 24);
+	Vec2f pos = vial.getPosition();
+	CMap@ map = getMap();
+	for(int x = -range; x < range; x++)
 	{
-		sprayEntropy(power * 5, 0, 360, 24 * (power * 2), vial, vial);
+		for(int y = -range; y < range; y++)
+		{
+			for(int i = 0; i < power + 1 + XORRandom(2); i++)
+				entropyEffect(map, pos + Vec2f(x, y) * 8);
+		}
 	}
 	return true;
 }
