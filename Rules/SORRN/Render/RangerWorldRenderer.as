@@ -16,7 +16,7 @@ void onInit(CRules@ this)
 	this.set("RLrender", @listr);
 	this.set("RLgui", @listg);
 	this.set("RLbg", @listb);
-	Render::addScript(Render::layer_objects, "RangerWorldRenderer.as", "renderLists", 0);
+	Render::addScript(Render::layer_tiles, "RangerWorldRenderer.as", "renderLists", 0);
 	Render::addScript(Render::layer_posthud, "RangerWorldRenderer.as", "renderGUI", 0);
 	Render::addScript(Render::layer_background, "RangerWorldRenderer.as", "renderBG", 0);
 }
@@ -80,9 +80,12 @@ void renderLists(int id)
 {
 	Render::SetTransformWorldspace();
 	Render::SetAlphaBlend(true);
+	Render::SetZBuffer(false, false);
 	array<RenderList@>@ list;
 	CRules@ rules = getRules();
+	SMesh@ mesh;
 	rules.get("RLtick", @list);
+	getMap().get("watermesh", @mesh);
 	if(list is null)
 	{
 		print("Null list in renderLists function");
@@ -99,6 +102,11 @@ void renderLists(int id)
 	{
 		//print("Rendering");
 		Render::RawQuads(list[i].sprite, list[i].verts);
+	}
+	if(mesh !is null)
+	{
+		//print("we do be renderin");
+		//mesh.RenderMeshWithMaterial();
 	}
 }
 

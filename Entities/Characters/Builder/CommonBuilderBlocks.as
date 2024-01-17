@@ -271,7 +271,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 	else if(SRN)
 	{
 		{
-			BuildBlock b(0, "workbench", "$workbench$", "Workbench");
+			BuildBlock b(0, "workbench", "$workbench$", "Workbench\nCan be upgraded to a decor bench with a lantern\nCan be upgraded to an armor bench with stone\nCan be upgraded to a crossbow bench with components\nCan be upgraded to a gun bench with metal");
 			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", WARCosts::workbench_wood);
 			b.buildOnGround = true;
 			b.size.Set(32, 16);
@@ -318,7 +318,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			blocks[0].push_back(b);
 		}
 		{
-			BuildBlock b(0, "kitchen", "$kitchen$", "Kitchen\nProduce special food items");
+			BuildBlock b(0, "kitchen", "$kitchen$", "Kitchen\nProduce special food items for powerful buffs");
 			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 200);
 			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 100);
 			AddRequirement(b.reqs, "blob", "mat_component", "Mechanical Components", 8);
@@ -506,6 +506,15 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			blocks[1].push_back(b);
 			AddIconToken("$alchemycompartment$", "AlchemyCompartment.png", Vec2f(32, 32), 0);
 		}
+		{
+			BuildBlock b(0, "alchemygrate", "$alchemygrate$", "Alchemic Grate\nTurns aqua essence back into water");
+			AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 50);
+			AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 50);
+			b.buildOnGround = false;
+			b.size.Set(8, 8);
+			blocks[1].push_back(b);
+			AddIconToken("$alchemygrate$", "AlchemyGrate.png", Vec2f(8, 8), 0);
+		}
 		if(sv_test)
 		{
 			BuildBlock b(0, "alchemycheatmachine", "$alchemycheatmachine$", "dirty dirty cheater");
@@ -517,18 +526,6 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 		BuildBlock[] page_2;
 		blocks.push_back(page_2);
 		//Maybe logic and items can share a page? have a long divider between the two sections, dunno
-		if(getRules().get_bool("is_test"))
-		{
-			{
-				BuildBlock b(0, "switch", "$switch$", "Logic Switch\nToggles between on and off");
-				// AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 750);
-				// AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 100);
-				b.buildOnGround = false;
-				b.size.Set(8, 8);
-				blocks[2].push_back(b);
-				AddIconToken("$switch$", "Switch.png", Vec2f(8, 8), 0);
-			}
-		}
 		{
 			BuildBlock b(0, "itemrelay", "$itemrelay$", "Item Relay\nAll items received by this will automatically and instantly be moved to the next connected structure");
 			AddRequirement(b.reqs, "blob", "mat_component", "Components", 1);
@@ -564,6 +561,16 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			b.size.Set(24, 8);
 			blocks[2].push_back(b);
 			AddIconToken("$itemswitch$", "ItemSwitch.png", Vec2f(24, 8), 0);
+		}
+		
+
+		{
+			BuildBlock b(0, "behavblaha", "$logicbelow$", "Logic Lies Below");
+			//AddRequirement(b.reqs, "blob", "mat_wood", "Black Hole", 1);
+			b.buildOnGround = false;
+			b.size.Set(24 * 8, 8);
+			blocks[2].push_back(b);
+			AddIconToken("$logicbelow$", "LogicBelow.png", Vec2f(24 * 8, 8), 0);
 		}
 		
 

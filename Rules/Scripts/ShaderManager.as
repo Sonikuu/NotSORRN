@@ -23,6 +23,7 @@ void onInit(CRules@ this)
     }
 
     getDriver().AddShader("disoriented",EShaderLayer::disoriented);
+
 	getDriver().AddShader("Fog", EShaderLayer::Fog);
 	getDriver().SetShader("Fog",true);
     
@@ -80,6 +81,7 @@ void onTick(CRules@ this)
         getDriver().SetShader("disoriented",false);
     }
 	
+    
 	Vec2f center = getLocalPlayerBlob() is null ? Vec2f(getScreenWidth() / 2.0, getScreenHeight() / 2.0) : getLocalPlayerBlob().getScreenPos(); 
 
     center /= Vec2f(getScreenWidth(), getScreenHeight());
@@ -92,5 +94,6 @@ void onTick(CRules@ this)
 
     getDriver().SetShaderFloat("Fog", "screenWidth", getScreenWidth());
     getDriver().SetShaderFloat("Fog", "screenHeight", getScreenHeight());
+    
 	
 }

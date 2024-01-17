@@ -100,6 +100,8 @@ void onInit(CBlob@ this)
 	//this.addCommandID("meltitem");
 	CItemIO@ input = @addItemIO(this, "Input", true, Vec2f(0, 0));
 	CItemIO@ output = @addItemIO(this, "Output", false, Vec2f(0, 0));
+
+	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(-8, 4));
 	output.onlymovetagged = true;
 
 	CItemIO@ fuelin = @addItemIO(this, "Fuel Input", true, Vec2f(0, 8));

@@ -56,12 +56,18 @@ class PNGLoader
 			SetupMap(image.getWidth(), image.getHeight());
 			SetupBackgrounds();
 
-			array<array<CWaterTile>>@ waterdata = @array<array<CWaterTile>>(map.tilemapwidth, array<CWaterTile>(map.tilemapheight, CWaterTile()));
-			array<bool>@ activelayers = @array<bool>(map.tilemapheight, false);
-			array<bool>@ activecolumns = @array<bool>(map.tilemapwidth, false);
-			map.set("waterdata", @waterdata);
-			map.set("activelayers", @activelayers);
-			map.set("activecolumns", @activecolumns);
+			
+			if(IS_WATER_ACTIVE)
+			{
+				print("Making arrays in map");
+				array<array<SColor>>@ waterdata = @array<array<SColor>>(map.tilemapheight, array<SColor>(map.tilemapwidth, SColor(0, 0, 0, 0)));
+				array<bool>@ activelayers = @array<bool>(map.tilemapheight, false);
+				array<bool>@ activecolumns = @array<bool>(map.tilemapwidth, false);
+				map.set("waterdata", @waterdata);
+				map.set("activelayers", @activelayers);
+				map.set("activecolumns", @activecolumns);
+			}
+			
 
 			while(image.nextPixel())
 			{
@@ -224,38 +230,49 @@ class PNGLoader
 
 			// Water
 			case map_colors::water_air:
-				map.server_setFloodWaterOffset(offset, true);
-				/*{
-					array<array<CWaterTile>>@ waterdata;
+
+				if(!IS_WATER_ACTIVE)
+				{
+					map.server_setFloodWaterOffset(offset, true);
+				}
+				else 
+				{
+					array<array<SColor>>@ waterdata;
 					array<bool>@ activelayers;
+					array<bool>@ activecolumns;
 
 					map.get("waterdata", @waterdata);
 					map.get("activelayers", @activelayers);
+					map.get("activecolumns", @activecolumns);
+					print("Water set: x:" + offset % map.tilemapwidth + " Y: " + offset / map.tilemapwidth);
 					
-					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].d = 15;
-					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].f = true;
-					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].a = true;
-					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].b = true;
+					waterdata[offset / map.tilemapwidth][offset % map.tilemapwidth].setRed(15);
+					waterdata[offset / map.tilemapwidth][offset % map.tilemapwidth].setBlue(0b1111);
 					activelayers[offset / map.tilemapwidth] = true;
-				}*/
+					activecolumns[offset % map.tilemapwidth] = true;
+				}
 			break;
 			case map_colors::water_backdirt:
-				map.server_setFloodWaterOffset(offset, true);
-
-				/*{
-					array<array<CWaterTile>>@ waterdata;
+				if(!IS_WATER_ACTIVE)
+				{
+					map.server_setFloodWaterOffset(offset, true);
+				}
+				else 
+				{
+					array<array<SColor>>@ waterdata;
 					array<bool>@ activelayers;
+					array<bool>@ activecolumns;
 
 					map.get("waterdata", @waterdata);
 					map.get("activelayers", @activelayers);
-
+					map.get("activecolumns", @activecolumns);
+					print("Water set: x:" + offset % map.tilemapwidth + " Y: " + offset / map.tilemapwidth);
 					
-					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].d = 15;
-					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].f = true;
-					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].a = true;
-					waterdata[offset % map.tilemapwidth][offset / map.tilemapwidth].b = true;
+					waterdata[offset / map.tilemapwidth][offset % map.tilemapwidth].setRed(15);
+					waterdata[offset / map.tilemapwidth][offset % map.tilemapwidth].setBlue(0b1111);
 					activelayers[offset / map.tilemapwidth] = true;
-				}*/
+					activecolumns[offset % map.tilemapwidth] = true;
+				}
 
 				map.SetTile(offset, CMap::tile_ground_back);
 			break;

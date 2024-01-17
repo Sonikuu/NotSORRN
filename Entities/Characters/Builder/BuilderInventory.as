@@ -46,7 +46,7 @@ const string[] PAGE_NAME_SORRN =
 const u8 GRID_SIZE = 48;
 const u8 GRID_PADDING = 12;
 
-const Vec2f MENU_SIZE(6, 6);
+const Vec2f MENU_SIZE(8, 7);
 const u32 SHOW_NO_BUILD_TIME = 90;
 
 void onInit(CInventory@ this)

@@ -105,23 +105,26 @@ void onTick(CRules@ this)
 		float zoom = camera.targetDistance;
 		Vec2f cpos = camera.getPosition();
 		
-		for (int i = 0; i < Maths::Min(raincount, 500); i++)
+		if(!v_fastrender)
 		{
-			float scale = (XORRandom(5) + 3) / 12.0;
-			CRenderParticleDrop newpart(scale, true, true, 60 / scale, 0, partc, true, 0);
-			newpart.velocity = Vec2f(-2.5, 30.0) * scale;
-			newpart.position = Vec2f(XORRandom(getScreenWidth()) + cpos.x - (getScreenWidth() / 2.0), XORRandom(40));
-			
-			float rotdeg = (newpart.velocity.getAngle() - 90) * -1;
-			
-			newpart.ul = Vec2f(0, scale * -1.0).RotateBy(rotdeg);
-			newpart.ur = Vec2f(2 * scale, scale * 0.125).RotateBy(rotdeg);
-			newpart.lr = Vec2f(0, scale * 20.0).RotateBy(rotdeg);
-			newpart.ll = Vec2f(-2 * scale, scale * 0.125).RotateBy(rotdeg);
-			
-			@newpart.heightdata = @heightdata;
-			
-			addParticleToList(newpart);
+			for (int i = 0; i < Maths::Min(raincount, 500); i++)
+			{
+				float scale = (XORRandom(5) + 3) / 12.0;
+				CRenderParticleDrop newpart(scale, true, true, 60 / scale, 0, partc, true, 0);
+				newpart.velocity = Vec2f(-2.5, 30.0) * scale;
+				newpart.position = Vec2f(XORRandom(getScreenWidth()) + cpos.x - (getScreenWidth() / 2.0), XORRandom(40));
+				
+				float rotdeg = (newpart.velocity.getAngle() - 90) * -1;
+				
+				newpart.ul = Vec2f(0, scale * -1.0).RotateBy(rotdeg);
+				newpart.ur = Vec2f(2 * scale, scale * 0.125).RotateBy(rotdeg);
+				newpart.lr = Vec2f(0, scale * 20.0).RotateBy(rotdeg);
+				newpart.ll = Vec2f(-2 * scale, scale * 0.125).RotateBy(rotdeg);
+				
+				@newpart.heightdata = @heightdata;
+				
+				addParticleToList(newpart);
+			}
 		}
 	}
 	

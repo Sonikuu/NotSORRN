@@ -53,7 +53,7 @@ void main()
 
     strength = max(0.0, min(strength, 1.0));
 
-    tex.rgb = tex.rgb * (1.0 - strength) + vec3(1.0 * brightness, 1.0 * brightness, 1.0 * brightness) * strength;
+    tex.rgb = tex.rgb * (1.0 - strength) + vec3(0.5 * brightness, 0.5 * brightness, 0.5 * brightness) * strength;
 
     gl_FragColor = tex;
 }

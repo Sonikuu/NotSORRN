@@ -4,6 +4,7 @@
 #include "MakeDustParticle.as";
 #include "FallDamageCommon.as";
 #include "KnockedCommon.as";
+#include "DynamicFluidCommon.as";
 
 void onInit(CMovement@ this)
 {
@@ -102,7 +103,7 @@ void onTick(CMovement@ this)
 		blob.set_u8("crouch_through", crouch_through);
 	}
 
-	if (onground || blob.isInWater())  //also reset when vaulting
+	if (onground || (blob.isInWater() || (IS_WATER_ACTIVE && dynamicIsInWater(blob.getPosition()))))  //also reset when vaulting
 	{
 		moveVars.walljumped_side = Walljump::NONE;
 		moveVars.fallCount = -1;
@@ -152,7 +153,7 @@ void onTick(CMovement@ this)
 	shape.getVars().onladder = false;
 
 	//swimming - overrides other movement partially
-	if (blob.isInWater() && !isknocked)
+	if ((blob.isInWater() || (IS_WATER_ACTIVE && dynamicIsInWater(blob.getPosition()))) && !isknocked)
 	{
 		CMap@ map = getMap();
 
@@ -169,7 +170,7 @@ void onTick(CMovement@ this)
 		{
 			if (vel.y > -swimspeed)
 			{
-				if (!map.isInWater(pos + Vec2f(0, -8)))
+				if (!(map.isInWater(pos + Vec2f(0, -8)) || (IS_WATER_ACTIVE && dynamicIsInWater(blob.getPosition()))))
 				{
 					waterForce.y -= 0.6f;
 				}

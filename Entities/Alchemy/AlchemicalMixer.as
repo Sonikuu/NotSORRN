@@ -55,6 +55,18 @@ array<CAlchemyMix@> mixrecipes =
 	"force",
 	"aer",
 	"yeet"
+	),
+
+	@CAlchemyMix(
+	"purity",
+	"order",
+	"holy"
+	),
+
+	@CAlchemyMix(
+	"corruption",
+	"entropy",
+	"unholy"
 	)
 };
 

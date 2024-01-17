@@ -2,6 +2,7 @@
 // Almost 100% accurately replicates the legacy minimap drawer
 // This is due to it being a port of the legacy code, provided by Geti
 #include "CustomBlocks.as";
+#include "DynamicFluidCommon.as";
 
 void CalculateMinimapColour( CMap@ map, u32 offset, TileType tile, SColor &out col)
 {
@@ -127,11 +128,26 @@ void CalculateMinimapColour( CMap@ map, u32 offset, TileType tile, SColor &out c
 	}
 
 	///Tint the map based on Fire/Water State
-	if (map.isInWater( pos * ts ))
+	if(IS_WATER_ACTIVE)
 	{
-		col = col.getInterpolated(color_minimap_water,0.5f);
+		array<array<SColor>>@ waterdata;
+		map.get("waterdata", @waterdata);
+		if(waterdata !is null)
+		{
+			if(waterdata[pos.y][pos.x].getRed() > 0)
+				col = col.getInterpolated(color_minimap_water,0.5f);
+		}
 	}
-	else if (map.isInFire( pos * ts ))
+	else 
+	{
+		if (map.isInWater( pos * ts ))
+		{
+			col = col.getInterpolated(color_minimap_water,0.5f);
+		}
+	}
+	
+	
+	if (map.isInFire( pos * ts ))
 	{
 		col = col.getInterpolated(color_minimap_fire,0.5f);
 	}

@@ -8,6 +8,12 @@
 #include "Requirements.as"
 #include "RunnerTextures.as"
 
+
+//Somehow, removing these scripts from the includes in "DynamicFluidCommon" meant they weren't included here somewhere in the include tree
+//I'm not going to figure out how that happened
+#include "RenderParticleCommon.as";
+#include "WorldRenderCommon.as";
+
 //server-only
 void PlaceBlob(CBlob@ this, CBlob @blob, Vec2f cursorPos)
 {

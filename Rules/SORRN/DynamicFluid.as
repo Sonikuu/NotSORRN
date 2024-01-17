@@ -1,9 +1,11 @@
-//Random tile ticking
-//Think ill either have this file handle all interactions or have other scripts 'attach' functions to blocks
+//Fluid simulation
+//Krilling myself
 
 #include "RenderParticleCommon.as";
 #include "WorldRenderCommon.as";
 #include "DynamicFluidCommon.as";
+
+
 
 void onInit(CRules@ this)
 {
@@ -454,7 +456,7 @@ void onRender(CRules@ this)
 
 		const int maxy = Maths::Min(waterdata[0].size(), (cam.getPosition().y + 384 / (cam.targetDistance * 2)) / 8);
 		const int maxx = Maths::Min(waterdata.size(), (cam.getPosition().x + 640 / (cam.targetDistance * 2)) / 8);
-		for(int y = Maths::Max(0, (cam.getPosition().y - 384 / (cam.targetDistance * 2)) / 8); y < maxy; y++)
+		for(int y = Maths::Max(0, (cam.getPosition().y - 384 /*LMAO I forgot what this number represents so I'm leaving it*/ / (cam.targetDistance * 2)) / 8); y < maxy; y++)
 		{
 			//if(!activelayers[y])
 				//continue;
