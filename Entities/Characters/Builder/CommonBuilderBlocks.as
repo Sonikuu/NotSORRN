@@ -97,6 +97,10 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 		blocks[0].push_back(b);
 	}
 
+
+	//Lets just have the whole thing on all gamemodes yeee
+	
+	/*
 	if(CTF)
 	{
 		BuildBlock b(0, "building", "$building$", "Workshop\nStand in an open space\nand tap this button.");
@@ -268,7 +272,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			blocks[3].push_back(b);
 		}
 	}
-	else if(SRN)
+	else if(SRN)*/
 	{
 		{
 			BuildBlock b(0, "workbench", "$workbench$", "Workbench\nCan be upgraded to a decor bench with a lantern\nCan be upgraded to an armor bench with stone\nCan be upgraded to a crossbow bench with components\nCan be upgraded to a gun bench with metal");
@@ -564,14 +568,14 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 		}
 		
 
-		{
+		/*{
 			BuildBlock b(0, "behavblaha", "$logicbelow$", "Logic Lies Below");
 			//AddRequirement(b.reqs, "blob", "mat_wood", "Black Hole", 1);
 			b.buildOnGround = false;
 			b.size.Set(24 * 8, 8);
 			blocks[2].push_back(b);
 			AddIconToken("$logicbelow$", "LogicBelow.png", Vec2f(24 * 8, 8), 0);
-		}
+		}*/
 		
 
 
@@ -602,6 +606,24 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks)
 			b.size.Set(24, 8);
 			blocks[2].push_back(b);
 			AddIconToken("$logicsplitter$", "LogicSplitter.png", Vec2f(24, 8), 0);
+		}
+		{
+			BuildBlock b(0, "logiccontroller", "$logiccontroller$", "Logic Controller\nCan control the state of certain objects when placed adjacent to them");
+			//AddRequirement(b.reqs, "blob", "mat_component", "Components", 4);
+			//AddRequirement(b.reqs, "blob", "mat_wood", "Stone", 75);
+			b.buildOnGround = false;
+			b.size.Set(8, 8);
+			blocks[2].push_back(b);
+			AddIconToken("$logiccontroller$", "LogicController.png", Vec2f(8, 8), 0);
+		}
+		{
+			BuildBlock b(0, "toggleblock", "$toggleblock$", "Toggle Block\nCan be toggled between solid and passable with a controller");
+			//AddRequirement(b.reqs, "blob", "mat_component", "Components", 4);
+			//AddRequirement(b.reqs, "blob", "mat_wood", "Stone", 75);
+			b.buildOnGround = false;
+			b.size.Set(8, 8);
+			blocks[2].push_back(b);
+			AddIconToken("$toggleblock$", "ToggleBlock.png", Vec2f(8, 8), 0);
 		}
 
 		BuildBlock[] page_3;

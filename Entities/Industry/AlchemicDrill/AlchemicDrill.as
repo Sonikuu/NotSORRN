@@ -79,7 +79,7 @@ void onInit(CBlob@ this)
 
 	this.set_u32(last_drill_prop, 0);
 	
-	CAlchemyTank@ tank = addTank(this, "input", true, Vec2f(0, 0));
+	CAlchemyTank@ tank = addTank(this, "Input", true, Vec2f(0, 0));
 	//tank.singleelement = true;
 	tank.dynamictank = true;
 	tank.unmixedstorage = true;

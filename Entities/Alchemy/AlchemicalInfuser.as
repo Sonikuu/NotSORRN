@@ -219,6 +219,8 @@ void onInit(CBlob@ this)
 	CItemIO@ iinput = @addItemIO(this, "Input", true, Vec2f(0, 0));
 	CItemIO@ output = @addItemIO(this, "Output", false, Vec2f(0, 0));
 	output.onlymovetagged = true;
+
+	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(12, -12));
 	//addTank(this, "inputr", true, Vec2f(4, -4));
 	//addTank(this, "output", false, Vec2f(0, 4));
 	this.set_u16("processtime", 0);
@@ -304,7 +306,7 @@ void onTick(CBlob@ this)
 	CInventory@ inv = this.getInventory();
 	
 	CSprite@ sprite = this.getSprite();
-	if(input !is null && inv !is null)
+	if(input !is null && inv !is null && !getDisabled(this))
 	{
 		for(int i = 0; i < input.storage.elements.length; i++)
 		{

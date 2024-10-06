@@ -94,7 +94,7 @@ void onCreateInventoryMenu(CBlob@ this, CBlob@ forBlob, CGridMenu @gridmenu)
 	Vec2f ul = gridmenu.getUpperLeftPosition();
     Vec2f lr = gridmenu.getLowerRightPosition();
 
-    Vec2f pos = Vec2f(ul.x, (ul.y + lr.y) / 2) + Vec2f(-84, -216);
+    Vec2f pos = Vec2f(ul.x, (ul.y + lr.y) / 2) + Vec2f(-132, -216);
     CGridMenu@ menu = CreateGridMenu(pos, this, Vec2f(1, 4), "Wiring Mode\nTry ctrl to quick change!");
     
     if (menu !is null)

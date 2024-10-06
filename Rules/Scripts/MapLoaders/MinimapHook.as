@@ -132,7 +132,7 @@ void CalculateMinimapColour( CMap@ map, u32 offset, TileType tile, SColor &out c
 	{
 		array<array<SColor>>@ waterdata;
 		map.get("waterdata", @waterdata);
-		if(waterdata !is null)
+		if(waterdata !is null && pos.y < waterdata.size() && pos.x < waterdata[0].size())
 		{
 			if(waterdata[pos.y][pos.x].getRed() > 0)
 				col = col.getInterpolated(color_minimap_water,0.5f);

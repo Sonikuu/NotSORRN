@@ -12,6 +12,8 @@ void onInit(CBlob@ this)
 	CItemIO@ fuelin = @addItemIO(this, "Fuel Input", true, Vec2f(0, 12));
 	@fuelin.insertfunc = @fuelInsertionFunc;
 	fuelInit(this);
+
+	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(4, -12));
 	
 	//this.addCommandID("meltitem");
 	
@@ -51,7 +53,7 @@ void onTick(CBlob@ this)
 	CSprite@ sprite = this.getSprite();
 	if(getGameTime() % 2 == 0)
 	{
-		if(this.get_f32("fuel") > 0)
+		if(this.get_f32("fuel") > 0 && !getDisabled(this))
 		{
 			//if(sprite !is null)
 			//	sprite.SetFrame(1);

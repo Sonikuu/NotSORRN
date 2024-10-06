@@ -7,6 +7,8 @@ void onInit(CBlob@ this)
 	tank.dynamictank = true;
 	tank.singleelement = true;
 	tank.maxelements = 50;
+
+	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(0, 0));
 	
 	this.addCommandID("activate");
 	
@@ -30,6 +32,7 @@ void onInit(CBlob@ this)
 
 void onTick(CBlob@ this)
 {
+	this.set_bool("active", !getDisabled(this));
 	if(this.get_u16("cooldown") != 0)
 		this.add_u16("cooldown", -1);
 	else
@@ -62,7 +65,7 @@ void onTick(CBlob@ this)
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
 	CBitStream params;
-	caller.CreateGenericButton("$toggle_pad$", Vec2f(0, -12), this, this.getCommandID("toggle"), this.get_bool("active") ? "Deactivate Pad" : "Reactivate Pad");
+	//caller.CreateGenericButton("$toggle_pad$", Vec2f(0, -12), this, this.getCommandID("toggle"), this.get_bool("active") ? "Deactivate Pad" : "Reactivate Pad");
 	
 	caller.CreateGenericButton("$flip_pad$", Vec2f(0, 0), this, this.getCommandID("flip"), "Flip Pad");
 }

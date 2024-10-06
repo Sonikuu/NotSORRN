@@ -91,7 +91,8 @@ void onInit(CInventory@ this)
 
 void MakeBlocksMenu(CInventory@ this, const Vec2f &in INVENTORY_CE)
 {
-	const bool SRN = getRules().gamemode_name == "SORRN";
+	const bool SRN = getRules().gamemode_name == "SORRN" || true;
+	
 	
 	CBlob@ blob = this.getBlob();
 	if(blob is null) return;

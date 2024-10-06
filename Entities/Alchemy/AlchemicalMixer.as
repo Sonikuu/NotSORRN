@@ -77,7 +77,8 @@ void onInit(CBlob@ this)
 	addTank(this, "Left Input", true, Vec2f(-4, -4));
 	addTank(this, "Right Input", true, Vec2f(4, -4));
 	addTank(this, "Output", false, Vec2f(0, 4));
-	
+
+	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(4, -4));
 }
 
 void onTick(CBlob@ this)
@@ -86,7 +87,7 @@ void onTick(CBlob@ this)
 	CAlchemyTank@ inputr = getTank(this, "Right Input");
 	CAlchemyTank@ output = getTank(this, "Output");
 	
-	if(inputl !is null && inputr !is null && output !is null)
+	if(inputl !is null && inputr !is null && output !is null && !getDisabled(this))
 	{
 		for(int i = 0; i < inputl.storage.elements.length; i++)
 		{

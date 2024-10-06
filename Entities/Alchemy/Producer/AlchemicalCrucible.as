@@ -193,6 +193,7 @@ void onInit(CBlob@ this)
 	//Setup tanks
 	addTank(this, "Output", false, Vec2f(0, -12));
 	addItemIO(this, "Input", true, Vec2f(0, 0));
+	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(4, 0));
 
 	CItemIO@ fuelin = @addItemIO(this, "Fuel Input", true, Vec2f(0, 12));
 	@fuelin.insertfunc = @fuelInsertionFunc;
@@ -235,6 +236,11 @@ void onTick(CSprite@ this)
 void onTick(CBlob@ this)
 {
 	CSprite@ sprite = this.getSprite();
+	if(getDisabled(this))
+	{
+		this.Untag("active");
+		return;
+	}
 	if(getGameTime() % 2 == 0)
 	{
 		if(this.get_u16("burncooldown") == 0 && this.get_f32("fuel") > 0)

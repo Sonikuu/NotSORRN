@@ -101,7 +101,7 @@ void onInit(CBlob@ this)
 	CItemIO@ input = @addItemIO(this, "Input", true, Vec2f(0, 0));
 	CItemIO@ output = @addItemIO(this, "Output", false, Vec2f(0, 0));
 
-	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(-8, 4));
+	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(4, -8));
 	output.onlymovetagged = true;
 
 	CItemIO@ fuelin = @addItemIO(this, "Fuel Input", true, Vec2f(0, 8));
@@ -145,7 +145,7 @@ void onTick(CBlob@ this)
 	CSprite@ sprite = this.getSprite();
 	if(getGameTime() % 2 == 0)
 	{
-		if(this.get_f32("fuel") > 0)
+		if(this.get_f32("fuel") > 0 && !getDisabled(this))
 		{
 			CInventory@ inv = this.getInventory();
 			for(int i = 0; i < this.getInventory().getItemsCount(); i++)

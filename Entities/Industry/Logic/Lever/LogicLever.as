@@ -20,7 +20,7 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
 	CBitStream params;
 	params.write_u8(this.get_bool("leverstate") ? 1 : 0);
-	caller.CreateGenericButton(2, Vec2f_zero, this, this.getCommandID("flip"), "Attach Part", params);
+	caller.CreateGenericButton(2, Vec2f_zero, this, this.getCommandID("flip"), "Flip Lever", params);
 }
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)

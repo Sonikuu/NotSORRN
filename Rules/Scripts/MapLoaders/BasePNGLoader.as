@@ -59,7 +59,7 @@ class PNGLoader
 			
 			if(IS_WATER_ACTIVE)
 			{
-				print("Making arrays in map");
+				//print("Making arrays in map");
 				array<array<SColor>>@ waterdata = @array<array<SColor>>(map.tilemapheight, array<SColor>(map.tilemapwidth, SColor(0, 0, 0, 0)));
 				array<bool>@ activelayers = @array<bool>(map.tilemapheight, false);
 				array<bool>@ activecolumns = @array<bool>(map.tilemapwidth, false);
@@ -244,7 +244,7 @@ class PNGLoader
 					map.get("waterdata", @waterdata);
 					map.get("activelayers", @activelayers);
 					map.get("activecolumns", @activecolumns);
-					print("Water set: x:" + offset % map.tilemapwidth + " Y: " + offset / map.tilemapwidth);
+					//print("Water set: x:" + offset % map.tilemapwidth + " Y: " + offset / map.tilemapwidth);
 					
 					waterdata[offset / map.tilemapwidth][offset % map.tilemapwidth].setRed(15);
 					waterdata[offset / map.tilemapwidth][offset % map.tilemapwidth].setBlue(0b1111);
@@ -266,7 +266,7 @@ class PNGLoader
 					map.get("waterdata", @waterdata);
 					map.get("activelayers", @activelayers);
 					map.get("activecolumns", @activecolumns);
-					print("Water set: x:" + offset % map.tilemapwidth + " Y: " + offset / map.tilemapwidth);
+					//print("Water set: x:" + offset % map.tilemapwidth + " Y: " + offset / map.tilemapwidth);
 					
 					waterdata[offset / map.tilemapwidth][offset % map.tilemapwidth].setRed(15);
 					waterdata[offset / map.tilemapwidth][offset % map.tilemapwidth].setBlue(0b1111);

@@ -1442,6 +1442,14 @@ void addToTank(CAlchemyTank@ tank, string element, int count)
 	}
 }
 
+bool getDisabled(CBlob@ this)	//Gets the "disabled" logic plug, returns it's state
+{
+	CLogicPlug@ p = getLogicPlug(this, "Disable");
+	if(p !is null)
+		return p.logicstate;
+	return false;
+}
+
 void addToTank(CAlchemyTank@ tank, int element, int count)
 {
 	if(element < elementlist.size() && tank !is null)

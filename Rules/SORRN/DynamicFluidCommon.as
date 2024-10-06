@@ -94,7 +94,7 @@ bool dynamicIsInWater(Vec2f pos)
 	array<array<SColor>>@ waterdata;
 
 	map.get("waterdata", @waterdata);
-	if(waterdata.size() == 0)//This can happen sometimes on nextmap
+	if(waterdata is null || waterdata.size() == 0)//This can happen sometimes on nextmap
 		return false;	
 
 	if(waterdata !is null && pos.x >= 0 && pos.y >= 0 && pos.x < waterdata[0].size() && pos.y < waterdata.size())

@@ -24,6 +24,7 @@ void onInit(CRules@ this)
 	this.addCommandID("removewater");
 	onRestart(this);
 	//In staging the object render layer is affected by the lightmap
+	//Partially hmm
 	Render::addScript(Render::layer_objects, "DynamicFluidSColor.as", "renderWater", 0);
 }
 
@@ -121,14 +122,16 @@ void onTick(CRules@ this)
 			CBlob@ blob = @blobs[i];
 			Vec2f pos = blob.getPosition() / map.tilesize;
 			CShape@ shape = blob.getShape();
-			if(shape !is null && pos.x >= 0 && pos.x < map.tilemapwidth && pos.y >= 0 && pos.y < map.tilemapheight)
+			if(shape !is null && !blob.isInInventory() && pos.y >= 0 && pos.y < waterdata.size() && pos.x >= 0 && pos.x < waterdata[0].size())
 			{
 				if(waterdata[pos.y][pos.x].getRed() > 0)
 				{
-					if(!shape.getVars().inwater && blob.getVelocity().Length() > 3.0)
+					if(!shape.getVars().inwater && blob.getOldVelocity().Length() > 2.5)
 					{
-						Sound::Play("SplashSlow.ogg", blob.getPosition(), blob.getVelocity().Length() / 3.0);
-						map.SplashEffect(blob.getPosition(), blob.getVelocity() * -1, shape.getWidth() / 2.0);
+						//print("vel: " + blob.getOldVelocity().Length());
+						//print("x: " + blob.getOldVelocity().x + " y: " + blob.getOldVelocity().y);
+						Sound::Play(blob.getOldVelocity().Length() > 4.5 ? "SplashSlow.ogg" : "SplashFast.ogg", blob.getPosition(), blob.getOldVelocity().Length() / 3.0);
+						map.SplashEffect(blob.getPosition(), blob.getOldVelocity() * -1, shape.getWidth() / 2.0);
 					}
 					
 					shape.getVars().inwater = true;
@@ -1150,12 +1153,12 @@ void onRender(CRules@ this)
 		}
 		#endif
 
-		
+		/*
 		if(cont !is null)
 		{
 			Vec2f mousepos = cont.getMouseWorldPos() / 8;
 			Vec2f drawpos = cont.getMouseScreenPos();
-
+			
 			if(mousepos.x >= 0 && mousepos.x < waterdata[0].size() && mousepos.y >= 0 && mousepos.y < waterdata.size())
 			{
 				GUI::DrawText("Depth: " + waterdata[mousepos.y][mousepos.x].getRed(), drawpos, SColor(255, 255, 255, 255));
@@ -1166,7 +1169,7 @@ void onRender(CRules@ this)
 				GUI::DrawText("Press K to spawn water", drawpos + Vec2f(0, 120), SColor(255, 255, 255, 255));
 				GUI::DrawText("Press L to remove water", drawpos + Vec2f(0, 140), SColor(255, 255, 255, 255));
 			}
-		}
+		}*/
 
 		if(cont.isKeyPressed(KEY_KEY_P))
 		{

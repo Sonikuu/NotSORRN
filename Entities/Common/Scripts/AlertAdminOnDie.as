@@ -60,3 +60,8 @@ string formatPlayerName(CPlayer@ player)
 }*/
 
 //Vanilla can sugma
+
+void onInit(CBlob@ this)
+{
+	//Staging doesnt like building an empty module so
+}

@@ -8,6 +8,7 @@ void onInit(CBlob@ this)
 	CAlchemyTank@ tank = addTank(this, "Input", true, Vec2f(0, 4));
 	tank.maxelements = 10;
 	tank.singleelement = true;
+	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(0, 4));
 	//getTank(this, 0).dynamictank = true;
 	
 	//this.addCommandID("activate");
@@ -123,6 +124,7 @@ void renderArea(CBlob@ this, int id)
 void onTick(CBlob@ this)
 {
 	this.set_u8("lasteleid", 255);
+	this.set_bool("active", !getDisabled(this));
 	if(this.get_bool("active"))
 	{
 		CAlchemyTank@ tank = getTank(this, 0);
@@ -146,6 +148,7 @@ void onTick(CBlob@ this)
 	}
 }
 
+/*
 void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
 	CBitStream params;
@@ -153,7 +156,7 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 	caller.CreateGenericButton("$toggle_pad$", Vec2f(0, -12), this, this.getCommandID("toggle"), this.get_bool("active") ? "Deactivate Ward" : "Reactivate Ward", params);
 	
 	//caller.CreateGenericButton("$flip_pad$", Vec2f(0, 0), this, this.getCommandID("flip"), "Flip Pad");
-}
+}*/
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream@ params)
 {

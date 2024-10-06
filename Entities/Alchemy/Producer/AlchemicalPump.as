@@ -4,6 +4,7 @@
 void onInit(CBlob@ this)
 {	
 	addTank(this, "Output", false, Vec2f(0, -12));
+	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(12, -12));
 	
 	this.set_TileType("background tile", CMap::tile_castle_back);
 }
@@ -17,7 +18,7 @@ void onInit(CSprite@ this)
 
 void onTick(CBlob@ this)
 {
-	if(getGameTime() % 10 == 0)
+	if(getGameTime() % 10 == 0 && !getDisabled(this))
 	{
 		CMap@ map = getMap();
 		if(IS_WATER_ACTIVE)

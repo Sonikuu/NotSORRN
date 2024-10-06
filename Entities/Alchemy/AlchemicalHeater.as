@@ -9,6 +9,8 @@ void onInit(CBlob@ this)
 	tank.onlyele = 5;//5 Is ignis
 	tank.maxelements = 250;
 	this.set_u16("dumptotal", 0);
+
+	CLogicPlug@ disable = @addLogicPlug(this, "Disable", true, Vec2f(4, 0));
 	
 }
 
@@ -27,7 +29,7 @@ void onTick(CBlob@ this)
 {
 	CAlchemyTank@ input = getTank(this, 0);
 	
-	if(input !is null && getGameTime() % 100 == 0)
+	if(input !is null && getGameTime() % 100 == 0 && !getDisabled(this))
 	{
 		//for(int i = 0; i < input.storage.elements.length; i++)
 		{
