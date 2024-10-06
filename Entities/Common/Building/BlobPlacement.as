@@ -453,7 +453,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 			{
 				Vec2f pos = params.read_Vec2f();
 				PlaceBlob(this, carryBlob, pos);
-				SendGameplayEvent(createBuiltBlobEvent(this.getPlayer(), carryBlob.getName()));
+				GE_BuildBlob(this.getPlayer().getNetworkID(), carryBlob.getName());
 			}
 		}
 	}

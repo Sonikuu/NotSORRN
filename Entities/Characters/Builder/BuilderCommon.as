@@ -144,7 +144,7 @@ CBlob@ server_BuildBlob(CBlob@ this, BuildBlock[]@ blocks, uint index)
 		this.getSprite().PlaySound("/Construct");
 		// take inv here instead of in onDetach
 		server_TakeRequirements(inv, b.reqs);
-		SendGameplayEvent(createBuiltBlobEvent(this.getPlayer(), b.name));
+		GE_BuildBlob(this.getPlayer().getNetworkID(), b.name);
 	}
 
 	this.set_u8("buildblob", index);

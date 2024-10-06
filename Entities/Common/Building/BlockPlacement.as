@@ -23,7 +23,7 @@ void PlaceBlock(CBlob@ this, u8 index, Vec2f cursorPos)
 		server_TakeRequirements(inv, bc.reqs);
 		getMap().server_SetTile(cursorPos, bc.tile);
 
-		SendGameplayEvent(createBuiltBlockEvent(this.getPlayer(), bc.tile));
+		GE_BuildBlock(this.getPlayer().getNetworkID(), bc.tile);
 	}
 }
 

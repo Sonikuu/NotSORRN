@@ -7,7 +7,7 @@ void onInit(CBlob@ this)
 		this.set_string("eat sound", "/Eat.ogg");
 	}
 
-	this.addCommandID(heal_id);
+	this.addCommandID("heal command client");
 
 	this.Tag("Eatable");
 }
